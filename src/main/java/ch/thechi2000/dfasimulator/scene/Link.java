@@ -1,16 +1,20 @@
 package ch.thechi2000.dfasimulator.scene;
 
+import ch.thechi2000.dfasimulator.simulator.Path;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 public class Link extends Group
 {
     private final StateNode from;
     private final StateNode to;
-    private final Line line;
 
-    public Link(StateNode from, StateNode to)
+    private final Line line, leftLine, rightLine;
+    private final Text alphabetDisplay;
+
+    public Link(StateNode from, StateNode to, Path path)
     {
         this.from = from;
         this.to = to;
@@ -18,32 +22,65 @@ public class Link extends Group
         line = new Line();
         line.fillProperty().bind(Constants.Link.Line.color);
         line.strokeWidthProperty().bind(Constants.Link.Line.width);
-        updateLinePosition();
 
-        from.layoutXProperty().addListener((o, ov, nv) -> updateLinePosition());
-        from.layoutYProperty().addListener((o, ov, nv) -> updateLinePosition());
+        leftLine = new Line();
+        leftLine.fillProperty().bind(Constants.Link.Line.color);
+        leftLine.strokeWidthProperty().bind(Constants.Link.Line.width);
 
-        to.layoutXProperty().addListener((o, ov, nv) -> updateLinePosition());
-        to.layoutYProperty().addListener((o, ov, nv) -> updateLinePosition());
+        rightLine = new Line();
+        rightLine.fillProperty().bind(Constants.Link.Line.color);
+        rightLine.strokeWidthProperty().bind(Constants.Link.Line.width);
 
-        Constants.Node.Circle.radius.addListener((o, ov, nv) -> updateLinePosition());
+        alphabetDisplay = new Text();
+        alphabetDisplay.setText(String.join(", ", path.getAlphabet()));
 
-        getChildren().add(line);
+        updatePositions();
+
+        from.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
+        from.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
+
+        to.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
+        to.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
+
+        Constants.Node.Circle.radius.addListener((o, ov, nv) -> updatePositions());
+
+        getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
     }
 
-    private void updateLinePosition()
+    private void updatePositions()
     {
-        Point2D start = new Point2D(from.getLayoutX(), from.getLayoutY()),
-                end = new Point2D(to.getLayoutX(), to.getLayoutY()),
-                director = end.subtract(start).normalize().multiply(Constants.Node.Circle.radius.get());
-
-        start = start.add(director);
-        end = end.subtract(director);
+        Point2D startCenter = new Point2D(from.getLayoutX(), from.getLayoutY()),
+                endCenter = new Point2D(to.getLayoutX(), to.getLayoutY()),
+                director = endCenter.subtract(startCenter).normalize(),
+                normal = new Point2D(director.getY(), -director.getX()),
+                start = startCenter.add(director.multiply(Constants.Node.Circle.radius.get())),
+                end = endCenter.subtract(director.multiply(Constants.Node.Circle.radius.get()));
 
         line.setStartX(start.getX());
         line.setStartY(start.getY());
-
         line.setEndX(end.getX());
         line.setEndY(end.getY());
+
+        Point2D projectionPoint = end.subtract(director.multiply(Constants.Link.Line.sidelineLength.get())),
+                projectionDistance = normal.multiply(Constants.Link.Line.sidelineLength.get()),
+                leftStart = projectionPoint.add(projectionDistance),
+                rightStart = projectionPoint.subtract(projectionDistance);
+
+        leftLine.setStartX(leftStart.getX());
+        leftLine.setStartY(leftStart.getY());
+        leftLine.setEndX(end.getX());
+        leftLine.setEndY(end.getY());
+
+        rightLine.setStartX(rightStart.getX());
+        rightLine.setStartY(rightStart.getY());
+        rightLine.setEndX(end.getX());
+        rightLine.setEndY(end.getY());
+
+        Point2D mid = start.midpoint(end),
+                textPos = mid.add(normal.multiply(Constants.Link.Text.distance.get()));
+        alphabetDisplay.relocate(textPos.getX(), textPos.getY());
+
+        var angle = new Point2D(1, 0).angle(director);
+        alphabetDisplay.setRotate(director.getY() > 0 ? angle : -angle);
     }
 }

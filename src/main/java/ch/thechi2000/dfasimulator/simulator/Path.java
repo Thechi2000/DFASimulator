@@ -4,6 +4,13 @@ import java.util.List;
 
 public class Path
 {
+    public Path(State from, State to, List<String> alphabet)
+    {
+        this.alphabet = alphabet;
+        this.from = from;
+        this.to = to;
+    }
+
     public List<String> getAlphabet()
     {
         return alphabet;
@@ -17,6 +24,7 @@ public class Path
         return to;
     }
 
-    private List<String> alphabet;
-    private State from, to;
+    private final List<String> alphabet;
+    private final State from;
+    private final State to;
 }

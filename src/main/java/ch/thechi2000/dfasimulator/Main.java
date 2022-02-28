@@ -1,12 +1,15 @@
 package ch.thechi2000.dfasimulator;
 
 import ch.thechi2000.dfasimulator.scene.Link;
+import ch.thechi2000.dfasimulator.scene.SimulatorPane;
 import ch.thechi2000.dfasimulator.scene.StateNode;
+import ch.thechi2000.dfasimulator.simulator.Path;
 import ch.thechi2000.dfasimulator.simulator.State;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class Main extends Application
 {
@@ -19,15 +22,22 @@ public class Main extends Application
     @Override
     public void start(Stage primaryStage)
     {
-        var stateNode1 = new StateNode(new State("source"));
+        State state1 = new State("source");
+        var stateNode1 = new StateNode(state1);
         stateNode1.relocate(50, 50);
 
-        var stateNode2 = new StateNode(new State("target"));
+        State state2 = new State("target");
+        var stateNode2 = new StateNode(state2);
         stateNode2.relocate(200, 50);
 
-        var link = new Link(stateNode1, stateNode2);
+        var link = new Link(stateNode1, stateNode2, new Path(state1, state2, List.of("0", "1")));
 
-        primaryStage.setScene(new Scene(new Pane(stateNode1, stateNode2, link), 800, 600));
+        SimulatorPane simulatorPane = new SimulatorPane();
+        simulatorPane.addState(stateNode1);
+        simulatorPane.addState(stateNode2);
+        simulatorPane.addLink(link);
+
+        primaryStage.setScene(new Scene(simulatorPane, 800, 600));
         primaryStage.show();
     }
 }
