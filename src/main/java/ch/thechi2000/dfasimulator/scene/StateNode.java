@@ -1,5 +1,6 @@
 package ch.thechi2000.dfasimulator.scene;
 
+import ch.thechi2000.dfasimulator.scene.lang.Strings;
 import ch.thechi2000.dfasimulator.simulator.State;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -124,7 +125,8 @@ public class StateNode extends Group
     {
         ContextMenu menu = new ContextMenu();
 
-        MenuItem delete = new MenuItem("Delete");
+        MenuItem delete = new MenuItem();
+        Strings.bind("delete", delete.textProperty());
         delete.setOnAction(event -> ((SimulatorPane) getParent()).deleteNode(state.getName()));
         menu.getItems().add(delete);
 
