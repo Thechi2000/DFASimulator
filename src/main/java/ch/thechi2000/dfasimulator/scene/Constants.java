@@ -11,7 +11,8 @@ import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import static javafx.scene.paint.Color.*;
+import static javafx.scene.paint.Color.BLACK;
+import static javafx.scene.paint.Color.GREEN;
 
 public class Constants
 {

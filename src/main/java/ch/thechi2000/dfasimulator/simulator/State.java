@@ -5,11 +5,12 @@ import java.util.List;
 
 public class State
 {
+    private final String name;
+    private final List<Path> paths = new ArrayList<>();
     public State(String name)
     {
         this.name = name;
     }
-
     public String getName()
     {
         return name;
@@ -22,7 +23,4 @@ public class State
     {
         return paths.get(index);
     }
-
-    private final String name;
-    private final List<Path> paths = new ArrayList<>();
 }

@@ -1,7 +1,5 @@
 package ch.thechi2000.dfasimulator.scene;
 
-import javafx.animation.KeyValue;
-import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.input.MouseButton;
 
 public class Controls

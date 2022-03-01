@@ -42,7 +42,7 @@ public class SimulatorPane extends Region
 
         MenuItem create = new MenuItem();
         Strings.bind("create", create.textProperty());
-        create.setOnAction(event ->                createNode(menuPosition.getX(), menuPosition.getY()));
+        create.setOnAction(event -> createNode(menuPosition.getX(), menuPosition.getY()));
         menu.getItems().add(create);
 
         menu.setAutoHide(true);
@@ -50,13 +50,13 @@ public class SimulatorPane extends Region
         return menu;
     }
 
-    public void setTool(Tool tool)
-    {
-        this.tool = tool;
-    }
     public Tool getTool()
     {
         return tool;
+    }
+    public void setTool(Tool tool)
+    {
+        this.tool = tool;
     }
 
     private boolean hasNode(String name)

@@ -13,19 +13,18 @@ import java.util.ArrayList;
 
 public class Link extends Group
 {
-    private ContextMenu menu;
-
     private final StateNode from;
     private final StateNode to;
-
     private final Line line, leftLine, rightLine;
     private final Text alphabetDisplay;
+    private ContextMenu menu;
 
     /**
      * Constructs a link between two StateNodes
      * Creates a new Path without any alphabet
-     * @param from  source StateNode
-     * @param to    target StateNode
+     *
+     * @param from source StateNode
+     * @param to   target StateNode
      */
     public Link(StateNode from, StateNode to)
     {
@@ -34,9 +33,10 @@ public class Link extends Group
 
     /**
      * Constructs a link between two StateNodes representing the given Path
-     * @param from  source StateNode
-     * @param to    target StateNode
-     * @param path  path to represent
+     *
+     * @param from source StateNode
+     * @param to   target StateNode
+     * @param path path to represent
      */
     public Link(StateNode from, StateNode to, Path path)
     {
