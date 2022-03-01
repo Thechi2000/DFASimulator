@@ -1,8 +1,11 @@
 package ch.thechi2000.dfasimulator.scene;
 
+import ch.thechi2000.dfasimulator.scene.lang.Strings;
 import ch.thechi2000.dfasimulator.simulator.Path;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
@@ -10,6 +13,8 @@ import java.util.ArrayList;
 
 public class Link extends Group
 {
+    private ContextMenu menu;
+
     private final StateNode from;
     private final StateNode to;
 
@@ -37,6 +42,8 @@ public class Link extends Group
     {
         this.from = from;
         this.to = to;
+
+        menu = createContextMenu();
 
         line = new Line();
         line.fillProperty().bind(Constants.Link.Line.color);
@@ -75,6 +82,24 @@ public class Link extends Group
     public String getTargetName()
     {
         return to.getState().getName();
+    }
+    public SimulatorPane getSimulatorParent()
+    {
+        return ((SimulatorPane) getParent());
+    }
+
+    private ContextMenu createContextMenu()
+    {
+        menu = new ContextMenu();
+
+        MenuItem delete = new MenuItem();
+        Strings.bind("delete", delete.textProperty());
+        delete.setOnAction(event -> getSimulatorParent().deleteLink(this));
+
+        setOnMousePressed(event -> menu.hide());
+        setOnContextMenuRequested(event -> menu.show(this, event.getScreenX(), event.getScreenY()));
+
+        return menu;
     }
 
     private void updatePositions()
