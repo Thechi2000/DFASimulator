@@ -1,9 +1,10 @@
 package ch.thechi2000.dfasimulator.scene;
 
-import ch.thechi2000.dfasimulator.Controls;
 import ch.thechi2000.dfasimulator.simulator.State;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -12,12 +13,20 @@ import javafx.scene.text.Text;
 
 public class StateNode extends Group
 {
-    private final Position pos = new Position();
+    private final Position pos;
     private final State state;
+    private final ContextMenu menu;
 
+    /**
+     * Constructs a StateNode representing a State
+     *
+     * @param state the state to represent
+     */
     public StateNode(State state)
     {
         this.state = state;
+        menu = createContextMenu();
+        pos = new Position();
 
         Circle circle = new Circle();
         circle.radiusProperty().bind(Constants.Node.Circle.radius);
@@ -28,8 +37,17 @@ public class StateNode extends Group
 
         getChildren().addAll(circle, new Text(state.getName()));
         addEventHandlers();
+        setOnContextMenuRequested(event ->
+        {
+            menu.show(this, event.getScreenX(), event.getScreenY());
+            event.consume();
+        });
     }
 
+    public SimulatorPane getSimulatorParent()
+    {
+        return ((SimulatorPane) getParent());
+    }
     public State getState()
     {
         return state;
@@ -42,20 +60,28 @@ public class StateNode extends Group
 
         setOnMousePressed(event ->
         {
-            if (event.getButton().equals(Controls.SimulatorPane.Node.dragButton))
-            {
-                setCursor(Cursor.MOVE);
+            menu.hide();
+            if (event.isPrimaryButtonDown())
+                switch (getSimulatorParent().getTool())
+                {
+                    case EDIT -> {
+                    }
+                    case DRAG -> {
+                        setCursor(Cursor.MOVE);
 
-                //When a press event occurs, the location coordinates of the event are cached
-                pos.x = event.getX();
-                pos.y = event.getY();
-            }
+                        //When a press event occurs, the location coordinates of the event are cached
+                        pos.x = event.getX();
+                        pos.y = event.getY();
+                    }
+                    case LINK -> {
+                    }
+                }
         });
         setOnMouseReleased(event -> setCursor(Cursor.DEFAULT));
 
         setOnMouseDragged(event ->
         {
-            if (event.getButton().equals(Controls.SimulatorPane.Node.dragButton))
+            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulatorPane.Tool.DRAG)
             {
                 double distanceX = event.getX() - pos.x;
                 double distanceY = event.getY() - pos.y;
@@ -71,7 +97,7 @@ public class StateNode extends Group
 
         setOnDragDetected(event ->
         {
-            if (event.getButton().equals(Controls.SimulatorPane.Node.linkButton))
+            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulatorPane.Tool.LINK)
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
@@ -94,9 +120,21 @@ public class StateNode extends Group
         });
     }
 
+    private ContextMenu createContextMenu()
+    {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem delete = new MenuItem("Delete");
+        delete.setOnAction(event -> ((SimulatorPane) getParent()).deleteNode(state.getName()));
+        menu.getItems().add(delete);
+
+        return menu;
+    }
+
     private static class Position
     {
         double x;
         double y;
     }
+
 }
