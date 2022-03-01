@@ -13,6 +13,7 @@ import java.util.List;
 
 public class Main extends Application
 {
+    public static final System.Logger logger = new Logger();
 
     public static void main(String[] args)
     {
