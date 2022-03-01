@@ -84,8 +84,10 @@ public class Link extends Group
         rightLine.setEndX(end.getX());
         rightLine.setEndY(end.getY());
 
-        Point2D textPos = start.add(end.subtract(start).multiply(Constants.Link.Text.distanceFromNode.get()))
-                .add(normal.multiply(Constants.Link.Text.distanceFromLine.get()));
+        Point2D projectionRelative = start.add(end.subtract(start).multiply(Constants.Link.Text.distanceFromNodeFactor.get())),
+                projectionAbsolute = start.add(director.multiply(Constants.Link.Text.distanceFromNodeAbsolute.get())),
+                textPos = (Constants.Link.Text.usesAbsoluteDistance.get() && (projectionRelative.subtract(start).magnitude() > Constants.Link.Text.distanceFromNodeAbsolute.get()) ? projectionAbsolute : projectionRelative).add(normal.multiply(Constants.Link.Text.distanceFromLine.get()));
+
         double angle = new Point2D(1, 0).angle(director);
 
         alphabetDisplay.relocate(textPos.getX(), textPos.getY());
