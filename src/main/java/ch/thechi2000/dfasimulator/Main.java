@@ -28,14 +28,14 @@ public class Main extends Application
 
         State state2 = new State("target");
         var stateNode2 = new StateNode(state2);
-        stateNode2.relocate(200, 50);
+        stateNode2.relocate(300, 50);
 
-        //var link = new Link(stateNode1, stateNode2, new Path(state1, state2, List.of("0", "1")));
+        var link = new Link(stateNode1, stateNode2, new Path(state1, state2, List.of("0", "1")));
 
         SimulatorPane simulatorPane = new SimulatorPane();
         simulatorPane.addState(stateNode1);
         simulatorPane.addState(stateNode2);
-        //simulatorPane.addLink(link);
+        simulatorPane.addLink(link);
 
         primaryStage.setScene(new Scene(simulatorPane, 800, 600));
         primaryStage.show();
