@@ -1,4 +1,4 @@
-package ch.thechi2000.dfasimulator.simulator;
+package ch.ludovic_mermod.dfasimulator.simulator;
 
 import java.util.List;
 

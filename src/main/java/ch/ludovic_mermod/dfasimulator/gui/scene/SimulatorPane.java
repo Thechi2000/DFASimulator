@@ -1,7 +1,7 @@
-package ch.thechi2000.dfasimulator.scene;
+package ch.ludovic_mermod.dfasimulator.gui.scene;
 
-import ch.thechi2000.dfasimulator.scene.lang.Strings;
-import ch.thechi2000.dfasimulator.simulator.State;
+import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.simulator.State;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;

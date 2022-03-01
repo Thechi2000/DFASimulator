@@ -1,12 +1,12 @@
-package ch.thechi2000.dfasimulator;
+package ch.ludovic_mermod.dfasimulator;
 
-import ch.thechi2000.dfasimulator.scene.Controls;
-import ch.thechi2000.dfasimulator.scene.Link;
-import ch.thechi2000.dfasimulator.scene.SimulatorPane;
-import ch.thechi2000.dfasimulator.scene.StateNode;
-import ch.thechi2000.dfasimulator.scene.lang.Strings;
-import ch.thechi2000.dfasimulator.simulator.Path;
-import ch.thechi2000.dfasimulator.simulator.State;
+import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.simulator.Path;
+import ch.ludovic_mermod.dfasimulator.simulator.State;
+import ch.ludovic_mermod.dfasimulator.gui.Controls;
+import ch.ludovic_mermod.dfasimulator.gui.scene.Link;
+import ch.ludovic_mermod.dfasimulator.gui.scene.SimulatorPane;
+import ch.ludovic_mermod.dfasimulator.gui.scene.StateNode;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;

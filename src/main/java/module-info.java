@@ -6,8 +6,10 @@ module ch.thechi2000.dfasimulator {
     requires com.dlsc.formsfx;
     requires validatorfx;
 
-    opens ch.thechi2000.dfasimulator to javafx.fxml;
-    exports ch.thechi2000.dfasimulator;
-    exports ch.thechi2000.dfasimulator.scene;
-    opens ch.thechi2000.dfasimulator.scene to javafx.fxml;
+    opens ch.ludovic_mermod.dfasimulator to javafx.fxml;
+    exports ch.ludovic_mermod.dfasimulator;
+    exports ch.ludovic_mermod.dfasimulator.gui;
+    opens ch.ludovic_mermod.dfasimulator.gui to javafx.fxml;
+    exports ch.ludovic_mermod.dfasimulator.gui.scene;
+    opens ch.ludovic_mermod.dfasimulator.gui.scene to javafx.fxml;
 }

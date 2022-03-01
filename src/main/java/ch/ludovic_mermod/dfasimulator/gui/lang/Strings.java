@@ -1,6 +1,6 @@
-package ch.thechi2000.dfasimulator.scene.lang;
+package ch.ludovic_mermod.dfasimulator.gui.lang;
 
-import ch.thechi2000.dfasimulator.Main;
+import ch.ludovic_mermod.dfasimulator.Main;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 

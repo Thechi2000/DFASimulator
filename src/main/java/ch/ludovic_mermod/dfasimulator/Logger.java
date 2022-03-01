@@ -1,4 +1,4 @@
-package ch.thechi2000.dfasimulator;
+package ch.ludovic_mermod.dfasimulator;
 
 import java.util.ResourceBundle;
 
