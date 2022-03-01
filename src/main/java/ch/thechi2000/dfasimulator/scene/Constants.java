@@ -9,7 +9,6 @@ import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import static java.lang.Math.sqrt;
 import static javafx.scene.paint.Color.*;
 
 public class Constants
@@ -34,13 +33,13 @@ public class Constants
         {
             protected static final ObservableIntegerValue width = new SimpleIntegerProperty(10);
             protected static final ObservableObjectValue<Color> color = new SimpleObjectProperty<>(BLACK);
-            protected static final ObservableDoubleValue normalFactor = new SimpleDoubleProperty(1 / sqrt(3));
             protected static final ObservableDoubleValue sidelineLength = new SimpleDoubleProperty(20);
         }
 
         protected static class Text
         {
-            protected static final ObservableDoubleValue distance = new SimpleDoubleProperty(25);
+            protected static final ObservableDoubleValue distanceFromLine = new SimpleDoubleProperty(25);
+            protected static final ObservableDoubleValue distanceFromNode = new SimpleDoubleProperty(0.25);
         }
     }
 }

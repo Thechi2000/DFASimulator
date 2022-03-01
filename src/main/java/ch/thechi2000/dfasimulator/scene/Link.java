@@ -6,6 +6,8 @@ import javafx.scene.Group;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
+
 public class Link extends Group
 {
     private final StateNode from;
@@ -14,6 +16,10 @@ public class Link extends Group
     private final Line line, leftLine, rightLine;
     private final Text alphabetDisplay;
 
+    public Link(StateNode from, StateNode to)
+    {
+        this(from, to, new Path(from.getState(), to.getState(), new ArrayList<>()));
+    }
     public Link(StateNode from, StateNode to, Path path)
     {
         this.from = from;
@@ -43,6 +49,8 @@ public class Link extends Group
         to.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
 
         Constants.Node.Circle.radius.addListener((o, ov, nv) -> updatePositions());
+        Constants.Link.Text.distanceFromLine.addListener((o, ov, nv) -> updatePositions());
+        Constants.Link.Line.sidelineLength.addListener((o, ov, nv) -> updatePositions());
 
         getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
     }
@@ -76,11 +84,11 @@ public class Link extends Group
         rightLine.setEndX(end.getX());
         rightLine.setEndY(end.getY());
 
-        Point2D mid = start.midpoint(end),
-                textPos = mid.add(normal.multiply(Constants.Link.Text.distance.get()));
-        alphabetDisplay.relocate(textPos.getX(), textPos.getY());
+        Point2D textPos = start.add(end.subtract(start).multiply(Constants.Link.Text.distanceFromNode.get()))
+                .add(normal.multiply(Constants.Link.Text.distanceFromLine.get()));
+        double angle = new Point2D(1, 0).angle(director);
 
-        var angle = new Point2D(1, 0).angle(director);
+        alphabetDisplay.relocate(textPos.getX(), textPos.getY());
         alphabetDisplay.setRotate(director.getY() > 0 ? angle : -angle);
     }
 }
