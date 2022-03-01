@@ -19,6 +19,12 @@ public class Strings
         set("create", "Create");
     }
 
+    /**
+     * The StringProperty representing the id
+     *
+     * @param id the StringProperty queried
+     * @return the StringProperty associated with the given id
+     */
     public static StringProperty get(String id)
     {
         if (!map.containsKey(id))
@@ -30,12 +36,24 @@ public class Strings
         return map.get(id);
     }
 
+    /**
+     * Bind the target to the property designated by id
+     *
+     * @param id     the StringProperty id to bind to
+     * @param target the StringProperty to bind
+     */
     public static void bind(String id, StringProperty target)
     {
         target.set(get(id).get());
         target.bind(get(id));
     }
 
+    /**
+     * Set the StringProperty associated with id to the given value
+     *
+     * @param id    the StringProperty to modify
+     * @param value the value to put
+     */
     public static void set(String id, String value)
     {
         if (map.containsKey(id)) map.get(id).set(value);

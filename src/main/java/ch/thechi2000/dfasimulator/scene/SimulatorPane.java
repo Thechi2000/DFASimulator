@@ -97,6 +97,12 @@ public class SimulatorPane extends Region
         Link lnk = new Link(getNode(from), getNode(to));
         addLink(lnk);
     }
+    /**
+     * Create and add a node at the given coordinates
+     *
+     * @param x coordinate
+     * @param y coordinate
+     */
     protected void createNode(double x, double y)
     {
         int i = 0;
@@ -117,7 +123,6 @@ public class SimulatorPane extends Region
         links.remove(link);
         getChildren().remove(link);
     }
-
     protected void deleteNode(String name)
     {
         if (!hasNode(name))
@@ -128,8 +133,8 @@ public class SimulatorPane extends Region
 
         getChildren().remove(getNode(name));
         nodes.remove(getNode(name));
-        links.stream().filter(l -> l.getStartName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
-        links.removeIf(l -> l.getStartName().equals(name) || l.getTargetName().equals(name));
+        links.stream().filter(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
+        links.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
     }
 
     public enum Tool

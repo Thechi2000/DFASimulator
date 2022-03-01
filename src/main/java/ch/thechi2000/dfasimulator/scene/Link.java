@@ -75,7 +75,7 @@ public class Link extends Group
         getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
     }
 
-    public String getStartName()
+    public String getSourceName()
     {
         return from.getState().getName();
     }
