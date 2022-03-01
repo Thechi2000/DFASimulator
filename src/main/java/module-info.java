@@ -8,4 +8,6 @@ module ch.thechi2000.dfasimulator {
 
     opens ch.thechi2000.dfasimulator to javafx.fxml;
     exports ch.thechi2000.dfasimulator;
+    exports ch.thechi2000.dfasimulator.scene;
+    opens ch.thechi2000.dfasimulator.scene to javafx.fxml;
 }
