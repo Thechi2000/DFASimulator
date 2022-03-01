@@ -1,5 +1,6 @@
 package ch.thechi2000.dfasimulator.scene;
 
+import ch.thechi2000.dfasimulator.Controls;
 import ch.thechi2000.dfasimulator.simulator.State;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -41,7 +42,7 @@ public class StateNode extends Group
 
         setOnMousePressed(event ->
         {
-            if (event.isPrimaryButtonDown())
+            if (event.getButton().equals(Controls.SimulatorPane.Node.dragButton))
             {
                 setCursor(Cursor.MOVE);
 
@@ -54,7 +55,7 @@ public class StateNode extends Group
 
         setOnMouseDragged(event ->
         {
-            if (event.isPrimaryButtonDown())
+            if (event.getButton().equals(Controls.SimulatorPane.Node.dragButton))
             {
                 double distanceX = event.getX() - pos.x;
                 double distanceY = event.getY() - pos.y;
@@ -70,7 +71,7 @@ public class StateNode extends Group
 
         setOnDragDetected(event ->
         {
-            if (event.isSecondaryButtonDown())
+            if (event.getButton().equals(Controls.SimulatorPane.Node.linkButton))
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
@@ -88,7 +89,7 @@ public class StateNode extends Group
         });
         setOnDragDropped(event ->
         {
-            if (getParent() instanceof SimulatorPane)
+            if (getParent() instanceof SimulatorPane && event.getGestureSource() instanceof StateNode)
                 ((SimulatorPane) getParent()).createLink(event.getDragboard().getString(), state.getName());
         });
     }
