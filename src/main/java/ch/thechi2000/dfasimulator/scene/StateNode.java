@@ -56,7 +56,12 @@ public class StateNode extends Group
 
     private void addEventHandlers()
     {
-        setOnMouseEntered(event -> setCursor(Cursor.HAND));
+        setOnMouseEntered(event ->
+                setCursor(switch (getSimulatorParent().getTool())
+                        {
+                            case EDIT -> Cursor.DEFAULT;
+                            case DRAG, LINK -> Cursor.HAND;
+                        }));
         setOnMouseExited(event -> setCursor(Cursor.DEFAULT));
 
         setOnMousePressed(event ->
@@ -65,17 +70,17 @@ public class StateNode extends Group
             if (event.isPrimaryButtonDown())
                 switch (getSimulatorParent().getTool())
                 {
-                    case EDIT -> {
-                    }
-                    case DRAG -> {
-                        setCursor(Cursor.MOVE);
+                    case EDIT:
+                    case LINK:
+                        break;
+
+                    case DRAG:
+                        setCursor(Cursor.CLOSED_HAND);
 
                         //When a press event occurs, the location coordinates of the event are cached
                         pos.x = event.getX();
                         pos.y = event.getY();
-                    }
-                    case LINK -> {
-                    }
+                        break;
                 }
         });
         setOnMouseReleased(event -> setCursor(Cursor.DEFAULT));

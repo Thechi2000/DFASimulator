@@ -17,6 +17,11 @@ public class Strings
 
         set("delete", "Delete");
         set("create", "Create");
+
+        set("tools", "Tools");
+        set("edit", "Edit");
+        set("drag", "Drag");
+        set("link", "Link");
     }
 
     /**
