@@ -3,6 +3,8 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.simulator.Path;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
@@ -10,39 +12,43 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class Link extends Group
 {
-    private final StateNode from;
-    private final StateNode to;
+    private final Path path;
     private final Line line, leftLine, rightLine;
     private final Text alphabetDisplay;
+    private final ObjectProperty<StateNode> source, target;
     private ContextMenu menu;
+    private MenuItem deleteMenuItem;
 
     /**
      * Constructs a link between two StateNodes
      * Creates a new Path without any alphabet
      *
-     * @param from source StateNode
-     * @param to   target StateNode
+     * @param source source StateNode
+     * @param target target StateNode
      */
-    public Link(StateNode from, StateNode to)
+    public Link(StateNode source, StateNode target)
     {
-        this(from, to, new Path(from.getState(), to.getState(), new ArrayList<>()));
+        this(source, target, new Path(source.getState(), target.getState(), new TreeSet<>()));
     }
 
     /**
      * Constructs a link between two StateNodes representing the given Path
      *
-     * @param from source StateNode
-     * @param to   target StateNode
-     * @param path path to represent
+     * @param source source StateNode
+     * @param target target StateNode
+     * @param path   path to represent
      */
-    public Link(StateNode from, StateNode to, Path path)
+    public Link(StateNode source, StateNode target, Path path)
     {
-        this.from = from;
-        this.to = to;
+        this.source = new SimpleObjectProperty<>(source);
+        this.target = new SimpleObjectProperty<>(target);
+        this.path = path;
 
         menu = createContextMenu();
 
@@ -59,15 +65,15 @@ public class Link extends Group
         rightLine.strokeWidthProperty().bind(Constants.Link.Line.width);
 
         alphabetDisplay = new Text();
-        alphabetDisplay.setText(String.join(", ", path.getAlphabet()));
+        alphabetDisplay.setText(path.getAlphabet().stream().map(Object::toString).collect(Collectors.joining(", ")));
 
         updatePositions();
 
-        from.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
-        from.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
+        source.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
+        source.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
 
-        to.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
-        to.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
+        target.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
+        target.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
 
         Constants.Node.Circle.radius.addListener((o, ov, nv) -> updatePositions());
         Constants.Link.Text.distanceFromLine.addListener((o, ov, nv) -> updatePositions());
@@ -78,24 +84,30 @@ public class Link extends Group
 
     public String getSourceName()
     {
-        return from.getState().getName();
+        return source.get().getState().getName();
     }
     public String getTargetName()
     {
-        return to.getState().getName();
+        return target.get().getState().getName();
     }
-    public SimulatorPane getSimulatorParent()
+    public SimulationPane getSimulatorParent()
     {
-        return ((SimulatorPane) getParent());
+        return ((SimulationPane) getParent());
+    }
+
+    protected void bindSimulationPane(SimulationPane simulationPane)
+    {
+        deleteMenuItem.disableProperty().bind(simulationPane.getSimulationProperty());
     }
 
     private ContextMenu createContextMenu()
     {
         menu = new ContextMenu();
 
-        MenuItem delete = new MenuItem();
-        Strings.bind("delete", delete.textProperty());
-        delete.setOnAction(event -> getSimulatorParent().deleteLink(this));
+        deleteMenuItem = new MenuItem();
+        Strings.bind("delete", deleteMenuItem.textProperty());
+        deleteMenuItem.setOnAction(event -> getSimulatorParent().deleteLink(this));
+        //delete.disableProperty().bind(getSimulatorParent().getSimulationProperty());
 
         setOnMousePressed(event -> menu.hide());
         setOnContextMenuRequested(event -> menu.show(this, event.getScreenX(), event.getScreenY()));
@@ -105,8 +117,8 @@ public class Link extends Group
 
     private void updatePositions()
     {
-        Point2D startCenter = new Point2D(from.getLayoutX(), from.getLayoutY()),
-                endCenter = new Point2D(to.getLayoutX(), to.getLayoutY()),
+        Point2D startCenter = new Point2D(source.get().getLayoutX(), source.get().getLayoutY()),
+                endCenter = new Point2D(target.get().getLayoutX(), target.get().getLayoutY()),
                 director = endCenter.subtract(startCenter).normalize(),
                 normal = new Point2D(director.getY(), -director.getX()),
                 start = startCenter.add(director.multiply(Constants.Node.Circle.radius.get())),
@@ -146,5 +158,19 @@ public class Link extends Group
             alphabetDisplay.relocate(textPos.getX(), textPos.getY());
             alphabetDisplay.setRotate(director.getY() > 0 ? angle : -angle);
         }
+    }
+
+    public void setAlphabet(Set<Character> alphabet)
+    {
+        path.setAlphabet(alphabet);
+    }
+
+    protected ObjectProperty<StateNode> getSource()
+    {
+        return source;
+    }
+    protected ObjectProperty<StateNode> getTarget()
+    {
+        return target;
     }
 }

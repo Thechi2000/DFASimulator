@@ -1,22 +1,28 @@
 package ch.ludovic_mermod.dfasimulator.simulator;
 
-import java.util.List;
+import java.util.Set;
 
 public class Path
 {
-    private final List<String> alphabet;
-    private final State from;
-    private final State to;
-    public Path(State from, State to, List<String> alphabet)
+    private Set<Character> alphabet;
+    private State from, to;
+
+    public Path(State from, State to, Set<Character> alphabet)
     {
         this.alphabet = alphabet;
         this.from = from;
         this.to = to;
     }
-    public List<String> getAlphabet()
+
+    public Set<Character> getAlphabet()
     {
         return alphabet;
     }
+    public void setAlphabet(Set<Character> alphabet)
+    {
+        this.alphabet = alphabet;
+    }
+
     public State getFrom()
     {
         return from;
