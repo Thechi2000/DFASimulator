@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -11,12 +12,13 @@ import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 class LinkEditPane extends VBox
 {
     private final TextField alphabetField;
-    private final ComboBox<StateNode> sourceNodeBox, targetNodeBox;
+    private final ComboBox<String> sourceNodeBox, targetNodeBox;
     private final Button deleteButton;
     private final SimulationPane simulationPane;
 
@@ -41,11 +43,23 @@ class LinkEditPane extends VBox
 
         // Setup linked nodes edit
         {
-            sourceNodeBox = new ComboBox<>(simulationPane.getNodes());
-            targetNodeBox = new ComboBox<>(simulationPane.getNodes());
+            sourceNodeBox = new ComboBox<>();
+            targetNodeBox = new ComboBox<>();
 
+            simulationPane.getNodes().addListener((o, ov, nv) -> updateComboBoxesContent());
+            updateComboBoxesContent();
+
+            /*
+            sourceNodeBox.setCellFactory(l -> new TextFieldListCell<>(new StateNodeStringConverter(simulationPane)));
+            sourceNodeBox.setItems(simulationPane.getNodes());
             sourceNodeBox.setConverter(new StateNodeStringConverter(simulationPane));
+            sourceNodeBox.setEditable(true);
+
+            targetNodeBox.setCellFactory(l -> new TextFieldListCell<>(new StateNodeStringConverter(simulationPane)));
+            targetNodeBox.setItems(simulationPane.getNodes());
             targetNodeBox.setConverter(new StateNodeStringConverter(simulationPane));
+            targetNodeBox.setEditable(false);
+            */
 
             Text linkingText = new Text();
             Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
@@ -56,7 +70,14 @@ class LinkEditPane extends VBox
         Strings.bind("delete", deleteButton.textProperty());
     }
 
-    private void bind(Link link)
+    private void updateComboBoxesContent()
+    {
+        List<String> items = simulationPane.getNodes().stream().map(n -> n.getState().getName()).toList();
+        sourceNodeBox.setItems(FXCollections.observableList(items));
+        targetNodeBox.setItems(FXCollections.observableList(items));
+    }
+
+    protected void bind(Link link)
     {
         if (alphabetFieldListener != null)
             alphabetField.textProperty().removeListener(alphabetFieldListener);
@@ -65,7 +86,7 @@ class LinkEditPane extends VBox
             var elements = Arrays.stream(nv.replace(" ", "").split(",")).toList();
 
             if (elements.stream().allMatch(s -> s.length() == 1))
-                link.setAlphabet(elements.stream().map(s -> ((Character) s.charAt(0))).collect(Collectors.toSet()));
+                link.setAlphabet(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
             else
             {
                 //TODO
@@ -81,13 +102,13 @@ class LinkEditPane extends VBox
 
         alphabetField.textProperty().addListener(alphabetFieldListener);
 
-        sourceNodeBox.setValue(link.getSource().get());
-        targetNodeBox.setValue(link.getTarget().get());
+        sourceNodeBox.setValue(link.getSourceName());
+        targetNodeBox.setValue(link.getTargetName());
 
         sourceNodeBox.valueProperty().unbind();
 
-        link.getSource().bind(sourceNodeBox.valueProperty());
-        link.getTarget().bind(targetNodeBox.valueProperty());
+        sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
+        targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
 
         deleteButton.setOnAction(event -> simulationPane.deleteLink(link));
     }

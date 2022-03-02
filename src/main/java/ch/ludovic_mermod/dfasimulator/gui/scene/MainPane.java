@@ -1,0 +1,98 @@
+package ch.ludovic_mermod.dfasimulator.gui.scene;
+
+import ch.ludovic_mermod.dfasimulator.gui.Controls;
+import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.simulator.Path;
+import ch.ludovic_mermod.dfasimulator.simulator.State;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+
+import java.util.Set;
+
+public class MainPane extends BorderPane
+{
+    private final SimulationPane simulationPane;
+    private final ObjectProperty<Pane> editPaneProperty;
+    private final LinkEditPane linkEditPane;
+    private final NodeEditPane nodeEditPane;
+
+    public MainPane()
+    {
+        editPaneProperty = new SimpleObjectProperty<>(new Pane());
+
+        simulationPane = createSimulatorPane();
+        MenuBar menuBar = createMenuBar();
+
+        linkEditPane = new LinkEditPane(simulationPane);
+        nodeEditPane = new NodeEditPane();
+
+        setCenter(simulationPane);
+        setTop(menuBar);
+        rightProperty().bind(editPaneProperty);
+    }
+
+    private SimulationPane createSimulatorPane()
+    {
+        State state1 = new State("source");
+        var stateNode1 = new StateNode(state1);
+        stateNode1.relocate(50, 50);
+
+        State state2 = new State("target");
+        var stateNode2 = new StateNode(state2);
+        stateNode2.relocate(300, 50);
+
+        var link = new Link(stateNode1, stateNode2, new Path(state1, state2, Set.of('0', '1')));
+
+        SimulationPane simulationPane = new SimulationPane();
+        simulationPane.addState(stateNode1);
+        simulationPane.addState(stateNode2);
+        simulationPane.addLink(link);
+
+        return simulationPane;
+    }
+
+    private MenuBar createMenuBar()
+    {
+        MenuBar menuBar = new MenuBar();
+
+        Menu toolsMenu = new Menu();
+        Strings.bind("tools", toolsMenu.textProperty());
+        menuBar.getMenus().add(toolsMenu);
+
+        MenuItem edit = new MenuItem();
+        Strings.bind("edit", edit.textProperty());
+        edit.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.EDIT));
+        edit.acceleratorProperty().bind(Controls.editTool);
+        toolsMenu.getItems().add(edit);
+
+        MenuItem drag = new MenuItem();
+        Strings.bind("drag", drag.textProperty());
+        drag.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.DRAG));
+        drag.acceleratorProperty().bind(Controls.dragTool);
+        toolsMenu.getItems().add(drag);
+
+        MenuItem link = new MenuItem();
+        Strings.bind("link", link.textProperty());
+        link.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.LINK));
+        link.acceleratorProperty().bind(Controls.linkTool);
+        toolsMenu.getItems().add(link);
+
+        return menuBar;
+    }
+
+    public void bindEditPane(Link link)
+    {
+        System.out.println("binding edit pane");
+        linkEditPane.bind(link);
+        editPaneProperty.set(linkEditPane);
+    }
+    public void bindEditPane(StateNode stateNode)
+    {
+        //TODO
+    }
+}

@@ -5,6 +5,8 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.simulator.Path;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
@@ -69,17 +71,31 @@ public class Link extends Group
 
         updatePositions();
 
-        source.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
-        source.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
+        this.source.addListener((o, ov, nv) -> updatePositions());
+        this.target.addListener((o, ov, nv) -> updatePositions());
 
-        target.layoutXProperty().addListener((o, ov, nv) -> updatePositions());
-        target.layoutYProperty().addListener((o, ov, nv) -> updatePositions());
+        var updatePos = new ChangeListener<Number>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> o, Number ov, Number nv)
+            {
+                Link.this.updatePositions();
+            }
+        };
 
-        Constants.Node.Circle.radius.addListener((o, ov, nv) -> updatePositions());
-        Constants.Link.Text.distanceFromLine.addListener((o, ov, nv) -> updatePositions());
-        Constants.Link.Line.sidelineLength.addListener((o, ov, nv) -> updatePositions());
+        source.layoutXProperty().addListener(updatePos);
+        source.layoutYProperty().addListener(updatePos);
+
+        target.layoutXProperty().addListener(updatePos);
+        target.layoutYProperty().addListener(updatePos);
+
+        Constants.Node.Circle.radius.addListener(updatePos);
+        Constants.Link.Text.distanceFromLine.addListener(updatePos);
+        Constants.Link.Line.sidelineLength.addListener(updatePos);
 
         getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
+
+        setOnMousePressed(event -> getSimulatorParent().bindEditPane(this));
     }
 
     public String getSourceName()

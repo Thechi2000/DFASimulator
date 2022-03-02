@@ -2,24 +2,19 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.simulator.State;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-import java.util.List;
-
 public class SimulationPane extends Region
 {
     private final BooleanProperty isSimulating;
 
-    private final ObservableList<StateNode> nodes;
-    private final ObservableList<Link> links;
+    private final ListProperty<StateNode> nodes;
+    private final ListProperty<Link> links;
 
     private final ContextMenu menu;
     private Point2D menuPosition;
@@ -30,11 +25,11 @@ public class SimulationPane extends Region
     {
         isSimulating = new SimpleBooleanProperty(false);
 
-        nodes = FXCollections.observableArrayList();
-        links = FXCollections.observableArrayList();
+        nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
+        links = new SimpleListProperty<>(FXCollections.observableArrayList());
 
         menu = createContextMenu();
-        tool = Tool.DRAG;
+        tool = Tool.EDIT;
 
         setOnMousePressed(event -> menu.hide());
         setOnContextMenuRequested(event ->
@@ -44,11 +39,11 @@ public class SimulationPane extends Region
         });
     }
 
-    protected ObservableList<StateNode> getNodes()
+    protected ReadOnlyListProperty<StateNode> getNodes()
     {
         return nodes;
     }
-    protected ObservableList<Link> getLinks()
+    protected ReadOnlyListProperty<Link> getLinks()
     {
         return links;
     }
@@ -139,6 +134,15 @@ public class SimulationPane extends Region
         String name = node.getState().getName();
         links.stream().filter(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
         links.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
+    }
+
+    protected void bindEditPane(Link link)
+    {
+        ((MainPane) getParent()).bindEditPane(link);
+    }
+    protected void bindEditPane(StateNode stateNode)
+    {
+        ((MainPane) getParent()).bindEditPane(stateNode);
     }
 
     private ContextMenu createContextMenu()
