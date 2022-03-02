@@ -1,12 +1,12 @@
 package ch.ludovic_mermod.dfasimulator;
 
+import ch.ludovic_mermod.dfasimulator.gui.Controls;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.gui.scene.Link;
+import ch.ludovic_mermod.dfasimulator.gui.scene.SimulationPane;
+import ch.ludovic_mermod.dfasimulator.gui.scene.StateNode;
 import ch.ludovic_mermod.dfasimulator.simulator.Path;
 import ch.ludovic_mermod.dfasimulator.simulator.State;
-import ch.ludovic_mermod.dfasimulator.gui.Controls;
-import ch.ludovic_mermod.dfasimulator.gui.scene.Link;
-import ch.ludovic_mermod.dfasimulator.gui.scene.SimulatorPane;
-import ch.ludovic_mermod.dfasimulator.gui.scene.StateNode;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -15,12 +15,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import java.util.List;
+import java.util.Set;
 
 public class Main extends Application
 {
     public static final System.Logger logger = new Logger();
-    private SimulatorPane simulatorPane;
+    private SimulationPane simulationPane;
     private MenuBar menuBar;
     public static void main(String[] args)
     {
@@ -34,7 +34,7 @@ public class Main extends Application
         createMenuBar();
 
         BorderPane pane = new BorderPane();
-        pane.setCenter(simulatorPane);
+        pane.setCenter(simulationPane);
         pane.setTop(menuBar);
 
 
@@ -52,12 +52,12 @@ public class Main extends Application
         var stateNode2 = new StateNode(state2);
         stateNode2.relocate(300, 50);
 
-        var link = new Link(stateNode1, stateNode2, new Path(state1, state2, List.of("0", "1")));
+        var link = new Link(stateNode1, stateNode2, new Path(state1, state2, Set.of('0', '1')));
 
-        simulatorPane = new SimulatorPane();
-        simulatorPane.addState(stateNode1);
-        simulatorPane.addState(stateNode2);
-        simulatorPane.addLink(link);
+        simulationPane = new SimulationPane();
+        simulationPane.addState(stateNode1);
+        simulationPane.addState(stateNode2);
+        simulationPane.addLink(link);
     }
 
     private void createMenuBar()
@@ -70,19 +70,19 @@ public class Main extends Application
 
         MenuItem edit = new MenuItem();
         Strings.bind("edit", edit.textProperty());
-        edit.setOnAction(event -> simulatorPane.setTool(SimulatorPane.Tool.EDIT));
+        edit.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.EDIT));
         edit.acceleratorProperty().bind(Controls.editTool);
         toolsMenu.getItems().add(edit);
 
         MenuItem drag = new MenuItem();
         Strings.bind("drag", drag.textProperty());
-        drag.setOnAction(event -> simulatorPane.setTool(SimulatorPane.Tool.DRAG));
+        drag.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.DRAG));
         drag.acceleratorProperty().bind(Controls.dragTool);
         toolsMenu.getItems().add(drag);
 
         MenuItem link = new MenuItem();
         Strings.bind("link", link.textProperty());
-        link.setOnAction(event -> simulatorPane.setTool(SimulatorPane.Tool.LINK));
+        link.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.LINK));
         link.acceleratorProperty().bind(Controls.linkTool);
         toolsMenu.getItems().add(link);
     }

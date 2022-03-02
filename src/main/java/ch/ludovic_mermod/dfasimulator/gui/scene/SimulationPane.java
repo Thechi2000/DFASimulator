@@ -2,28 +2,36 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.simulator.State;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class SimulatorPane extends Region
+public class SimulationPane extends Region
 {
-    private final List<StateNode> nodes;
-    private final List<Link> links;
+    private final BooleanProperty isSimulating;
+
+    private final ObservableList<StateNode> nodes;
+    private final ObservableList<Link> links;
 
     private final ContextMenu menu;
     private Point2D menuPosition;
 
     private Tool tool;
 
-    public SimulatorPane()
+    public SimulationPane()
     {
-        nodes = new ArrayList<>();
-        links = new ArrayList<>();
+        isSimulating = new SimpleBooleanProperty(false);
+
+        nodes = FXCollections.observableArrayList();
+        links = FXCollections.observableArrayList();
 
         menu = createContextMenu();
         tool = Tool.DRAG;
@@ -36,18 +44,13 @@ public class SimulatorPane extends Region
         });
     }
 
-    private ContextMenu createContextMenu()
+    protected ObservableList<StateNode> getNodes()
     {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem create = new MenuItem();
-        Strings.bind("create", create.textProperty());
-        create.setOnAction(event -> createNode(menuPosition.getX(), menuPosition.getY()));
-        menu.getItems().add(create);
-
-        menu.setAutoHide(true);
-
-        return menu;
+        return nodes;
+    }
+    protected ObservableList<Link> getLinks()
+    {
+        return links;
     }
 
     public Tool getTool()
@@ -57,6 +60,11 @@ public class SimulatorPane extends Region
     public void setTool(Tool tool)
     {
         this.tool = tool;
+    }
+
+    public ReadOnlyBooleanProperty getSimulationProperty()
+    {
+        return isSimulating;
     }
 
     private boolean hasNode(String name)
@@ -123,18 +131,27 @@ public class SimulatorPane extends Region
         links.remove(link);
         getChildren().remove(link);
     }
-    protected void deleteNode(String name)
+    protected void deleteNode(StateNode node)
     {
-        if (!hasNode(name))
-        {
-            System.out.println("Could not remove node " + name + ", node does not exist");
-            return;
-        }
+        getChildren().remove(node);
+        nodes.remove(node);
 
-        getChildren().remove(getNode(name));
-        nodes.remove(getNode(name));
+        String name = node.getState().getName();
         links.stream().filter(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
         links.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
+    }
+
+    private ContextMenu createContextMenu()
+    {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem create = new MenuItem();
+        Strings.bind("create", create.textProperty());
+        create.setOnAction(event -> createNode(menuPosition.getX(), menuPosition.getY()));
+        create.disableProperty().bind(isSimulating);
+        menu.getItems().add(create);
+
+        return menu;
     }
 
     public enum Tool

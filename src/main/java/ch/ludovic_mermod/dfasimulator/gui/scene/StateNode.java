@@ -18,6 +18,7 @@ public class StateNode extends Group
     private final Position pos;
     private final State state;
     private final ContextMenu menu;
+    private MenuItem deleteMenuItem;
 
     /**
      * Constructs a StateNode representing a State
@@ -46,13 +47,18 @@ public class StateNode extends Group
         });
     }
 
-    public SimulatorPane getSimulatorParent()
+    public SimulationPane getSimulatorParent()
     {
-        return ((SimulatorPane) getParent());
+        return ((SimulationPane) getParent());
     }
     public State getState()
     {
         return state;
+    }
+
+    protected void bindSimulationPane(SimulationPane simulationPane)
+    {
+        deleteMenuItem.disableProperty().bind(simulationPane.getSimulationProperty());
     }
 
     private void addEventHandlers()
@@ -88,7 +94,7 @@ public class StateNode extends Group
 
         setOnMouseDragged(event ->
         {
-            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulatorPane.Tool.DRAG)
+            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulationPane.Tool.DRAG)
             {
                 double distanceX = event.getX() - pos.x;
                 double distanceY = event.getY() - pos.y;
@@ -104,7 +110,7 @@ public class StateNode extends Group
 
         setOnDragDetected(event ->
         {
-            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulatorPane.Tool.LINK)
+            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulationPane.Tool.LINK)
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
@@ -122,8 +128,8 @@ public class StateNode extends Group
         });
         setOnDragDropped(event ->
         {
-            if (getParent() instanceof SimulatorPane && event.getGestureSource() instanceof StateNode)
-                ((SimulatorPane) getParent()).createLink(event.getDragboard().getString(), state.getName());
+            if (getParent() instanceof SimulationPane && event.getGestureSource() instanceof StateNode)
+                ((SimulationPane) getParent()).createLink(event.getDragboard().getString(), state.getName());
         });
     }
 
@@ -131,10 +137,11 @@ public class StateNode extends Group
     {
         ContextMenu menu = new ContextMenu();
 
-        MenuItem delete = new MenuItem();
-        Strings.bind("delete", delete.textProperty());
-        delete.setOnAction(event -> ((SimulatorPane) getParent()).deleteNode(state.getName()));
-        menu.getItems().add(delete);
+        deleteMenuItem = new MenuItem();
+        Strings.bind("delete", deleteMenuItem.textProperty());
+        deleteMenuItem.setOnAction(event -> ((SimulationPane) getParent()).deleteNode(this));
+        //delete.disableProperty().bind(getSimulatorParent().getSimulationProperty());
+        menu.getItems().add(deleteMenuItem);
 
         return menu;
     }
