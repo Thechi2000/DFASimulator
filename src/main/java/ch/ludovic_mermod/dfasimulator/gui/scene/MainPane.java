@@ -82,7 +82,6 @@ public class MainPane extends BorderPane
 
     protected void bindEditPane(Link link)
     {
-        System.out.println("binding edit pane");
         editPaneProperty.set(new LinkEditPane(simulationPane, link));
     }
     protected void bindEditPane(StateNode stateNode)

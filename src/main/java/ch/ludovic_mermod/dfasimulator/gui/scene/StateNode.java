@@ -78,6 +78,9 @@ public class StateNode extends Group
                 switch (getSimulatorParent().getTool())
                 {
                     case EDIT:
+                        getSimulatorParent().bindEditPane(this);
+                        break;
+
                     case LINK:
                         break;
 
