@@ -107,7 +107,6 @@ public class StateNode extends Group
                 double x = getLayoutX() + distanceX - 50;
                 double y = getLayoutY() + distanceY - 50;
 
-                //After calculating X and y, relocate the node to the specified coordinate point (x, y)
                 relocate(x, y);
             }
         });
