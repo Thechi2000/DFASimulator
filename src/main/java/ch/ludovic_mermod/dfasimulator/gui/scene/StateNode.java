@@ -4,17 +4,19 @@ import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
-public class StateNode extends Group
+public class StateNode extends StackPane
 {
     private final Position pos;
     private final StringProperty nameProperty;
@@ -23,6 +25,8 @@ public class StateNode extends Group
 
     public StateNode(String name)
     {
+        setAlignment(Pos.CENTER);
+
         nameProperty = new SimpleStringProperty(name);
         menu = createContextMenu();
         pos = new Position();
@@ -34,6 +38,7 @@ public class StateNode extends Group
         Text text = new Text();
         text.fontProperty().bind(Constants.Node.Text.font);
         text.textProperty().bind(nameProperty);
+        text.setTextAlignment(TextAlignment.CENTER);
 
         getChildren().addAll(circle, text);
         addEventHandlers();
@@ -104,8 +109,8 @@ public class StateNode extends Group
                 double distanceX = event.getX() - pos.x;
                 double distanceY = event.getY() - pos.y;
 
-                double x = getLayoutX() + distanceX - 50;
-                double y = getLayoutY() + distanceY - 50;
+                double x = getLayoutX() + distanceX;
+                double y = getLayoutY() + distanceY;
 
                 relocate(x, y);
             }

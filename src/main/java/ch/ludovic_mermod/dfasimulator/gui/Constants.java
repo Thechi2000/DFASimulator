@@ -26,7 +26,7 @@ public class Constants
 
         public static class Text
         {
-            public static final ObservableObjectValue<Font> font = new SimpleObjectProperty<>(Font.font("Courier", 30));
+            public static final ObservableObjectValue<Font> font = new SimpleObjectProperty<>(Font.font("Courier", 20));
         }
     }
 

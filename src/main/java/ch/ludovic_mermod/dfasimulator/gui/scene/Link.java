@@ -130,8 +130,9 @@ public class Link extends Group
 
     private void updatePositions()
     {
-        Point2D startCenter = new Point2D(source.get().getLayoutX(), source.get().getLayoutY()),
-                endCenter = new Point2D(target.get().getLayoutX(), target.get().getLayoutY()),
+        double radius = Constants.Node.Circle.radius.get();
+        Point2D startCenter = new Point2D(source.get().getLayoutX() + radius, source.get().getLayoutY() + radius),
+                endCenter = new Point2D(target.get().getLayoutX() + radius, target.get().getLayoutY() + radius),
                 director = endCenter.subtract(startCenter).normalize(),
                 normal = new Point2D(director.getY(), -director.getX()),
                 start = startCenter.add(director.multiply(Constants.Node.Circle.radius.get())),
