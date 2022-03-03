@@ -2,11 +2,13 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import ch.ludovic_mermod.dfasimulator.simulator.Path;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
@@ -20,23 +22,18 @@ import java.util.stream.Collectors;
 
 public class Link extends Group
 {
-    private final Path path;
+    private final ObjectProperty<StateNode> source, target;
+    private final SetProperty<Character> alphabetProperty;
+
     private final Line line, leftLine, rightLine;
     private final Text alphabetDisplay;
-    private final ObjectProperty<StateNode> source, target;
+
     private ContextMenu menu;
     private MenuItem deleteMenuItem;
 
-    /**
-     * Constructs a link between two StateNodes
-     * Creates a new Path without any alphabet
-     *
-     * @param source source StateNode
-     * @param target target StateNode
-     */
     public Link(StateNode source, StateNode target)
     {
-        this(source, target, new Path(source.getState(), target.getState(), new TreeSet<>()));
+        this(source, target, Set.of());
     }
 
     /**
@@ -44,13 +41,12 @@ public class Link extends Group
      *
      * @param source source StateNode
      * @param target target StateNode
-     * @param path   path to represent
      */
-    public Link(StateNode source, StateNode target, Path path)
+    public Link(StateNode source, StateNode target, Set<Character> alphabet)
     {
+        alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabet)));
         this.source = new SimpleObjectProperty<>(source);
         this.target = new SimpleObjectProperty<>(target);
-        this.path = path;
 
         menu = createContextMenu();
 
@@ -67,7 +63,8 @@ public class Link extends Group
         rightLine.strokeWidthProperty().bind(Constants.Link.Line.width);
 
         alphabetDisplay = new Text();
-        alphabetDisplay.setText(path.getAlphabet().stream().map(Object::toString).collect(Collectors.joining(", ")));
+        alphabetDisplay.setText(alphabetProperty.stream().map(Object::toString).collect(Collectors.joining(", ")));
+        alphabetProperty.addListener((o, ov, nv) -> alphabetDisplay.setText(nv.stream().map(Object::toString).collect(Collectors.joining(", "))));
 
         updatePositions();
 
@@ -100,11 +97,11 @@ public class Link extends Group
 
     public String getSourceName()
     {
-        return source.get().getState().getName();
+        return source.get().getName();
     }
     public String getTargetName()
     {
-        return target.get().getState().getName();
+        return target.get().getName();
     }
     public SimulationPane getSimulatorParent()
     {
@@ -176,16 +173,10 @@ public class Link extends Group
         }
     }
 
-    protected Set<Character> getAlphabet()
+    protected SetProperty<Character> alphabetProperty()
     {
-        return path.getAlphabet();
+        return alphabetProperty;
     }
-    protected void setAlphabet(Set<Character> alphabet)
-    {
-        path.setAlphabet(alphabet);
-        alphabetDisplay.setText(alphabet.stream().map(Object::toString).collect(Collectors.joining(", ")));
-    }
-
 
     protected ObjectProperty<StateNode> getSource()
     {

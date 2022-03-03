@@ -10,10 +10,10 @@ class NodeEditPane extends VBox
     public NodeEditPane(SimulationPane pane, StateNode node)
     {
         {
-            TextField text = new TextField(node.getState().getName());
+            TextField text = new TextField(node.getName());
             Strings.bind("editpane.node.state_prompt", text.promptTextProperty());
-            text.setText(node.getState().getName());
-            text.setOnAction(event -> node.getState().setName(text.getText()));
+            text.setText(node.getName());
+            text.setOnAction(event -> node.nameProperty().set(text.getText()));
             getChildren().add(text);
         }
 

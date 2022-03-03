@@ -1,7 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import ch.ludovic_mermod.dfasimulator.simulator.State;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.geometry.Point2D;
@@ -17,8 +16,8 @@ public class SimulationPane extends Region
     private final ListProperty<Link> links;
 
     private final ContextMenu menu;
-    private Point2D menuPosition;
 
+    private Point2D menuPosition;
     private Tool tool;
 
     public SimulationPane()
@@ -64,11 +63,11 @@ public class SimulationPane extends Region
 
     private boolean hasNode(String name)
     {
-        return nodes.stream().anyMatch(n -> n.getState().getName().equals(name));
+        return nodes.stream().anyMatch(n -> n.getName().equals(name));
     }
     private StateNode getNode(String name)
     {
-        return nodes.stream().filter(n -> n.getState().getName().equals(name)).findAny().orElse(null);
+        return nodes.stream().filter(n -> n.getName().equals(name)).findAny().orElse(null);
     }
 
     public void addState(StateNode stateNode)
@@ -116,7 +115,7 @@ public class SimulationPane extends Region
             }
             while (hasNode("new" + i));
 
-        StateNode node = new StateNode(new State("new" + (i == 0 ? "" : Integer.toString(i))));
+        StateNode node = new StateNode("new" + (i == 0 ? "" : Integer.toString(i)));
         node.relocate(x, y);
         addState(node);
     }
@@ -131,7 +130,7 @@ public class SimulationPane extends Region
         getChildren().remove(node);
         nodes.remove(node);
 
-        String name = node.getState().getName();
+        String name = node.getName();
         links.stream().filter(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
         links.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
     }

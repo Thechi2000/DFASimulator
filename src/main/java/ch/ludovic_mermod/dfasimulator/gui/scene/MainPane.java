@@ -2,8 +2,6 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Controls;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import ch.ludovic_mermod.dfasimulator.simulator.Path;
-import ch.ludovic_mermod.dfasimulator.simulator.State;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Menu;
@@ -33,15 +31,13 @@ public class MainPane extends BorderPane
 
     private SimulationPane createSimulatorPane()
     {
-        State state1 = new State("source");
-        var stateNode1 = new StateNode(state1);
+        var stateNode1 = new StateNode("source");
         stateNode1.relocate(50, 50);
 
-        State state2 = new State("target");
-        var stateNode2 = new StateNode(state2);
+        var stateNode2 = new StateNode("target");
         stateNode2.relocate(300, 50);
 
-        var link = new Link(stateNode1, stateNode2, new Path(state1, state2, Set.of('0', '1')));
+        var link = new Link(stateNode1, stateNode2, Set.of('0', '1'));
 
         SimulationPane simulationPane = new SimulationPane();
         simulationPane.addState(stateNode1);

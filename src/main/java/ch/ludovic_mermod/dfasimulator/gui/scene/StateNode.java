@@ -2,7 +2,8 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import ch.ludovic_mermod.dfasimulator.simulator.State;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
@@ -16,18 +17,13 @@ import javafx.scene.text.Text;
 public class StateNode extends Group
 {
     private final Position pos;
-    private final State state;
+    private final StringProperty nameProperty;
     private final ContextMenu menu;
     private MenuItem deleteMenuItem;
 
-    /**
-     * Constructs a StateNode representing a State
-     *
-     * @param state the state to represent
-     */
-    public StateNode(State state)
+    public StateNode(String name)
     {
-        this.state = state;
+        nameProperty = new SimpleStringProperty(name);
         menu = createContextMenu();
         pos = new Position();
 
@@ -35,10 +31,11 @@ public class StateNode extends Group
         circle.radiusProperty().bind(Constants.Node.Circle.radius);
         circle.fillProperty().bind(Constants.Node.Circle.color);
 
-        Text text = new Text(state.getName());
+        Text text = new Text();
         text.fontProperty().bind(Constants.Node.Text.font);
+        text.textProperty().bind(nameProperty);
 
-        getChildren().addAll(circle, new Text(state.getName()));
+        getChildren().addAll(circle, text);
         addEventHandlers();
         setOnContextMenuRequested(event ->
         {
@@ -51,9 +48,14 @@ public class StateNode extends Group
     {
         return ((SimulationPane) getParent());
     }
-    public State getState()
+
+    protected StringProperty nameProperty()
     {
-        return state;
+        return nameProperty;
+    }
+    public String getName()
+    {
+        return nameProperty.get();
     }
 
     protected void bindSimulationPane(SimulationPane simulationPane)
@@ -117,7 +119,7 @@ public class StateNode extends Group
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
-                content.putString(state.getName());
+                content.putString(nameProperty.get());
                 db.setContent(content);
             }
 
@@ -132,7 +134,7 @@ public class StateNode extends Group
         setOnDragDropped(event ->
         {
             if (getParent() instanceof SimulationPane && event.getGestureSource() instanceof StateNode)
-                ((SimulationPane) getParent()).createLink(event.getDragboard().getString(), state.getName());
+                ((SimulationPane) getParent()).createLink(event.getDragboard().getString(), nameProperty.get());
         });
     }
 

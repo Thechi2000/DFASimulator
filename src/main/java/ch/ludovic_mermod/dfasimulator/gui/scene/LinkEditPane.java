@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.util.StringConverter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +35,12 @@ class LinkEditPane extends VBox
                 var elements = Arrays.stream(alphabetField.getText().replace(" ", "").split(",")).toList();
 
                 if (elements.stream().allMatch(s -> s.length() == 1))
-                    link.setAlphabet(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
+                {
+                    link.alphabetProperty().clear();
+                    link.alphabetProperty().addAll(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
+                }
             });
-            alphabetField.setText(link.getAlphabet().stream().map(Objects::toString).collect(Collectors.joining(", ")));
+            alphabetField.setText(link.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
             getChildren().add(new HBox(alphabetText, alphabetField));
         }
@@ -48,7 +50,7 @@ class LinkEditPane extends VBox
             ComboBox<String> sourceNodeBox = new ComboBox<>();
             ComboBox<String> targetNodeBox = new ComboBox<>();
 
-            var items = FXCollections.observableList(new ArrayList<>(simulationPane.getNodes().stream().map(n -> n.getState().getName()).toList()));
+            var items = FXCollections.observableList(new ArrayList<>(simulationPane.getNodes().stream().map(StateNode::getName).toList()));
             sourceNodeBox.setItems(items);
             targetNodeBox.setItems(items);
 
@@ -56,16 +58,16 @@ class LinkEditPane extends VBox
             {
                 change.next();
                 if (change.getAddedSize() > 0)
-                    items.addAll(change.getAddedSubList().stream().map(n -> n.getState().getName()).toList());
+                    items.addAll(change.getAddedSubList().stream().map(StateNode::getName).toList());
 
                 if (change.getRemovedSize() > 0)
-                    items.removeAll(change.getRemoved().stream().map(n -> n.getState().getName()).toList());
+                    items.removeAll(change.getRemoved().stream().map(StateNode::getName).toList());
             });
             sourceNodeBox.setValue(link.getSourceName());
             targetNodeBox.setValue(link.getTargetName());
 
-            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
-            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
+            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(simulationPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
+            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(simulationPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
 
             Text linkingText = new Text();
             Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
@@ -82,26 +84,5 @@ class LinkEditPane extends VBox
         });
 
         getChildren().add(deleteButton);
-    }
-
-    private static class StateNodeStringConverter extends StringConverter<StateNode>
-    {
-        private final SimulationPane simulationPane;
-
-        private StateNodeStringConverter(SimulationPane simulationPane)
-        {
-            this.simulationPane = simulationPane;
-        }
-
-        @Override
-        public String toString(StateNode stateNode)
-        {
-            return stateNode.getState().getName();
-        }
-        @Override
-        public StateNode fromString(String s)
-        {
-            return simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(s)).findAny().orElse(null);
-        }
     }
 }
