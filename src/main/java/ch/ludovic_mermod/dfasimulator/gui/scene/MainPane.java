@@ -1,12 +1,8 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
-import ch.ludovic_mermod.dfasimulator.gui.Controls;
-import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
@@ -22,7 +18,7 @@ public class MainPane extends BorderPane
         editPaneProperty = new SimpleObjectProperty<>(new Pane());
 
         simulationPane = createSimulatorPane();
-        MenuBar menuBar = createMenuBar();
+        MenuBar menuBar = MenuBarCreator.createMenuBar(simulationPane);
 
         setCenter(simulationPane);
         setTop(menuBar);
@@ -47,43 +43,15 @@ public class MainPane extends BorderPane
         return simulationPane;
     }
 
-    private MenuBar createMenuBar()
-    {
-        MenuBar menuBar = new MenuBar();
-
-        Menu toolsMenu = new Menu();
-        Strings.bind("tools", toolsMenu.textProperty());
-        menuBar.getMenus().add(toolsMenu);
-
-        MenuItem edit = new MenuItem();
-        Strings.bind("edit", edit.textProperty());
-        edit.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.EDIT));
-        edit.acceleratorProperty().bind(Controls.editTool);
-        toolsMenu.getItems().add(edit);
-
-        MenuItem drag = new MenuItem();
-        Strings.bind("drag", drag.textProperty());
-        drag.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.DRAG));
-        drag.acceleratorProperty().bind(Controls.dragTool);
-        toolsMenu.getItems().add(drag);
-
-        MenuItem link = new MenuItem();
-        Strings.bind("link", link.textProperty());
-        link.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.LINK));
-        link.acceleratorProperty().bind(Controls.linkTool);
-        toolsMenu.getItems().add(link);
-
-        return menuBar;
-    }
-
     protected void bindEditPane(Link link)
     {
-        editPaneProperty.set(new LinkEditPane(simulationPane, link));
+        editPaneProperty.set(EditPaneCreator.createLinkEditPane(simulationPane, link));
     }
     protected void bindEditPane(StateNode stateNode)
     {
-        editPaneProperty.set(new NodeEditPane(simulationPane, stateNode));
+        editPaneProperty.set(EditPaneCreator.createNodeEditPane(simulationPane, stateNode));
     }
+
     protected void removeEditPane()
     {
         editPaneProperty.set(null);

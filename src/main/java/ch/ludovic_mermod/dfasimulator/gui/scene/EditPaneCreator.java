@@ -15,10 +15,11 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-class LinkEditPane extends VBox
+class EditPaneCreator extends VBox
 {
-    public LinkEditPane(SimulationPane simulationPane, Link link)
+    public static VBox createLinkEditPane(SimulationPane simulationPane, Link link)
     {
+        VBox pane = new VBox();
 
         // Setup alphabet edit
         {
@@ -42,7 +43,7 @@ class LinkEditPane extends VBox
             });
             alphabetField.setText(link.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
-            getChildren().add(new HBox(alphabetText, alphabetField));
+            pane.getChildren().add(new HBox(alphabetText, alphabetField));
         }
 
         // Setup linked nodes edit
@@ -72,7 +73,7 @@ class LinkEditPane extends VBox
             Text linkingText = new Text();
             Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
 
-            getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
+            pane.getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
         }
 
         Button deleteButton = new Button();
@@ -83,6 +84,34 @@ class LinkEditPane extends VBox
             simulationPane.removeEditPane();
         });
 
-        getChildren().add(deleteButton);
+        pane.getChildren().add(deleteButton);
+
+        return pane;
+    }
+
+    protected static VBox createNodeEditPane(SimulationPane simulationPane, StateNode node)
+    {
+        VBox pane = new VBox();
+
+        {
+            TextField text = new TextField(node.getName());
+            Strings.bind("editpane.node.state_prompt", text.promptTextProperty());
+            text.setText(node.getName());
+            text.setOnAction(event -> node.nameProperty().set(text.getText()));
+            pane.getChildren().add(text);
+        }
+
+        {
+            Button deleteButton = new Button();
+            Strings.bind("delete", deleteButton.textProperty());
+            deleteButton.setOnAction(event ->
+            {
+                simulationPane.deleteNode(node);
+                simulationPane.removeEditPane();
+            });
+            pane.getChildren().add(deleteButton);
+        }
+
+        return pane;
     }
 }
