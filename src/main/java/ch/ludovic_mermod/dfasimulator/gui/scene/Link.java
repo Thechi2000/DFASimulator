@@ -176,10 +176,16 @@ public class Link extends Group
         }
     }
 
-    public void setAlphabet(Set<Character> alphabet)
+    protected Set<Character> getAlphabet()
+    {
+        return path.getAlphabet();
+    }
+    protected void setAlphabet(Set<Character> alphabet)
     {
         path.setAlphabet(alphabet);
+        alphabetDisplay.setText(alphabet.stream().map(Object::toString).collect(Collectors.joining(", ")));
     }
+
 
     protected ObjectProperty<StateNode> getSource()
     {

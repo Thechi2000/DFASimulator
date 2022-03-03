@@ -22,6 +22,10 @@ public class Strings
         set("edit", "Edit");
         set("drag", "Drag");
         set("link", "Link");
+
+        set("editpane.link.alphabet_text", "Alphabet: ");
+        set("editpane.link.alphabet_prompt", "alphabet");
+        set("editpane.link.nodes_linking", "to");
     }
 
     /**

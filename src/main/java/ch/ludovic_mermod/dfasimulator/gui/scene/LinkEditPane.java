@@ -1,8 +1,8 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -11,55 +11,61 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 class LinkEditPane extends VBox
 {
-    private final TextField alphabetField;
-    private final ComboBox<String> sourceNodeBox, targetNodeBox;
-    private final Button deleteButton;
-    private final SimulationPane simulationPane;
-
-    private ChangeListener<? super String> alphabetFieldListener;
-    private Link link;
-
-    public LinkEditPane(SimulationPane simulationPane)
+    public LinkEditPane(SimulationPane simulationPane, Link link)
     {
-        this.simulationPane = simulationPane;
-        deleteButton = new Button();
 
         // Setup alphabet edit
         {
             Text alphabetText = new Text();
             Strings.bind("editpane.link.alphabet_text", alphabetText.textProperty());
 
-            alphabetField = new TextField();
+            TextField alphabetField = new TextField();
             Strings.bind("editpane.link.alphabet_prompt", alphabetField.promptTextProperty());
+
+
+            alphabetField.setOnAction(event ->
+            {
+                System.out.println("test");
+                var elements = Arrays.stream(alphabetField.getText().replace(" ", "").split(",")).toList();
+
+                if (elements.stream().allMatch(s -> s.length() == 1))
+                    link.setAlphabet(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
+            });
+            alphabetField.setText(link.getAlphabet().stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
             getChildren().add(new HBox(alphabetText, alphabetField));
         }
 
         // Setup linked nodes edit
         {
-            sourceNodeBox = new ComboBox<>();
-            targetNodeBox = new ComboBox<>();
+            ComboBox<String> sourceNodeBox = new ComboBox<>();
+            ComboBox<String> targetNodeBox = new ComboBox<>();
 
-            simulationPane.getNodes().addListener((o, ov, nv) -> updateComboBoxesContent());
-            updateComboBoxesContent();
+            var items = FXCollections.observableList(new ArrayList<>(simulationPane.getNodes().stream().map(n -> n.getState().getName()).toList()));
+            sourceNodeBox.setItems(items);
+            targetNodeBox.setItems(items);
 
-            /*
-            sourceNodeBox.setCellFactory(l -> new TextFieldListCell<>(new StateNodeStringConverter(simulationPane)));
-            sourceNodeBox.setItems(simulationPane.getNodes());
-            sourceNodeBox.setConverter(new StateNodeStringConverter(simulationPane));
-            sourceNodeBox.setEditable(true);
+            simulationPane.getNodes().addListener((ListChangeListener<StateNode>) change ->
+            {
+                change.next();
+                if (change.getAddedSize() > 0)
+                    items.addAll(change.getAddedSubList().stream().map(n -> n.getState().getName()).toList());
 
-            targetNodeBox.setCellFactory(l -> new TextFieldListCell<>(new StateNodeStringConverter(simulationPane)));
-            targetNodeBox.setItems(simulationPane.getNodes());
-            targetNodeBox.setConverter(new StateNodeStringConverter(simulationPane));
-            targetNodeBox.setEditable(false);
-            */
+                if (change.getRemovedSize() > 0)
+                    items.removeAll(change.getRemoved().stream().map(n -> n.getState().getName()).toList());
+            });
+            sourceNodeBox.setValue(link.getSourceName());
+            targetNodeBox.setValue(link.getTargetName());
+
+            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
+            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
 
             Text linkingText = new Text();
             Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
@@ -67,50 +73,15 @@ class LinkEditPane extends VBox
             getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
         }
 
+        Button deleteButton = new Button();
         Strings.bind("delete", deleteButton.textProperty());
-    }
-
-    private void updateComboBoxesContent()
-    {
-        List<String> items = simulationPane.getNodes().stream().map(n -> n.getState().getName()).toList();
-        sourceNodeBox.setItems(FXCollections.observableList(items));
-        targetNodeBox.setItems(FXCollections.observableList(items));
-    }
-
-    protected void bind(Link link)
-    {
-        if (alphabetFieldListener != null)
-            alphabetField.textProperty().removeListener(alphabetFieldListener);
-        alphabetFieldListener = (o, ov, nv) ->
+        deleteButton.setOnAction(event ->
         {
-            var elements = Arrays.stream(nv.replace(" ", "").split(",")).toList();
+            simulationPane.deleteLink(link);
+            simulationPane.removeEditPane();
+        });
 
-            if (elements.stream().allMatch(s -> s.length() == 1))
-                link.setAlphabet(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
-            else
-            {
-                //TODO
-            }
-        };
-
-        if (this.link != null)
-        {
-            this.link.getSource().unbind();
-            this.link.getTarget().unbind();
-        }
-        this.link = link;
-
-        alphabetField.textProperty().addListener(alphabetFieldListener);
-
-        sourceNodeBox.setValue(link.getSourceName());
-        targetNodeBox.setValue(link.getTargetName());
-
-        sourceNodeBox.valueProperty().unbind();
-
-        sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
-        targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(simulationPane.getNodes().stream().filter(n -> n.getState().getName().equals(nv)).findAny().orElseThrow()));
-
-        deleteButton.setOnAction(event -> simulationPane.deleteLink(link));
+        getChildren().add(deleteButton);
     }
 
     private static class StateNodeStringConverter extends StringConverter<StateNode>

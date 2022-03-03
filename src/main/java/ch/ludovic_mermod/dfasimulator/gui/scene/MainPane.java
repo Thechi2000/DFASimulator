@@ -18,8 +18,6 @@ public class MainPane extends BorderPane
 {
     private final SimulationPane simulationPane;
     private final ObjectProperty<Pane> editPaneProperty;
-    private final LinkEditPane linkEditPane;
-    private final NodeEditPane nodeEditPane;
 
     public MainPane()
     {
@@ -27,9 +25,6 @@ public class MainPane extends BorderPane
 
         simulationPane = createSimulatorPane();
         MenuBar menuBar = createMenuBar();
-
-        linkEditPane = new LinkEditPane(simulationPane);
-        nodeEditPane = new NodeEditPane();
 
         setCenter(simulationPane);
         setTop(menuBar);
@@ -85,14 +80,17 @@ public class MainPane extends BorderPane
         return menuBar;
     }
 
-    public void bindEditPane(Link link)
+    protected void bindEditPane(Link link)
     {
         System.out.println("binding edit pane");
-        linkEditPane.bind(link);
-        editPaneProperty.set(linkEditPane);
+        editPaneProperty.set(new LinkEditPane(simulationPane, link));
     }
-    public void bindEditPane(StateNode stateNode)
+    protected void bindEditPane(StateNode stateNode)
     {
-        //TODO
+        editPaneProperty.set(new NodeEditPane(simulationPane, stateNode));
+    }
+    protected void removeEditPane()
+    {
+        editPaneProperty.set(null);
     }
 }

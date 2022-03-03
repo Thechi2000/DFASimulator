@@ -157,6 +157,10 @@ public class SimulationPane extends Region
 
         return menu;
     }
+    protected void removeEditPane()
+    {
+        ((MainPane) getParent()).removeEditPane();
+    }
 
     public enum Tool
     {
