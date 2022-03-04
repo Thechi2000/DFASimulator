@@ -7,7 +7,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
