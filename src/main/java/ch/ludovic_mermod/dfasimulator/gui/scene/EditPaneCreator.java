@@ -4,6 +4,7 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -93,18 +94,38 @@ class EditPaneCreator extends VBox
     {
         VBox pane = new VBox();
 
+        // Name
         {
-            TextField text = new TextField(node.getName());
-            Strings.bind("editpane.node.state_prompt", text.promptTextProperty());
-            text.setText(node.getName());
-            text.setOnAction(event ->
+            TextField nameField = new TextField(node.getName());
+            Strings.bind("editpane.node.state_prompt", nameField.promptTextProperty());
+            nameField.setText(node.getName());
+            nameField.setOnAction(event ->
             {
-                if (graphPane.getNodes().stream().noneMatch(n -> n.getName().equals(text.getText())))
-                    node.nameProperty().set(text.getText());
+                if (graphPane.getNodes().stream().noneMatch(n -> n.getName().equals(nameField.getText())))
+                    node.nameProperty().set(nameField.getText());
             });
-            pane.getChildren().add(text);
+            pane.getChildren().add(nameField);
         }
 
+        // Initial state
+        {
+            CheckBox initialStateBox = new CheckBox();
+            Strings.bind("editpane.node.initial_state", initialStateBox.textProperty());
+            initialStateBox.setSelected(node.initialProperty().get());
+            node.initialProperty().bind(initialStateBox.selectedProperty());
+            pane.getChildren().add(initialStateBox);
+        }
+
+        // Accepting state
+        {
+            CheckBox acceptingStateBox = new CheckBox();
+            Strings.bind("editpane.node.accepting_state", acceptingStateBox.textProperty());
+            acceptingStateBox.setSelected(node.initialProperty().get());
+            node.initialProperty().bind(acceptingStateBox.selectedProperty());
+            pane.getChildren().add(acceptingStateBox);
+        }
+
+        // Delete
         {
             Button deleteButton = new Button();
             Strings.bind("delete", deleteButton.textProperty());
