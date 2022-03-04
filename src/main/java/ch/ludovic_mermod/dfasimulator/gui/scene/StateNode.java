@@ -2,8 +2,8 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
@@ -18,13 +18,20 @@ import javafx.scene.text.TextAlignment;
 
 public class StateNode extends StackPane
 {
-    private final Position pos;
+    private final ListProperty<Link> outgoingLinksProperty;
     private final StringProperty nameProperty;
+    private final BooleanProperty initialProperty, acceptingProperty;
+
+    private final Position pos;
     private final ContextMenu menu;
     private MenuItem deleteMenuItem;
 
     public StateNode(String name)
     {
+        outgoingLinksProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+        initialProperty = new SimpleBooleanProperty(false);
+        acceptingProperty = new SimpleBooleanProperty(false);
+
         setAlignment(Pos.CENTER);
 
         nameProperty = new SimpleStringProperty(name);
@@ -58,6 +65,18 @@ public class StateNode extends StackPane
     {
         return nameProperty;
     }
+    public ListProperty<Link> outgoingLinksProperty()
+    {
+        return outgoingLinksProperty;
+    }
+    public BooleanProperty initialProperty()
+    {
+        return initialProperty;
+    }
+    public BooleanProperty acceptingProperty()
+    {
+        return acceptingProperty;
+    }
     public String getName()
     {
         return nameProperty.get();
@@ -66,6 +85,15 @@ public class StateNode extends StackPane
     protected void bindSimulationPane(GraphPane graphPane)
     {
         deleteMenuItem.disableProperty().bind(graphPane.getSimulationProperty());
+    }
+
+    protected void addLink(Link link)
+    {
+        outgoingLinksProperty.add(link);
+    }
+    protected void removeLink(Link link)
+    {
+        outgoingLinksProperty.remove(link);
     }
 
     private void addEventHandlers()

@@ -3,17 +3,18 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 import ch.ludovic_mermod.dfasimulator.gui.Controls;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
-public class MenuBarCreator
+public class SimulatorMenuBar extends MenuBar
 {
-    protected static javafx.scene.control.MenuBar createMenuBar(GraphPane graphPane)
+    public void create(MainPane mainPane)
     {
-        javafx.scene.control.MenuBar menuBar = new javafx.scene.control.MenuBar();
+        var graphPane = mainPane.getGraphPane();
 
         Menu toolsMenu = new Menu();
         Strings.bind("tools", toolsMenu.textProperty());
-        menuBar.getMenus().add(toolsMenu);
+        getMenus().add(toolsMenu);
 
         MenuItem edit = new MenuItem();
         Strings.bind("edit", edit.textProperty());
@@ -33,6 +34,8 @@ public class MenuBarCreator
         link.acceleratorProperty().bind(Controls.linkTool);
         toolsMenu.getItems().add(link);
 
-        return menuBar;
+        MenuItem test = new MenuItem("test");
+        test.setOnAction(event -> System.out.println(graphPane.isValidDFA()));
+        toolsMenu.getItems().add(test);
     }
 }
