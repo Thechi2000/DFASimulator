@@ -97,7 +97,11 @@ class EditPaneCreator extends VBox
             TextField text = new TextField(node.getName());
             Strings.bind("editpane.node.state_prompt", text.promptTextProperty());
             text.setText(node.getName());
-            text.setOnAction(event -> node.nameProperty().set(text.getText()));
+            text.setOnAction(event ->
+            {
+                if (graphPane.getNodes().stream().noneMatch(n -> n.getName().equals(text.getText())))
+                    node.nameProperty().set(text.getText());
+            });
             pane.getChildren().add(text);
         }
 
