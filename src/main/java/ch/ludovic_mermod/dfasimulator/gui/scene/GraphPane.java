@@ -7,9 +7,11 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
-import javafx.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class GraphPane extends Region
@@ -187,32 +189,30 @@ public class GraphPane extends Region
     public List<Error> checkDFA()
     {
         List<Error> errors = new ArrayList<>();
-
         Set<Character> alphabet = getAlphabet();
 
-        var invalidNodes = nodes.stream()
-                .map(n ->
-                {
-                    List<Character> elements = n.outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
-                    return new Pair<>(elements.size() != alphabet.size() || !elements.containsAll(alphabet), n);
-                })
-                .filter(Pair::getKey)
-                .map(p ->
-                {
-                    List<Character> elements = p.getValue().outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
-                    elements.removeAll(alphabet);
-                    return new Pair<>(p.getValue(), new Pair<>(elements.size() > alphabet.size(), elements));
-                })
-                .collect(() -> new HashMap<StateNode, Pair<Boolean, List<Character>>>(), (m, p) -> m.put(p.getKey(), p.getValue()), HashMap::putAll);
+        for (StateNode node : nodes)
+        {
+            List<Character> elements = node.outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
 
-        if (invalidNodes.size() > 0)
-            errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, invalidNodes));
+            if (elements.size() != alphabet.size())
+            {
+                if (elements.size() < alphabet.size())
+                {
+                    var missingElements = new TreeSet<>(alphabet);
+                    elements.forEach(missingElements::remove);
+                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, false, missingElements}));
+                } else
+                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, true}));
+            }
+        }
+
 
         var initialNodes = nodes.stream().filter(n -> n.initialProperty().get()).toList();
         if (initialNodes.size() == 0)
             errors.add(new Error(ErrorCode.NO_INITIAL_STATE, null));
         else if (initialNodes.size() > 1)
-            errors.add(new Error(ErrorCode.TOO_MANY_INITIAL_STATES, initialNodes));
+            errors.add(new Error(ErrorCode.TOO_MANY_INITIAL_STATES, initialNodes.toArray()));
 
         return errors;
     }
@@ -223,7 +223,7 @@ public class GraphPane extends Region
         List<Error> errors = checkDFA();
 
         if (alphabet.stream().anyMatch(c -> !alphabet.contains(c)))
-            errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())));
+            errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, new Object[]{alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())}));
 
         if (!errors.isEmpty())
             return errors;
@@ -240,7 +240,6 @@ public class GraphPane extends Region
     {
         return null;
     }
-
     public Set<Character> getAlphabet()
     {
         return links.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
@@ -261,7 +260,7 @@ public class GraphPane extends Region
         LINK
     }
 
-    public record Error(ErrorCode code, Object data)
+    public record Error(ErrorCode code, Object[] data)
     {
     }
 }

@@ -25,12 +25,14 @@ public class MainPane extends BorderPane
         simulatorMenuBar.create(this);
         consolePane.create(this);
 
-        createSimulatorPane();
+        fillGraphPane();
 
         setCenter(graphPane);
         setTop(simulatorMenuBar);
         rightProperty().bind(editPaneProperty);
+        setBottom(consolePane);
     }
+
     public SimulatorMenuBar getSimulatorMenuBar()
     {
         return simulatorMenuBar;
@@ -51,7 +53,8 @@ public class MainPane extends BorderPane
     {
         return editPaneProperty;
     }
-    private void createSimulatorPane()
+
+    private void fillGraphPane()
     {
         var stateNode1 = new StateNode("source");
         stateNode1.relocate(50, 50);
@@ -59,11 +62,17 @@ public class MainPane extends BorderPane
         var stateNode2 = new StateNode("target");
         stateNode2.relocate(300, 50);
 
-        var link = new Link(stateNode1, stateNode2, Set.of('0', '1'));
+        var stateNode3 = new StateNode("other");
+        stateNode3.relocate(50, 300);
+
+        var link1 = new Link(stateNode1, stateNode2, Set.of('0', '1'));
+        var link2 = new Link(stateNode1, stateNode3, Set.of('1'));
 
         graphPane.addState(stateNode1);
         graphPane.addState(stateNode2);
-        graphPane.addLink(link);
+        graphPane.addState(stateNode3);
+        graphPane.addLink(link1);
+        graphPane.addLink(link2);
     }
 
     protected void bindEditPane(Link link)
