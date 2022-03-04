@@ -10,22 +10,22 @@ import java.util.Set;
 
 public class MainPane extends BorderPane
 {
-    private final SimulationPane simulationPane;
+    private final GraphPane graphPane;
     private final ObjectProperty<Pane> editPaneProperty;
 
     public MainPane()
     {
         editPaneProperty = new SimpleObjectProperty<>(new Pane());
 
-        simulationPane = createSimulatorPane();
-        MenuBar menuBar = MenuBarCreator.createMenuBar(simulationPane);
+        graphPane = createSimulatorPane();
+        MenuBar menuBar = MenuBarCreator.createMenuBar(graphPane);
 
-        setCenter(simulationPane);
+        setCenter(graphPane);
         setTop(menuBar);
         rightProperty().bind(editPaneProperty);
     }
 
-    private SimulationPane createSimulatorPane()
+    private GraphPane createSimulatorPane()
     {
         var stateNode1 = new StateNode("source");
         stateNode1.relocate(50, 50);
@@ -35,21 +35,21 @@ public class MainPane extends BorderPane
 
         var link = new Link(stateNode1, stateNode2, Set.of('0', '1'));
 
-        SimulationPane simulationPane = new SimulationPane();
-        simulationPane.addState(stateNode1);
-        simulationPane.addState(stateNode2);
-        simulationPane.addLink(link);
+        GraphPane graphPane = new GraphPane();
+        graphPane.addState(stateNode1);
+        graphPane.addState(stateNode2);
+        graphPane.addLink(link);
 
-        return simulationPane;
+        return graphPane;
     }
 
     protected void bindEditPane(Link link)
     {
-        editPaneProperty.set(EditPaneCreator.createLinkEditPane(simulationPane, link));
+        editPaneProperty.set(EditPaneCreator.createLinkEditPane(graphPane, link));
     }
     protected void bindEditPane(StateNode stateNode)
     {
-        editPaneProperty.set(EditPaneCreator.createNodeEditPane(simulationPane, stateNode));
+        editPaneProperty.set(EditPaneCreator.createNodeEditPane(graphPane, stateNode));
     }
 
     protected void removeEditPane()

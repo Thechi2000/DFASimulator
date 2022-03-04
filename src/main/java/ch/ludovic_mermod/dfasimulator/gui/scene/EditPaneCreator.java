@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 class EditPaneCreator extends VBox
 {
-    public static VBox createLinkEditPane(SimulationPane simulationPane, Link link)
+    public static VBox createLinkEditPane(GraphPane graphPane, Link link)
     {
         VBox pane = new VBox();
 
@@ -51,11 +51,11 @@ class EditPaneCreator extends VBox
             ComboBox<String> sourceNodeBox = new ComboBox<>();
             ComboBox<String> targetNodeBox = new ComboBox<>();
 
-            var items = FXCollections.observableList(new ArrayList<>(simulationPane.getNodes().stream().map(StateNode::getName).toList()));
+            var items = FXCollections.observableList(new ArrayList<>(graphPane.getNodes().stream().map(StateNode::getName).toList()));
             sourceNodeBox.setItems(items);
             targetNodeBox.setItems(items);
 
-            simulationPane.getNodes().addListener((ListChangeListener<StateNode>) change ->
+            graphPane.getNodes().addListener((ListChangeListener<StateNode>) change ->
             {
                 change.next();
                 if (change.getAddedSize() > 0)
@@ -67,8 +67,8 @@ class EditPaneCreator extends VBox
             sourceNodeBox.setValue(link.getSourceName());
             targetNodeBox.setValue(link.getTargetName());
 
-            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(simulationPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
-            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(simulationPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
+            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
+            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
 
             Text linkingText = new Text();
             Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
@@ -80,8 +80,8 @@ class EditPaneCreator extends VBox
         Strings.bind("delete", deleteButton.textProperty());
         deleteButton.setOnAction(event ->
         {
-            simulationPane.deleteLink(link);
-            simulationPane.removeEditPane();
+            graphPane.deleteLink(link);
+            graphPane.removeEditPane();
         });
 
         pane.getChildren().add(deleteButton);
@@ -89,7 +89,7 @@ class EditPaneCreator extends VBox
         return pane;
     }
 
-    protected static VBox createNodeEditPane(SimulationPane simulationPane, StateNode node)
+    protected static VBox createNodeEditPane(GraphPane graphPane, StateNode node)
     {
         VBox pane = new VBox();
 
@@ -106,8 +106,8 @@ class EditPaneCreator extends VBox
             Strings.bind("delete", deleteButton.textProperty());
             deleteButton.setOnAction(event ->
             {
-                simulationPane.deleteNode(node);
-                simulationPane.removeEditPane();
+                graphPane.deleteNode(node);
+                graphPane.removeEditPane();
             });
             pane.getChildren().add(deleteButton);
         }

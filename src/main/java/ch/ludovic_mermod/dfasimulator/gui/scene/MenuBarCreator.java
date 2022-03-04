@@ -7,7 +7,7 @@ import javafx.scene.control.MenuItem;
 
 public class MenuBarCreator
 {
-    protected static javafx.scene.control.MenuBar createMenuBar(SimulationPane simulationPane)
+    protected static javafx.scene.control.MenuBar createMenuBar(GraphPane graphPane)
     {
         javafx.scene.control.MenuBar menuBar = new javafx.scene.control.MenuBar();
 
@@ -17,19 +17,19 @@ public class MenuBarCreator
 
         MenuItem edit = new MenuItem();
         Strings.bind("edit", edit.textProperty());
-        edit.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.EDIT));
+        edit.setOnAction(event -> graphPane.setTool(GraphPane.Tool.EDIT));
         edit.acceleratorProperty().bind(Controls.editTool);
         toolsMenu.getItems().add(edit);
 
         MenuItem drag = new MenuItem();
         Strings.bind("drag", drag.textProperty());
-        drag.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.DRAG));
+        drag.setOnAction(event -> graphPane.setTool(GraphPane.Tool.DRAG));
         drag.acceleratorProperty().bind(Controls.dragTool);
         toolsMenu.getItems().add(drag);
 
         MenuItem link = new MenuItem();
         Strings.bind("link", link.textProperty());
-        link.setOnAction(event -> simulationPane.setTool(SimulationPane.Tool.LINK));
+        link.setOnAction(event -> graphPane.setTool(GraphPane.Tool.LINK));
         link.acceleratorProperty().bind(Controls.linkTool);
         toolsMenu.getItems().add(link);
 

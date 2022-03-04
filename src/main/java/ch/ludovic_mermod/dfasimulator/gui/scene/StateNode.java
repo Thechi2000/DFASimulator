@@ -49,9 +49,9 @@ public class StateNode extends StackPane
         });
     }
 
-    public SimulationPane getSimulatorParent()
+    public GraphPane getSimulatorParent()
     {
-        return ((SimulationPane) getParent());
+        return ((GraphPane) getParent());
     }
 
     protected StringProperty nameProperty()
@@ -63,9 +63,9 @@ public class StateNode extends StackPane
         return nameProperty.get();
     }
 
-    protected void bindSimulationPane(SimulationPane simulationPane)
+    protected void bindSimulationPane(GraphPane graphPane)
     {
-        deleteMenuItem.disableProperty().bind(simulationPane.getSimulationProperty());
+        deleteMenuItem.disableProperty().bind(graphPane.getSimulationProperty());
     }
 
     private void addEventHandlers()
@@ -104,7 +104,7 @@ public class StateNode extends StackPane
 
         setOnMouseDragged(event ->
         {
-            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulationPane.Tool.DRAG)
+            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == GraphPane.Tool.DRAG)
             {
                 double distanceX = event.getX() - pos.x;
                 double distanceY = event.getY() - pos.y;
@@ -119,7 +119,7 @@ public class StateNode extends StackPane
 
         setOnDragDetected(event ->
         {
-            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == SimulationPane.Tool.LINK)
+            if (event.isPrimaryButtonDown() && getSimulatorParent().getTool() == GraphPane.Tool.LINK)
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
@@ -137,8 +137,8 @@ public class StateNode extends StackPane
         });
         setOnDragDropped(event ->
         {
-            if (getParent() instanceof SimulationPane && event.getGestureSource() instanceof StateNode)
-                ((SimulationPane) getParent()).createLink(event.getDragboard().getString(), nameProperty.get());
+            if (getParent() instanceof GraphPane && event.getGestureSource() instanceof StateNode)
+                ((GraphPane) getParent()).createLink(event.getDragboard().getString(), nameProperty.get());
         });
     }
 
@@ -148,7 +148,7 @@ public class StateNode extends StackPane
 
         deleteMenuItem = new MenuItem();
         Strings.bind("delete", deleteMenuItem.textProperty());
-        deleteMenuItem.setOnAction(event -> ((SimulationPane) getParent()).deleteNode(this));
+        deleteMenuItem.setOnAction(event -> ((GraphPane) getParent()).deleteNode(this));
         //delete.disableProperty().bind(getSimulatorParent().getSimulationProperty());
         menu.getItems().add(deleteMenuItem);
 

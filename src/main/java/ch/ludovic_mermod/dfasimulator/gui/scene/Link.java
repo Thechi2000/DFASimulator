@@ -103,14 +103,14 @@ public class Link extends Group
     {
         return target.get().getName();
     }
-    public SimulationPane getSimulatorParent()
+    public GraphPane getSimulatorParent()
     {
-        return ((SimulationPane) getParent());
+        return ((GraphPane) getParent());
     }
 
-    protected void bindSimulationPane(SimulationPane simulationPane)
+    protected void bindSimulationPane(GraphPane graphPane)
     {
-        deleteMenuItem.disableProperty().bind(simulationPane.getSimulationProperty());
+        deleteMenuItem.disableProperty().bind(graphPane.getSimulationProperty());
     }
 
     private ContextMenu createContextMenu()

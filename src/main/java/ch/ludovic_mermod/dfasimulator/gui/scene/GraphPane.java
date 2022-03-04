@@ -8,7 +8,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-public class SimulationPane extends Region
+public class GraphPane extends Region
 {
     private final BooleanProperty isSimulating;
 
@@ -20,7 +20,7 @@ public class SimulationPane extends Region
     private Point2D menuPosition;
     private Tool tool;
 
-    public SimulationPane()
+    public GraphPane()
     {
         isSimulating = new SimpleBooleanProperty(false);
 
