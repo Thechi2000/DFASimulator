@@ -218,7 +218,7 @@ public class GraphPane extends Region
         return errors;
     }
 
-    public List<Error> startSimulation(String input)
+    public List<Error> checkDFA(String input)
     {
         Set<Character> alphabet = getAlphabet();
         List<Error> errors = checkDFA();
@@ -226,15 +226,7 @@ public class GraphPane extends Region
         if (alphabet.stream().anyMatch(c -> !alphabet.contains(c)))
             errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, new Object[]{alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())}));
 
-        if (!errors.isEmpty())
-            return errors;
-
-        remainingInputProperty.set(input);
-        currentStateProperty.set(getInitialState());
-        lastUsedLinkProperty.set(null);
-        isSimulating.set(true);
-
-        return List.of();
+        return errors;
     }
 
     public void compileDFA()
@@ -262,6 +254,39 @@ public class GraphPane extends Region
                 default -> throw new IllegalStateException("Unexpected value: " + e.code());
             }
         });
+    }
+
+    public void startSimulation(String input)
+    {
+        if (checkDFA(input).size() > 0)
+            return;
+
+        remainingInputProperty.set(input);
+        currentStateProperty.set(getInitialState());
+        lastUsedLinkProperty.set(null);
+        isSimulating.set(true);
+    }
+
+    public void nextSimulationStep()
+    {
+        if (remainingInputProperty.get().length() == 0)
+        {
+            currentStateProperty.set(null);
+            lastUsedLinkProperty.set(null);
+            isSimulating.set(false);
+            return;
+        }
+
+        String input = remainingInputProperty.get();
+        char c = input.charAt(input.length() - 1);
+        remainingInputProperty.set(input.substring(0, input.length() - 1));
+
+        for (var l : currentStateProperty.get().outgoingLinksProperty().get())
+            if (l.alphabetProperty().contains(c))
+            {
+                currentStateProperty.set(l.getTarget().get());
+                break;
+            }
     }
 
     private StateNode getInitialState()
