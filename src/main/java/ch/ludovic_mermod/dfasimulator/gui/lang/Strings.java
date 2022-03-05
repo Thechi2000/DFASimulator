@@ -14,18 +14,6 @@ public class Strings
     static
     {
         map = new TreeMap<>();
-
-        set("delete", "Delete");
-        set("create", "Create");
-
-        set("tools", "Tools");
-        set("edit", "Edit");
-        set("drag", "Drag");
-        set("link", "Link");
-
-        set("editpane.link.alphabet_text", "Alphabet: ");
-        set("editpane.link.alphabet_prompt", "alphabet");
-        set("editpane.link.nodes_linking", "to");
     }
 
     /**
