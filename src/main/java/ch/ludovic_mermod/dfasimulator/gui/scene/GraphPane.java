@@ -8,11 +8,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane.ErrorCode.TOO_MANY_INITIAL_STATES;
 
 public class GraphPane extends Region
 {
@@ -25,6 +24,7 @@ public class GraphPane extends Region
     private final ListProperty<Link> links;
 
     private ContextMenu menu;
+    private MainPane mainPane;
 
     private Point2D menuPosition;
     private Tool tool;
@@ -46,6 +46,7 @@ public class GraphPane extends Region
 
     public void create(MainPane mainPane)
     {
+        this.mainPane = mainPane;
         menu = createContextMenu();
 
         setOnMousePressed(event -> menu.hide());
@@ -212,7 +213,7 @@ public class GraphPane extends Region
         if (initialNodes.size() == 0)
             errors.add(new Error(ErrorCode.NO_INITIAL_STATE, null));
         else if (initialNodes.size() > 1)
-            errors.add(new Error(ErrorCode.TOO_MANY_INITIAL_STATES, initialNodes.toArray()));
+            errors.add(new Error(TOO_MANY_INITIAL_STATES, initialNodes.toArray()));
 
         return errors;
     }
@@ -234,6 +235,33 @@ public class GraphPane extends Region
         isSimulating.set(true);
 
         return List.of();
+    }
+
+    public void compileDFA()
+    {
+        var errors = checkDFA();
+        errors.forEach(e ->
+        {
+            switch (e.code())
+            {
+                case TOO_MANY_INITIAL_STATES -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((StateNode) o).getName()).collect(Collectors.joining(", ")));
+
+                case NO_INITIAL_STATE -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "No initial state");
+
+                case NODE_DOES_NOT_MATCH_ALPHABET -> {
+                    if (((boolean) e.data()[1]))
+                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" has too many outputs", ((StateNode) e.data()[0]).getName());
+                    else
+                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" is missing outputs { %s }",
+                                ((StateNode) e.data()[0]).getName(),
+                                ((Set<Character>) e.data()[2]).stream()
+                                        .map(Object::toString)
+                                        .collect(Collectors.joining(", ")));
+                }
+
+                default -> throw new IllegalStateException("Unexpected value: " + e.code());
+            }
+        });
     }
 
     private StateNode getInitialState()

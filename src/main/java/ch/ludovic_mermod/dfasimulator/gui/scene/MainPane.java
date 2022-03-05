@@ -9,33 +9,49 @@ import java.util.Set;
 
 public class MainPane extends BorderPane
 {
+    private final SimulationSettingsPane simulationSettingsPane;
+    private final ObjectProperty<Pane> editPaneProperty;
     private final SimulatorMenuBar simulatorMenuBar;
     private final ConsolePane consolePane;
     private final GraphPane graphPane;
-    private final ObjectProperty<Pane> editPaneProperty;
 
     public MainPane()
     {
         editPaneProperty = new SimpleObjectProperty<>(new Pane());
-        graphPane = new GraphPane();
+        simulationSettingsPane = new SimulationSettingsPane();
         simulatorMenuBar = new SimulatorMenuBar();
         consolePane = new ConsolePane();
+        graphPane = new GraphPane();
 
-        graphPane.create(this);
+        simulationSettingsPane.create(this);
         simulatorMenuBar.create(this);
         consolePane.create(this);
+        graphPane.create(this);
 
         fillGraphPane();
 
-        setCenter(graphPane);
-        setTop(simulatorMenuBar);
         rightProperty().bind(editPaneProperty);
+        setLeft(simulationSettingsPane);
+        setTop(simulatorMenuBar);
         setBottom(consolePane);
+        setCenter(graphPane);
     }
 
+    public SimulationSettingsPane getSimulationSettingsPane()
+    {
+        return simulationSettingsPane;
+    }
+    public ObjectProperty<Pane> editPaneProperty()
+    {
+        return editPaneProperty;
+    }
     public SimulatorMenuBar getSimulatorMenuBar()
     {
         return simulatorMenuBar;
+    }
+    public Pane getEditPane()
+    {
+        return editPaneProperty.get();
     }
     public ConsolePane getConsolePane()
     {
@@ -44,14 +60,6 @@ public class MainPane extends BorderPane
     public GraphPane getGraphPane()
     {
         return graphPane;
-    }
-    public Pane getEditPane()
-    {
-        return editPaneProperty.get();
-    }
-    public ObjectProperty<Pane> editPaneProperty()
-    {
-        return editPaneProperty;
     }
 
     private void fillGraphPane()
