@@ -47,6 +47,34 @@ public class StateNode extends StackPane
         text.textProperty().bind(nameProperty);
         text.setTextAlignment(TextAlignment.CENTER);
 
+        getStyleClass().add("refusing");
+        getSimulatorParent().currentStateProperty().addListener((o, ov, nv) ->
+        {
+            if (nv == this)
+                getStyleClass().add("current");
+            else
+                getStyleClass().remove("current");
+        });
+        initialProperty.addListener((o, ov, nv) ->
+        {
+            if (nv)
+                getStyleClass().add("initial");
+            else
+                getStyleClass().remove("initial");
+        });
+        acceptingProperty.addListener((o, ov, nv) ->
+        {
+            if (nv)
+            {
+                getStyleClass().add("accepting");
+                getStyleClass().remove("refusing");
+            } else
+            {
+                getStyleClass().remove("accepting");
+                getStyleClass().add("refusing");
+            }
+        });
+
         getChildren().addAll(circle, text);
         addEventHandlers();
         setOnContextMenuRequested(event ->
