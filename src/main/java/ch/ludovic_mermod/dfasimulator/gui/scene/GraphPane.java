@@ -65,7 +65,14 @@ public class GraphPane extends Region
     {
         return links;
     }
-
+    public ReadOnlyObjectProperty<StateNode> currentStateProperty()
+    {
+        return currentStateProperty;
+    }
+    public ReadOnlyObjectProperty<Link> lastUsedLinkProperty()
+    {
+        return lastUsedLinkProperty;
+    }
     public Tool getTool()
     {
         return tool;
