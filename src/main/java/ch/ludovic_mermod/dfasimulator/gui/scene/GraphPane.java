@@ -239,6 +239,7 @@ public class GraphPane extends Region
     public void compileDFA()
     {
         var errors = checkDFA();
+        mainPane.getConsolePane().clear();
         errors.forEach(e ->
         {
             switch (e.code())

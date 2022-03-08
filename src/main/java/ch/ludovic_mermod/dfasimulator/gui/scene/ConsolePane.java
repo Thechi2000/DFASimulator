@@ -39,4 +39,9 @@ public class ConsolePane extends ScrollPane implements System.Logger
         text.getStyleClass().add(level.name().toLowerCase());
         textFlow.getChildren().add(text);
     }
+
+    public void clear()
+    {
+        textFlow.getChildren().clear();
+    }
 }
