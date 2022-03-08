@@ -12,7 +12,7 @@ import java.util.Set;
 public class MainPane extends BorderPane
 {
     private final SimulationSettingsPane simulationSettingsPane;
-    private final ObjectProperty<Pane> editPaneProperty;
+    private final ObjectProperty<EditPane> editPaneProperty;
     private final SimulatorMenuBar simulatorMenuBar;
     private final ConsolePane consolePane;
     private final GraphPane graphPane;
@@ -57,7 +57,7 @@ public class MainPane extends BorderPane
     {
         return simulationSettingsPane;
     }
-    public ObjectProperty<Pane> editPaneProperty()
+    public ObjectProperty<EditPane> editPaneProperty()
     {
         return editPaneProperty;
     }
@@ -102,11 +102,16 @@ public class MainPane extends BorderPane
 
     protected void bindEditPane(Link link)
     {
-        editPaneProperty.set(EditPaneCreator.createLinkEditPane(graphPane, link));
+        bindEditPane(new LinkEditPane(graphPane, link));
     }
     protected void bindEditPane(StateNode stateNode)
     {
-        editPaneProperty.set(EditPaneCreator.createNodeEditPane(graphPane, stateNode));
+        bindEditPane(new NodeEditPane(graphPane, stateNode));
+    }
+    private void bindEditPane(EditPane pane)
+    {
+        if (editPaneProperty.get() != null) editPaneProperty.get().unbind();
+        editPaneProperty.set(pane);
     }
 
     protected void removeEditPane()

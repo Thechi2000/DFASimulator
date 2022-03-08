@@ -4,11 +4,9 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
@@ -16,19 +14,17 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-class EditPaneCreator extends VBox
+public class LinkEditPane extends EditPane
 {
-    public static VBox createLinkEditPane(GraphPane graphPane, Link link)
+    public LinkEditPane(GraphPane graphPane, Link link)
     {
-        VBox pane = new VBox();
-
         // Setup alphabet edit
         {
             Text alphabetText = new Text();
-            Strings.bind("editpane.link.alphabet_text", alphabetText.textProperty());
+            Strings.bind("editlink.alphabet_text", alphabetText.textProperty());
 
             TextField alphabetField = new TextField();
-            Strings.bind("editpane.link.alphabet_prompt", alphabetField.promptTextProperty());
+            Strings.bind("editlink.alphabet_prompt", alphabetField.promptTextProperty());
 
 
             alphabetField.setOnAction(event ->
@@ -44,7 +40,7 @@ class EditPaneCreator extends VBox
             });
             alphabetField.setText(link.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
-            pane.getChildren().add(new HBox(alphabetText, alphabetField));
+            getChildren().add(new HBox(alphabetText, alphabetField));
         }
 
         // Setup linked nodes edit
@@ -74,7 +70,7 @@ class EditPaneCreator extends VBox
             Text linkingText = new Text();
             Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
 
-            pane.getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
+            getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
         }
 
         Button deleteButton = new Button();
@@ -85,58 +81,12 @@ class EditPaneCreator extends VBox
             graphPane.removeEditPane();
         });
 
-        pane.getChildren().add(deleteButton);
-
-        return pane;
+        getChildren().add(deleteButton);
     }
 
-    protected static VBox createNodeEditPane(GraphPane graphPane, StateNode node)
+    @Override
+    public void unbind()
     {
-        VBox pane = new VBox();
 
-        // Name
-        {
-            TextField nameField = new TextField(node.getName());
-            Strings.bind("editpane.node.state_prompt", nameField.promptTextProperty());
-            nameField.setText(node.getName());
-            nameField.setOnAction(event ->
-            {
-                if (graphPane.getNodes().stream().noneMatch(n -> n.getName().equals(nameField.getText())))
-                    node.nameProperty().set(nameField.getText());
-            });
-            pane.getChildren().add(nameField);
-        }
-
-        // Initial state
-        {
-            CheckBox initialStateBox = new CheckBox();
-            Strings.bind("editpane.node.initial_state", initialStateBox.textProperty());
-            initialStateBox.setSelected(node.initialProperty().get());
-            node.initialProperty().bind(initialStateBox.selectedProperty());
-            pane.getChildren().add(initialStateBox);
-        }
-
-        // Accepting state
-        {
-            CheckBox acceptingStateBox = new CheckBox();
-            Strings.bind("editpane.node.accepting_state", acceptingStateBox.textProperty());
-            acceptingStateBox.setSelected(node.initialProperty().get());
-            node.acceptingProperty().bind(acceptingStateBox.selectedProperty());
-            pane.getChildren().add(acceptingStateBox);
-        }
-
-        // Delete
-        {
-            Button deleteButton = new Button();
-            Strings.bind("delete", deleteButton.textProperty());
-            deleteButton.setOnAction(event ->
-            {
-                graphPane.deleteNode(node);
-                graphPane.removeEditPane();
-            });
-            pane.getChildren().add(deleteButton);
-        }
-
-        return pane;
     }
 }
