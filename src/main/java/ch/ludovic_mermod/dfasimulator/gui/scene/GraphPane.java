@@ -323,8 +323,8 @@ public class GraphPane extends Region
         }
 
         String input = remainingInputProperty.get();
-        char c = input.charAt(input.length() - 1);
-        remainingInputProperty.set(input.substring(0, input.length() - 1));
+        char c = input.charAt(0);
+        remainingInputProperty.set(input.substring(1));
 
         for (var l : currentStateProperty.get().outgoingLinksProperty().get())
             if (l.alphabetProperty().contains(c))
