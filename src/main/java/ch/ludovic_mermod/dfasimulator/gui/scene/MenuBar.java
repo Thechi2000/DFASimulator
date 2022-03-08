@@ -3,10 +3,9 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 import ch.ludovic_mermod.dfasimulator.gui.Controls;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
-public class SimulatorMenuBar extends MenuBar
+public class MenuBar extends javafx.scene.control.MenuBar
 {
 
     public void create(MainPane mainPane)

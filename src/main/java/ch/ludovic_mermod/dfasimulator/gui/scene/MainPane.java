@@ -13,7 +13,7 @@ public class MainPane extends BorderPane
 {
     private final SimulationSettingsPane simulationSettingsPane;
     private final ObjectProperty<EditPane> editPaneProperty;
-    private final SimulatorMenuBar simulatorMenuBar;
+    private final MenuBar menuBar;
     private final ConsolePane consolePane;
     private final GraphPane graphPane;
     private final SplitPane rightPane;
@@ -22,13 +22,13 @@ public class MainPane extends BorderPane
     {
         editPaneProperty = new SimpleObjectProperty<>(null);
         simulationSettingsPane = new SimulationSettingsPane();
-        simulatorMenuBar = new SimulatorMenuBar();
+        menuBar = new MenuBar();
         consolePane = new ConsolePane();
         graphPane = new GraphPane();
         rightPane = new SplitPane();
 
         simulationSettingsPane.create(this);
-        simulatorMenuBar.create(this);
+        menuBar.create(this);
         consolePane.create(this);
         graphPane.create(this);
 
@@ -48,7 +48,7 @@ public class MainPane extends BorderPane
         fillGraphPane();
 
         setRight(rightPane);
-        setTop(simulatorMenuBar);
+        setTop(menuBar);
         setBottom(consolePane);
         setCenter(graphPane);
     }
@@ -61,9 +61,9 @@ public class MainPane extends BorderPane
     {
         return editPaneProperty;
     }
-    public SimulatorMenuBar getSimulatorMenuBar()
+    public MenuBar getSimulatorMenuBar()
     {
-        return simulatorMenuBar;
+        return menuBar;
     }
     public Pane getEditPane()
     {
