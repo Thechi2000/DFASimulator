@@ -2,6 +2,8 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Orientation;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
@@ -14,24 +16,38 @@ public class MainPane extends BorderPane
     private final SimulatorMenuBar simulatorMenuBar;
     private final ConsolePane consolePane;
     private final GraphPane graphPane;
+    private final SplitPane rightPane;
 
     public MainPane()
     {
-        editPaneProperty = new SimpleObjectProperty<>(new Pane());
+        editPaneProperty = new SimpleObjectProperty<>(null);
         simulationSettingsPane = new SimulationSettingsPane();
         simulatorMenuBar = new SimulatorMenuBar();
         consolePane = new ConsolePane();
         graphPane = new GraphPane();
+        rightPane = new SplitPane();
 
         simulationSettingsPane.create(this);
         simulatorMenuBar.create(this);
         consolePane.create(this);
         graphPane.create(this);
 
+        editPaneProperty.addListener((o, ov, nv) ->
+        {
+            if (nv != null)
+            {
+                if (ov == null)
+                    rightPane.getItems().add(0, nv);
+                else
+                    rightPane.getItems().set(0, nv);
+            }
+        });
+        rightPane.setOrientation(Orientation.VERTICAL);
+        rightPane.getItems().add(simulationSettingsPane);
+
         fillGraphPane();
 
-        rightProperty().bind(editPaneProperty);
-        setLeft(simulationSettingsPane);
+        setRight(rightPane);
         setTop(simulatorMenuBar);
         setBottom(consolePane);
         setCenter(graphPane);
@@ -64,13 +80,14 @@ public class MainPane extends BorderPane
 
     private void fillGraphPane()
     {
-        var stateNode1 = new StateNode("source");
+        var stateNode1 = new StateNode("source", graphPane);
         stateNode1.relocate(50, 50);
+        stateNode1.acceptingProperty().set(true);
 
-        var stateNode2 = new StateNode("target");
+        var stateNode2 = new StateNode("target", graphPane);
         stateNode2.relocate(300, 50);
 
-        var stateNode3 = new StateNode("other");
+        var stateNode3 = new StateNode("other", graphPane);
         stateNode3.relocate(50, 300);
 
         var link1 = new Link(stateNode1, stateNode2, Set.of('0', '1'));
