@@ -16,7 +16,8 @@ public class MainPane extends BorderPane
     private final MenuBar menuBar;
     private final ConsolePane consolePane;
     private final GraphPane graphPane;
-    private final SplitPane rightPane;
+    private final SimulationStatePane simulationStatePane;
+    private final SplitPane rightSplitPane;
 
     public MainPane()
     {
@@ -25,29 +26,31 @@ public class MainPane extends BorderPane
         menuBar = new MenuBar();
         consolePane = new ConsolePane();
         graphPane = new GraphPane();
-        rightPane = new SplitPane();
+        simulationStatePane = new SimulationStatePane();
+        rightSplitPane = new SplitPane();
 
         simulationSettingsPane.create(this);
         menuBar.create(this);
         consolePane.create(this);
         graphPane.create(this);
+        simulationStatePane.create(this);
 
         editPaneProperty.addListener((o, ov, nv) ->
         {
             if (nv != null)
             {
                 if (ov == null)
-                    rightPane.getItems().add(0, nv);
+                    rightSplitPane.getItems().add(0, nv);
                 else
-                    rightPane.getItems().set(0, nv);
+                    rightSplitPane.getItems().set(0, nv);
             }
         });
-        rightPane.setOrientation(Orientation.VERTICAL);
-        rightPane.getItems().add(simulationSettingsPane);
+        rightSplitPane.setOrientation(Orientation.VERTICAL);
+        rightSplitPane.getItems().addAll(simulationSettingsPane, simulationStatePane);
 
         fillGraphPane();
 
-        setRight(rightPane);
+        setRight(rightSplitPane);
         setTop(menuBar);
         setBottom(consolePane);
         setCenter(graphPane);
@@ -77,7 +80,11 @@ public class MainPane extends BorderPane
     {
         return graphPane;
     }
-
+    public SimulationStatePane getSimulationStatePane()
+    {
+        return simulationStatePane;
+    }
+    
     private void fillGraphPane()
     {
         var stateNode1 = new StateNode("source", graphPane);
@@ -86,18 +93,21 @@ public class MainPane extends BorderPane
 
         var stateNode2 = new StateNode("target", graphPane);
         stateNode2.relocate(300, 50);
+        stateNode2.initialProperty().set(true);
 
         var stateNode3 = new StateNode("other", graphPane);
         stateNode3.relocate(50, 300);
 
         var link1 = new Link(stateNode1, stateNode2, Set.of('0', '1'));
-        var link2 = new Link(stateNode1, stateNode3, Set.of('1'));
+        var link2 = new Link(stateNode2, stateNode3, Set.of('0', '1'));
+        var link3 = new Link(stateNode3, stateNode1, Set.of('0', '1'));
 
         graphPane.addState(stateNode1);
         graphPane.addState(stateNode2);
         graphPane.addState(stateNode3);
         graphPane.addLink(link1);
         graphPane.addLink(link2);
+        graphPane.addLink(link3);
     }
 
     protected void bindEditPane(Link link)

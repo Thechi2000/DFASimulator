@@ -18,7 +18,11 @@ public class GraphPane extends Region
     private final ObjectProperty<StateNode> currentStateProperty;
     private final ObjectProperty<Link> lastUsedLinkProperty;
     private final StringProperty remainingInputProperty;
-    private final BooleanProperty isSimulating;
+    private final BooleanProperty isSimulatingProperty;
+
+    private final StringProperty initialInputProperty;
+    private final BooleanProperty resultProperty;
+    private final BooleanProperty simulationEndedProperty;
 
     private final ListProperty<StateNode> nodes;
     private final ListProperty<Link> links;
@@ -34,8 +38,11 @@ public class GraphPane extends Region
         currentStateProperty = new SimpleObjectProperty<>();
         lastUsedLinkProperty = new SimpleObjectProperty<>();
         remainingInputProperty = new SimpleStringProperty();
+        isSimulatingProperty = new SimpleBooleanProperty(false);
 
-        isSimulating = new SimpleBooleanProperty(false);
+        initialInputProperty = new SimpleStringProperty("");
+        resultProperty = new SimpleBooleanProperty(false);
+        simulationEndedProperty = new SimpleBooleanProperty(false);
 
         nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
         links = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -65,6 +72,7 @@ public class GraphPane extends Region
     {
         return links;
     }
+
     public ReadOnlyObjectProperty<StateNode> currentStateProperty()
     {
         return currentStateProperty;
@@ -73,6 +81,28 @@ public class GraphPane extends Region
     {
         return lastUsedLinkProperty;
     }
+    public StringProperty remainingInputProperty()
+    {
+        return remainingInputProperty;
+    }
+    public BooleanProperty isSimulatingProperty()
+    {
+        return isSimulatingProperty;
+    }
+
+    public StringProperty initialInputProperty()
+    {
+        return initialInputProperty;
+    }
+    public BooleanProperty resultProperty()
+    {
+        return resultProperty;
+    }
+    public BooleanProperty simulationEndedProperty()
+    {
+        return simulationEndedProperty;
+    }
+
     public Tool getTool()
     {
         return tool;
@@ -84,7 +114,7 @@ public class GraphPane extends Region
 
     public ReadOnlyBooleanProperty getSimulationProperty()
     {
-        return isSimulating;
+        return isSimulatingProperty;
     }
 
     private boolean hasNode(String name)
@@ -183,7 +213,7 @@ public class GraphPane extends Region
         MenuItem create = new MenuItem();
         Strings.bind("create", create.textProperty());
         create.setOnAction(event -> createNode(menuPosition.getX(), menuPosition.getY()));
-        create.disableProperty().bind(isSimulating);
+        create.disableProperty().bind(isSimulatingProperty);
         menu.getItems().add(create);
 
         return menu;
@@ -210,7 +240,8 @@ public class GraphPane extends Region
                     var missingElements = new TreeSet<>(alphabet);
                     elements.forEach(missingElements::remove);
                     errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, false, missingElements}));
-                } else
+                }
+                else
                     errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, true}));
             }
         }
@@ -236,7 +267,7 @@ public class GraphPane extends Region
         return errors;
     }
 
-    public void compileDFA()
+    public boolean compileDFA()
     {
         var errors = checkDFA();
         mainPane.getConsolePane().clear();
@@ -262,17 +293,23 @@ public class GraphPane extends Region
                 default -> throw new IllegalStateException("Unexpected value: " + e.code());
             }
         });
+
+        if (errors.size() == 0)
+            mainPane.getConsolePane().log(System.Logger.Level.INFO, "DFA is valid");
+
+        return errors.size() == 0;
     }
 
     public void startSimulation(String input)
     {
-        if (checkDFA(input).size() > 0)
-            return;
+        if (!compileDFA()) return;
 
-        remainingInputProperty.set(input);
+        isSimulatingProperty.set(true);
+        simulationEndedProperty.set(false);
         currentStateProperty.set(getInitialState());
+        remainingInputProperty.set(input);
         lastUsedLinkProperty.set(null);
-        isSimulating.set(true);
+        initialInputProperty.set(input);
     }
 
     public void nextSimulationStep()
@@ -281,7 +318,7 @@ public class GraphPane extends Region
         {
             currentStateProperty.set(null);
             lastUsedLinkProperty.set(null);
-            isSimulating.set(false);
+            isSimulatingProperty.set(false);
             return;
         }
 
@@ -295,11 +332,29 @@ public class GraphPane extends Region
                 currentStateProperty.set(l.getTarget().get());
                 break;
             }
+
+        if (remainingInputProperty.get().length() == 0)
+            simulationEndedProperty.set(true);
+    }
+
+    public void finish()
+    {
+        if (!isSimulatingProperty.get()) return;
+
+        nextSimulationStep();
+        new Timer().schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                finish();
+            }
+        }, 1000);
     }
 
     private StateNode getInitialState()
     {
-        return null;
+        return nodes.stream().filter(n -> n.initialProperty().get()).findAny().orElse(null);
     }
     public Set<Character> getAlphabet()
     {
