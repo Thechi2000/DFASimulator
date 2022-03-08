@@ -11,29 +11,26 @@ import java.util.Set;
 
 public class MainPane extends BorderPane
 {
-    private final SimulationSettingsPane simulationSettingsPane;
     private final ObjectProperty<EditPane> editPaneProperty;
     private final MenuBar menuBar;
     private final ConsolePane consolePane;
     private final GraphPane graphPane;
-    private final SimulationStatePane simulationStatePane;
+    private final SimulationPane simulationPane;
     private final SplitPane rightSplitPane;
 
     public MainPane()
     {
         editPaneProperty = new SimpleObjectProperty<>(null);
-        simulationSettingsPane = new SimulationSettingsPane();
         menuBar = new MenuBar();
         consolePane = new ConsolePane();
         graphPane = new GraphPane();
-        simulationStatePane = new SimulationStatePane();
+        simulationPane = new SimulationPane();
         rightSplitPane = new SplitPane();
 
-        simulationSettingsPane.create(this);
         menuBar.create(this);
         consolePane.create(this);
         graphPane.create(this);
-        simulationStatePane.create(this);
+        simulationPane.create(this);
 
         editPaneProperty.addListener((o, ov, nv) ->
         {
@@ -46,7 +43,7 @@ public class MainPane extends BorderPane
             }
         });
         rightSplitPane.setOrientation(Orientation.VERTICAL);
-        rightSplitPane.getItems().addAll(simulationSettingsPane, simulationStatePane);
+        rightSplitPane.getItems().addAll(simulationPane);
 
         fillGraphPane();
 
@@ -56,10 +53,6 @@ public class MainPane extends BorderPane
         setCenter(graphPane);
     }
 
-    public SimulationSettingsPane getSimulationSettingsPane()
-    {
-        return simulationSettingsPane;
-    }
     public ObjectProperty<EditPane> editPaneProperty()
     {
         return editPaneProperty;
@@ -80,11 +73,11 @@ public class MainPane extends BorderPane
     {
         return graphPane;
     }
-    public SimulationStatePane getSimulationStatePane()
+    public SimulationPane getSimulationStatePane()
     {
-        return simulationStatePane;
+        return simulationPane;
     }
-    
+
     private void fillGraphPane()
     {
         var stateNode1 = new StateNode("source", graphPane);
