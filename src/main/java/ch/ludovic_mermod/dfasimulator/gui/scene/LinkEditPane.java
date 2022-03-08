@@ -21,10 +21,10 @@ public class LinkEditPane extends EditPane
         // Setup alphabet edit
         {
             Text alphabetText = new Text();
-            Strings.bind("editlink.alphabet_text", alphabetText.textProperty());
+            Strings.bind("edit_pane.link.alphabet_text", alphabetText.textProperty());
 
             TextField alphabetField = new TextField();
-            Strings.bind("editlink.alphabet_prompt", alphabetField.promptTextProperty());
+            Strings.bind("edit_pane.link.alphabet_prompt", alphabetField.promptTextProperty());
 
 
             alphabetField.setOnAction(event ->
@@ -68,7 +68,7 @@ public class LinkEditPane extends EditPane
             targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
 
             Text linkingText = new Text();
-            Strings.bind("editpane.link.nodes_linking", linkingText.textProperty());
+            Strings.bind("edit_pane.link.nodes_linking", linkingText.textProperty());
 
             getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
         }

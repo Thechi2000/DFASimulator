@@ -12,10 +12,11 @@ public class NodeEditPane extends EditPane
     public NodeEditPane(GraphPane graphPane, StateNode node)
     {
         this.node = node;
+
         // Name
         {
             TextField nameField = new TextField(node.getName());
-            Strings.bind("editnode.state_prompt", nameField.promptTextProperty());
+            Strings.bind("edit_pane.node.state_prompt", nameField.promptTextProperty());
             nameField.setText(node.getName());
             nameField.setOnAction(event ->
             {
@@ -28,7 +29,7 @@ public class NodeEditPane extends EditPane
         // Initial state
         {
             CheckBox initialStateBox = new CheckBox();
-            Strings.bind("editnode.initial_state", initialStateBox.textProperty());
+            Strings.bind("edit_pane.node.initial_state", initialStateBox.textProperty());
             initialStateBox.setSelected(node.initialProperty().get());
             node.initialProperty().bind(initialStateBox.selectedProperty());
             getChildren().add(initialStateBox);
@@ -37,7 +38,7 @@ public class NodeEditPane extends EditPane
         // Accepting state
         {
             CheckBox acceptingStateBox = new CheckBox();
-            Strings.bind("editnode.accepting_state", acceptingStateBox.textProperty());
+            Strings.bind("edit_pane.node.accepting_state", acceptingStateBox.textProperty());
             acceptingStateBox.setSelected(node.acceptingProperty().get());
             node.acceptingProperty().bind(acceptingStateBox.selectedProperty());
             getChildren().add(acceptingStateBox);
