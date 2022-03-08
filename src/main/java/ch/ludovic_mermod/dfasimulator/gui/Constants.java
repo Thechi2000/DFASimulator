@@ -11,8 +11,7 @@ import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import static javafx.scene.paint.Color.BLACK;
-import static javafx.scene.paint.Color.GREEN;
+import static javafx.scene.paint.Color.*;
 
 public class Constants
 {
@@ -22,6 +21,8 @@ public class Constants
         {
             public static final ObservableIntegerValue radius = new SimpleIntegerProperty(50);
             public static final ObservableObjectValue<Color> color = new SimpleObjectProperty<>(GREEN);
+            public static final ObservableObjectValue<Color> currentColor = new SimpleObjectProperty<>(RED);
+            public static final ObservableObjectValue<Color> initialColor = new SimpleObjectProperty<>(BLUE);
         }
 
         public static class Text

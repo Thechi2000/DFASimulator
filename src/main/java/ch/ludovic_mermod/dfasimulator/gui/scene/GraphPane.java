@@ -142,7 +142,7 @@ public class GraphPane extends Region
             }
             while (hasNode("new" + i));
 
-        StateNode node = new StateNode("new" + (i == 0 ? "" : Integer.toString(i)));
+        StateNode node = new StateNode("new" + (i == 0 ? "" : Integer.toString(i)), this);
         node.relocate(x, y);
         addState(node);
     }
