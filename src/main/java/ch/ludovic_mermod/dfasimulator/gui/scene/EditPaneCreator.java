@@ -121,7 +121,7 @@ class EditPaneCreator extends VBox
             CheckBox acceptingStateBox = new CheckBox();
             Strings.bind("editpane.node.accepting_state", acceptingStateBox.textProperty());
             acceptingStateBox.setSelected(node.initialProperty().get());
-            node.initialProperty().bind(acceptingStateBox.selectedProperty());
+            node.acceptingProperty().bind(acceptingStateBox.selectedProperty());
             pane.getChildren().add(acceptingStateBox);
         }
 
