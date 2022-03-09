@@ -92,9 +92,9 @@ public class MainPane extends BorderPane
         var stateNode3 = new StateNode("other", graphPane);
         stateNode3.relocate(50, 300);
 
-        var link1 = new Link(stateNode1, stateNode2, Set.of('0', '1'));
-        var link2 = new Link(stateNode2, stateNode3, Set.of('0', '1'));
-        var link3 = new Link(stateNode3, stateNode1, Set.of('0', '1'));
+        var link1 = new Edge(stateNode1, stateNode2, Set.of('0', '1'));
+        var link2 = new Edge(stateNode2, stateNode3, Set.of('0', '1'));
+        var link3 = new Edge(stateNode3, stateNode1, Set.of('0', '1'));
 
         graphPane.addState(stateNode1);
         graphPane.addState(stateNode2);
@@ -106,9 +106,9 @@ public class MainPane extends BorderPane
         graphPane.saveToFile("default.json");
     }
 
-    protected void bindEditPane(Link link)
+    protected void bindEditPane(Edge edge)
     {
-        bindEditPane(new LinkEditPane(graphPane, link));
+        bindEditPane(new EdgeEditPane(graphPane, edge));
     }
     protected void bindEditPane(StateNode stateNode)
     {

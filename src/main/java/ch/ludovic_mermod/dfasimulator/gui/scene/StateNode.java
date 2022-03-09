@@ -22,7 +22,7 @@ import javafx.scene.text.TextAlignment;
 
 public class StateNode extends StackPane
 {
-    private final ListProperty<Link> outgoingLinksProperty;
+    private final ListProperty<Edge> outgoingLinksProperty;
     private final StringProperty nameProperty;
     private final BooleanProperty initialProperty, acceptingProperty;
 
@@ -97,7 +97,7 @@ public class StateNode extends StackPane
     {
         return nameProperty;
     }
-    public ListProperty<Link> outgoingLinksProperty()
+    public ListProperty<Edge> outgoingLinksProperty()
     {
         return outgoingLinksProperty;
     }
@@ -119,13 +119,13 @@ public class StateNode extends StackPane
         deleteMenuItem.disableProperty().bind(graphPane.getSimulationProperty());
     }
 
-    protected void addLink(Link link)
+    protected void addLink(Edge edge)
     {
-        outgoingLinksProperty.add(link);
+        outgoingLinksProperty.add(edge);
     }
-    protected void removeLink(Link link)
+    protected void removeLink(Edge edge)
     {
-        outgoingLinksProperty.remove(link);
+        outgoingLinksProperty.remove(edge);
     }
 
     private void updateCircleColor(Circle c)

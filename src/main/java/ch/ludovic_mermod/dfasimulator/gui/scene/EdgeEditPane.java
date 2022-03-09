@@ -14,17 +14,17 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class LinkEditPane extends EditPane
+public class EdgeEditPane extends EditPane
 {
-    public LinkEditPane(GraphPane graphPane, Link link)
+    public EdgeEditPane(GraphPane graphPane, Edge edge)
     {
         // Setup alphabet edit
         {
             Text alphabetText = new Text();
-            Strings.bind("edit_pane.link.alphabet_text", alphabetText.textProperty());
+            Strings.bind("edit_pane.edge.alphabet_text", alphabetText.textProperty());
 
             TextField alphabetField = new TextField();
-            Strings.bind("edit_pane.link.alphabet_prompt", alphabetField.promptTextProperty());
+            Strings.bind("edit_pane.edge.alphabet_prompt", alphabetField.promptTextProperty());
 
 
             alphabetField.setOnAction(event ->
@@ -34,11 +34,11 @@ public class LinkEditPane extends EditPane
 
                 if (elements.stream().allMatch(s -> s.length() == 1))
                 {
-                    link.alphabetProperty().clear();
-                    link.alphabetProperty().addAll(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
+                    edge.alphabetProperty().clear();
+                    edge.alphabetProperty().addAll(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
                 }
             });
-            alphabetField.setText(link.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
+            alphabetField.setText(edge.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
             getChildren().add(new HBox(alphabetText, alphabetField));
         }
@@ -61,14 +61,14 @@ public class LinkEditPane extends EditPane
                 if (change.getRemovedSize() > 0)
                     items.removeAll(change.getRemoved().stream().map(StateNode::getName).toList());
             });
-            sourceNodeBox.setValue(link.getSourceName());
-            targetNodeBox.setValue(link.getTargetName());
+            sourceNodeBox.setValue(edge.getSourceName());
+            targetNodeBox.setValue(edge.getTargetName());
 
-            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.getSource().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
-            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
+            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getSource().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
+            targetNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
 
             Text linkingText = new Text();
-            Strings.bind("edit_pane.link.nodes_linking", linkingText.textProperty());
+            Strings.bind("edit_pane.edge.nodes_linking", linkingText.textProperty());
 
             getChildren().add(new HBox(sourceNodeBox, linkingText, targetNodeBox));
         }
@@ -77,7 +77,7 @@ public class LinkEditPane extends EditPane
         Strings.bind("delete", deleteButton.textProperty());
         deleteButton.setOnAction(event ->
         {
-            graphPane.deleteLink(link);
+            graphPane.deleteLink(edge);
             graphPane.removeEditPane();
         });
 

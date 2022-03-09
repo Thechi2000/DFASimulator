@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class Link extends Group
+public class Edge extends Group
 {
     private final ObjectProperty<StateNode> source, target;
     private final SetProperty<Character> alphabetProperty;
@@ -34,7 +34,7 @@ public class Link extends Group
     private ContextMenu menu;
     private MenuItem deleteMenuItem;
 
-    public Link(StateNode source, StateNode target)
+    public Edge(StateNode source, StateNode target)
     {
         this(source, target, Set.of());
     }
@@ -45,7 +45,7 @@ public class Link extends Group
      * @param source source StateNode
      * @param target target StateNode
      */
-    public Link(StateNode source, StateNode target, Set<Character> alphabet)
+    public Edge(StateNode source, StateNode target, Set<Character> alphabet)
     {
         alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabet)));
         this.source = new SimpleObjectProperty<>(source);
@@ -79,7 +79,7 @@ public class Link extends Group
             @Override
             public void changed(ObservableValue<? extends Number> o, Number ov, Number nv)
             {
-                Link.this.updatePositions();
+                Edge.this.updatePositions();
             }
         };
 
@@ -98,14 +98,14 @@ public class Link extends Group
         setOnMousePressed(event -> getSimulatorParent().bindEditPane(this));
     }
 
-    public static Link fromJSONObject(JsonObject object, GraphPane graphPane)
+    public static Edge fromJSONObject(JsonObject object, GraphPane graphPane)
     {
         Set<Character> alphabet = new TreeSet<>();
         JsonArray alphabetArray = object.get("alphabet").getAsJsonArray();
         for (int i = 0; i < alphabetArray.size(); ++i)
             alphabet.add(alphabetArray.get(i).getAsString().charAt(0));
 
-        return new Link(
+        return new Edge(
                 graphPane.getNode(object.get("source_name").getAsString()),
                 graphPane.getNode(object.get("target_name").getAsString()),
                 alphabet);

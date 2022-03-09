@@ -22,7 +22,7 @@ import static ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane.ErrorCode.TOO_M
 public class GraphPane extends Region
 {
     private final ObjectProperty<StateNode> currentStateProperty;
-    private final ObjectProperty<Link> lastUsedLinkProperty;
+    private final ObjectProperty<Edge> lastUsedLinkProperty;
     private final StringProperty remainingInputProperty;
     private final BooleanProperty isSimulatingProperty;
 
@@ -31,7 +31,7 @@ public class GraphPane extends Region
     private final BooleanProperty simulationEndedProperty;
 
     private final ListProperty<StateNode> nodes;
-    private final ListProperty<Link> links;
+    private final ListProperty<Edge> edges;
 
     private ContextMenu menu;
     private MainPane mainPane;
@@ -51,7 +51,7 @@ public class GraphPane extends Region
         simulationEndedProperty = new SimpleBooleanProperty(false);
 
         nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
-        links = new SimpleListProperty<>(FXCollections.observableArrayList());
+        edges = new SimpleListProperty<>(FXCollections.observableArrayList());
 
         tool = Tool.EDIT;
     }
@@ -74,16 +74,16 @@ public class GraphPane extends Region
     {
         return nodes;
     }
-    protected ReadOnlyListProperty<Link> getLinks()
+    protected ReadOnlyListProperty<Edge> getLinks()
     {
-        return links;
+        return edges;
     }
 
     public ReadOnlyObjectProperty<StateNode> currentStateProperty()
     {
         return currentStateProperty;
     }
-    public ReadOnlyObjectProperty<Link> lastUsedLinkProperty()
+    public ReadOnlyObjectProperty<Edge> lastUsedLinkProperty()
     {
         return lastUsedLinkProperty;
     }
@@ -137,11 +137,11 @@ public class GraphPane extends Region
         getChildren().add(stateNode);
         nodes.add(stateNode);
     }
-    public void addLink(Link link)
+    public void addLink(Edge edge)
     {
-        link.getSource().get().addLink(link);
-        getChildren().add(link);
-        links.add(link);
+        edge.getSource().get().addLink(edge);
+        getChildren().add(edge);
+        edges.add(edge);
     }
 
     private JsonElement toJSONObject()
@@ -151,10 +151,10 @@ public class GraphPane extends Region
                 linksArray = new JsonArray();
 
         nodes.stream().map(StateNode::toJSONObject).forEach(nodesArray::add);
-        links.stream().map(Link::toJSONObject).forEach(linksArray::add);
+        edges.stream().map(Edge::toJSONObject).forEach(linksArray::add);
 
         object.add("nodes", nodesArray);
-        object.add("links", linksArray);
+        object.add("edges", linksArray);
         return object;
     }
 
@@ -180,10 +180,10 @@ public class GraphPane extends Region
         {
             JsonObject object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             var nodes = object.get("nodes").getAsJsonArray();
-            var links = object.get("links").getAsJsonArray();
+            var links = object.get("edges").getAsJsonArray();
 
             nodes.forEach(e -> addState(StateNode.fromJSONObject(e.getAsJsonObject(), this)));
-            links.forEach(e -> addLink(Link.fromJSONObject(e.getAsJsonObject(), this)));
+            links.forEach(e -> addLink(Edge.fromJSONObject(e.getAsJsonObject(), this)));
         }
         catch (FileNotFoundException e)
         {
@@ -206,7 +206,7 @@ public class GraphPane extends Region
             return;
         }
 
-        Link lnk = new Link(getNode(from), getNode(to));
+        Edge lnk = new Edge(getNode(from), getNode(to));
         addLink(lnk);
     }
     /**
@@ -230,11 +230,11 @@ public class GraphPane extends Region
         addState(node);
     }
 
-    protected void deleteLink(Link link)
+    protected void deleteLink(Edge edge)
     {
-        link.getSource().get().removeLink(link);
-        links.remove(link);
-        getChildren().remove(link);
+        edge.getSource().get().removeLink(edge);
+        edges.remove(edge);
+        getChildren().remove(edge);
     }
     protected void deleteNode(StateNode node)
     {
@@ -242,13 +242,13 @@ public class GraphPane extends Region
         nodes.remove(node);
 
         String name = node.getName();
-        links.stream().filter(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
-        links.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
+        edges.stream().filter(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name)).forEach(l -> getChildren().remove(l));
+        edges.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
     }
 
-    protected void bindEditPane(Link link)
+    protected void bindEditPane(Edge edge)
     {
-        ((MainPane) getParent()).bindEditPane(link);
+        ((MainPane) getParent()).bindEditPane(edge);
     }
     protected void bindEditPane(StateNode stateNode)
     {
@@ -411,7 +411,7 @@ public class GraphPane extends Region
     }
     public Set<Character> getAlphabet()
     {
-        return links.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
+        return edges.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
     }
 
     public enum ErrorCode
