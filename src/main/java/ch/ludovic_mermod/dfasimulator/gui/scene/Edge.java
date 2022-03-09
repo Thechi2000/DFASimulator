@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class Edge extends Group
 {
-    private final ObjectProperty<StateNode> source, target;
+    private final ObjectProperty<Node> source, target;
     private final SetProperty<Character> alphabetProperty;
 
     private final Line line, leftLine, rightLine;
@@ -34,7 +34,7 @@ public class Edge extends Group
     private ContextMenu menu;
     private MenuItem deleteMenuItem;
 
-    public Edge(StateNode source, StateNode target)
+    public Edge(Node source, Node target)
     {
         this(source, target, Set.of());
     }
@@ -42,10 +42,10 @@ public class Edge extends Group
     /**
      * Constructs a link between two StateNodes representing the given Path
      *
-     * @param source source StateNode
-     * @param target target StateNode
+     * @param source source Node
+     * @param target target Node
      */
-    public Edge(StateNode source, StateNode target, Set<Character> alphabet)
+    public Edge(Node source, Node target, Set<Character> alphabet)
     {
         alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabet)));
         this.source = new SimpleObjectProperty<>(source);
@@ -207,11 +207,11 @@ public class Edge extends Group
         return alphabetProperty;
     }
 
-    protected ObjectProperty<StateNode> getSource()
+    protected ObjectProperty<Node> getSource()
     {
         return source;
     }
-    protected ObjectProperty<StateNode> getTarget()
+    protected ObjectProperty<Node> getTarget()
     {
         return target;
     }

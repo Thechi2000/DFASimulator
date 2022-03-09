@@ -7,9 +7,9 @@ import javafx.scene.control.TextField;
 
 public class NodeEditPane extends EditPane
 {
-    private final StateNode node;
+    private final Node node;
 
-    public NodeEditPane(GraphPane graphPane, StateNode node)
+    public NodeEditPane(GraphPane graphPane, Node node)
     {
         this.node = node;
 

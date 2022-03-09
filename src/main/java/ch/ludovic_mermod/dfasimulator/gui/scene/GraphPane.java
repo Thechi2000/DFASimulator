@@ -21,7 +21,7 @@ import static ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane.ErrorCode.TOO_M
 
 public class GraphPane extends Region
 {
-    private final ObjectProperty<StateNode> currentStateProperty;
+    private final ObjectProperty<Node> currentStateProperty;
     private final ObjectProperty<Edge> lastUsedLinkProperty;
     private final StringProperty remainingInputProperty;
     private final BooleanProperty isSimulatingProperty;
@@ -30,7 +30,7 @@ public class GraphPane extends Region
     private final BooleanProperty resultProperty;
     private final BooleanProperty simulationEndedProperty;
 
-    private final ListProperty<StateNode> nodes;
+    private final ListProperty<Node> nodes;
     private final ListProperty<Edge> edges;
 
     private ContextMenu menu;
@@ -70,7 +70,7 @@ public class GraphPane extends Region
         });
     }
 
-    protected ReadOnlyListProperty<StateNode> getNodes()
+    protected ReadOnlyListProperty<Node> getNodes()
     {
         return nodes;
     }
@@ -79,7 +79,7 @@ public class GraphPane extends Region
         return edges;
     }
 
-    public ReadOnlyObjectProperty<StateNode> currentStateProperty()
+    public ReadOnlyObjectProperty<Node> currentStateProperty()
     {
         return currentStateProperty;
     }
@@ -127,15 +127,15 @@ public class GraphPane extends Region
     {
         return nodes.stream().anyMatch(n -> n.getName().equals(name));
     }
-    protected StateNode getNode(String name)
+    protected Node getNode(String name)
     {
         return nodes.stream().filter(n -> n.getName().equals(name)).findAny().orElse(null);
     }
 
-    public void addState(StateNode stateNode)
+    public void addState(Node node)
     {
-        getChildren().add(stateNode);
-        nodes.add(stateNode);
+        getChildren().add(node);
+        nodes.add(node);
     }
     public void addLink(Edge edge)
     {
@@ -150,7 +150,7 @@ public class GraphPane extends Region
         JsonArray nodesArray = new JsonArray(),
                 linksArray = new JsonArray();
 
-        nodes.stream().map(StateNode::toJSONObject).forEach(nodesArray::add);
+        nodes.stream().map(Node::toJSONObject).forEach(nodesArray::add);
         edges.stream().map(Edge::toJSONObject).forEach(linksArray::add);
 
         object.add("nodes", nodesArray);
@@ -182,7 +182,7 @@ public class GraphPane extends Region
             var nodes = object.get("nodes").getAsJsonArray();
             var links = object.get("edges").getAsJsonArray();
 
-            nodes.forEach(e -> addState(StateNode.fromJSONObject(e.getAsJsonObject(), this)));
+            nodes.forEach(e -> addState(Node.fromJSONObject(e.getAsJsonObject(), this)));
             links.forEach(e -> addLink(Edge.fromJSONObject(e.getAsJsonObject(), this)));
         }
         catch (FileNotFoundException e)
@@ -225,7 +225,7 @@ public class GraphPane extends Region
             }
             while (hasNode("new" + i));
 
-        StateNode node = new StateNode("new" + (i == 0 ? "" : Integer.toString(i)), this);
+        Node node = new Node("new" + (i == 0 ? "" : Integer.toString(i)), this);
         node.relocate(x, y);
         addState(node);
     }
@@ -236,7 +236,7 @@ public class GraphPane extends Region
         edges.remove(edge);
         getChildren().remove(edge);
     }
-    protected void deleteNode(StateNode node)
+    protected void deleteNode(Node node)
     {
         getChildren().remove(node);
         nodes.remove(node);
@@ -250,9 +250,9 @@ public class GraphPane extends Region
     {
         ((MainPane) getParent()).bindEditPane(edge);
     }
-    protected void bindEditPane(StateNode stateNode)
+    protected void bindEditPane(Node node)
     {
-        ((MainPane) getParent()).bindEditPane(stateNode);
+        ((MainPane) getParent()).bindEditPane(node);
     }
     protected void removeEditPane()
     {
@@ -282,7 +282,7 @@ public class GraphPane extends Region
         List<Error> errors = new ArrayList<>();
         Set<Character> alphabet = getAlphabet();
 
-        for (StateNode node : nodes)
+        for (Node node : nodes)
         {
             List<Character> elements = node.outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
 
@@ -328,16 +328,16 @@ public class GraphPane extends Region
         {
             switch (e.code())
             {
-                case TOO_MANY_INITIAL_STATES -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((StateNode) o).getName()).collect(Collectors.joining(", ")));
+                case TOO_MANY_INITIAL_STATES -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((Node) o).getName()).collect(Collectors.joining(", ")));
 
                 case NO_INITIAL_STATE -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "No initial state");
 
                 case NODE_DOES_NOT_MATCH_ALPHABET -> {
                     if (((boolean) e.data()[1]))
-                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" has too many outputs", ((StateNode) e.data()[0]).getName());
+                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" has too many outputs", ((Node) e.data()[0]).getName());
                     else
                         mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" is missing outputs { %s }",
-                                ((StateNode) e.data()[0]).getName(),
+                                ((Node) e.data()[0]).getName(),
                                 ((Set<Character>) e.data()[2]).stream()
                                         .map(Object::toString)
                                         .collect(Collectors.joining(", ")));
@@ -405,7 +405,7 @@ public class GraphPane extends Region
         }, 1000);
     }
 
-    private StateNode getInitialState()
+    private Node getInitialState()
     {
         return nodes.stream().filter(n -> n.initialProperty().get()).findAny().orElse(null);
     }

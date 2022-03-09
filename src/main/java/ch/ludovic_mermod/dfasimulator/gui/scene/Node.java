@@ -20,7 +20,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-public class StateNode extends StackPane
+public class Node extends StackPane
 {
     private final ListProperty<Edge> outgoingLinksProperty;
     private final StringProperty nameProperty;
@@ -31,7 +31,7 @@ public class StateNode extends StackPane
     private final GraphPane graphPane;
     private MenuItem deleteMenuItem;
 
-    public StateNode(String name, GraphPane graphPane)
+    public Node(String name, GraphPane graphPane)
     {
         this.graphPane = graphPane;
         outgoingLinksProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -74,9 +74,9 @@ public class StateNode extends StackPane
         });
     }
 
-    public static StateNode fromJSONObject(JsonObject object, GraphPane graphPane)
+    public static Node fromJSONObject(JsonObject object, GraphPane graphPane)
     {
-        StateNode node = new StateNode(object.get("name").getAsString(), graphPane);
+        Node node = new Node(object.get("name").getAsString(), graphPane);
         node.initialProperty.set(object.get("initial").getAsBoolean());
         node.acceptingProperty.set(object.get("accepting").getAsBoolean());
         node.relocate(object.get("x_coord").getAsDouble(), object.get("y_coord").getAsDouble());
@@ -202,7 +202,7 @@ public class StateNode extends StackPane
         });
         setOnDragDropped(event ->
         {
-            if (getParent() instanceof GraphPane && event.getGestureSource() instanceof StateNode)
+            if (getParent() instanceof GraphPane && event.getGestureSource() instanceof Node)
                 ((GraphPane) getParent()).createLink(event.getDragboard().getString(), nameProperty.get());
         });
     }

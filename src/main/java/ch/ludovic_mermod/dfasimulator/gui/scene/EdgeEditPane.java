@@ -48,18 +48,18 @@ public class EdgeEditPane extends EditPane
             ComboBox<String> sourceNodeBox = new ComboBox<>();
             ComboBox<String> targetNodeBox = new ComboBox<>();
 
-            var items = FXCollections.observableList(new ArrayList<>(graphPane.getNodes().stream().map(StateNode::getName).toList()));
+            var items = FXCollections.observableList(new ArrayList<>(graphPane.getNodes().stream().map(Node::getName).toList()));
             sourceNodeBox.setItems(items);
             targetNodeBox.setItems(items);
 
-            graphPane.getNodes().addListener((ListChangeListener<StateNode>) change ->
+            graphPane.getNodes().addListener((ListChangeListener<Node>) change ->
             {
                 change.next();
                 if (change.getAddedSize() > 0)
-                    items.addAll(change.getAddedSubList().stream().map(StateNode::getName).toList());
+                    items.addAll(change.getAddedSubList().stream().map(Node::getName).toList());
 
                 if (change.getRemovedSize() > 0)
-                    items.removeAll(change.getRemoved().stream().map(StateNode::getName).toList());
+                    items.removeAll(change.getRemoved().stream().map(Node::getName).toList());
             });
             sourceNodeBox.setValue(edge.getSourceName());
             targetNodeBox.setValue(edge.getTargetName());

@@ -81,15 +81,15 @@ public class MainPane extends BorderPane
 
     private void fillGraphPane()
     {
-        var stateNode1 = new StateNode("source", graphPane);
+        var stateNode1 = new Node("source", graphPane);
         stateNode1.relocate(50, 50);
         stateNode1.acceptingProperty().set(true);
 
-        var stateNode2 = new StateNode("target", graphPane);
+        var stateNode2 = new Node("target", graphPane);
         stateNode2.relocate(300, 50);
         stateNode2.initialProperty().set(true);
 
-        var stateNode3 = new StateNode("other", graphPane);
+        var stateNode3 = new Node("other", graphPane);
         stateNode3.relocate(50, 300);
 
         var link1 = new Edge(stateNode1, stateNode2, Set.of('0', '1'));
@@ -110,9 +110,9 @@ public class MainPane extends BorderPane
     {
         bindEditPane(new EdgeEditPane(graphPane, edge));
     }
-    protected void bindEditPane(StateNode stateNode)
+    protected void bindEditPane(Node node)
     {
-        bindEditPane(new NodeEditPane(graphPane, stateNode));
+        bindEditPane(new NodeEditPane(graphPane, node));
     }
     private void bindEditPane(EditPane pane)
     {
