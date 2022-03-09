@@ -2,6 +2,8 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -70,6 +72,25 @@ public class StateNode extends StackPane
             menu.show(this, event.getScreenX(), event.getScreenY());
             event.consume();
         });
+    }
+
+    public static StateNode fromJSONObject(JsonObject object, GraphPane graphPane)
+    {
+        StateNode node = new StateNode(object.get("name").getAsString(), graphPane);
+        node.initialProperty.set(object.get("initial").getAsBoolean());
+        node.acceptingProperty.set(object.get("accepting").getAsBoolean());
+        node.relocate(object.get("x_coord").getAsDouble(), object.get("y_coord").getAsDouble());
+        return node;
+    }
+    public JsonElement toJSONObject()
+    {
+        JsonObject object = new JsonObject();
+        object.addProperty("name", nameProperty.get());
+        object.addProperty("initial", initialProperty.get());
+        object.addProperty("accepting", acceptingProperty.get());
+        object.addProperty("x_coord", getLayoutX());
+        object.addProperty("y_coord", getLayoutY());
+        return object;
     }
 
     protected StringProperty nameProperty()

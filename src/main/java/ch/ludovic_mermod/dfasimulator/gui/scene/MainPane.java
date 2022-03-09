@@ -45,7 +45,8 @@ public class MainPane extends BorderPane
         rightSplitPane.setOrientation(Orientation.VERTICAL);
         rightSplitPane.getItems().addAll(simulationPane);
 
-        fillGraphPane();
+        //fillGraphPane();
+        graphPane.loadFromFile("default.json");
 
         setRight(rightSplitPane);
         setTop(menuBar);
@@ -101,6 +102,8 @@ public class MainPane extends BorderPane
         graphPane.addLink(link1);
         graphPane.addLink(link2);
         graphPane.addLink(link3);
+
+        graphPane.saveToFile("default.json");
     }
 
     protected void bindEditPane(Link link)

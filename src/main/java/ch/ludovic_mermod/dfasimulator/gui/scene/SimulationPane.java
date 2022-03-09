@@ -13,15 +13,9 @@ public class SimulationPane extends VBox
     private MainPane mainPane;
     private TextField inputTextField;
 
-    public SimulationPane()
-    {
-
-    }
-
     public void create(MainPane mainPane)
     {
         this.mainPane = mainPane;
-
         // Input
         {
             inputTextField = new TextField();

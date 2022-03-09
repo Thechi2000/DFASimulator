@@ -1,6 +1,10 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.geometry.Point2D;
@@ -8,6 +12,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -117,11 +123,11 @@ public class GraphPane extends Region
         return isSimulatingProperty;
     }
 
-    private boolean hasNode(String name)
+    protected boolean hasNode(String name)
     {
         return nodes.stream().anyMatch(n -> n.getName().equals(name));
     }
-    private StateNode getNode(String name)
+    protected StateNode getNode(String name)
     {
         return nodes.stream().filter(n -> n.getName().equals(name)).findAny().orElse(null);
     }
@@ -136,6 +142,53 @@ public class GraphPane extends Region
         link.getSource().get().addLink(link);
         getChildren().add(link);
         links.add(link);
+    }
+
+    private JsonElement toJSONObject()
+    {
+        JsonObject object = new JsonObject();
+        JsonArray nodesArray = new JsonArray(),
+                linksArray = new JsonArray();
+
+        nodes.stream().map(StateNode::toJSONObject).forEach(nodesArray::add);
+        links.stream().map(Link::toJSONObject).forEach(linksArray::add);
+
+        object.add("nodes", nodesArray);
+        object.add("links", linksArray);
+        return object;
+    }
+
+    void saveToFile(String filename)
+    {
+        File file = new File(filename);
+        try
+        {
+            if (!file.exists()) file.createNewFile();
+            try (FileOutputStream o = new FileOutputStream(file))
+            {
+                o.write(toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    void loadFromFile(String filename)
+    {
+        try
+        {
+            JsonObject object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            var nodes = object.get("nodes").getAsJsonArray();
+            var links = object.get("links").getAsJsonArray();
+
+            nodes.forEach(e -> addState(StateNode.fromJSONObject(e.getAsJsonObject(), this)));
+            links.forEach(e -> addLink(Link.fromJSONObject(e.getAsJsonObject(), this)));
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**

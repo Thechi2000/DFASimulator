@@ -2,6 +2,9 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -93,6 +96,31 @@ public class Link extends Group
         getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
 
         setOnMousePressed(event -> getSimulatorParent().bindEditPane(this));
+    }
+
+    public static Link fromJSONObject(JsonObject object, GraphPane graphPane)
+    {
+        Set<Character> alphabet = new TreeSet<>();
+        JsonArray alphabetArray = object.get("alphabet").getAsJsonArray();
+        for (int i = 0; i < alphabetArray.size(); ++i)
+            alphabet.add(alphabetArray.get(i).getAsString().charAt(0));
+
+        return new Link(
+                graphPane.getNode(object.get("source_name").getAsString()),
+                graphPane.getNode(object.get("target_name").getAsString()),
+                alphabet);
+    }
+    public JsonElement toJSONObject()
+    {
+        JsonObject object = new JsonObject();
+        object.addProperty("source_name", source.get().getName());
+        object.addProperty("target_name", target.get().getName());
+
+        JsonArray alphabetArray = new JsonArray();
+        alphabetProperty.forEach(c -> alphabetArray.add(c.toString()));
+
+        object.add("alphabet", alphabetArray);
+        return object;
     }
 
     public String getSourceName()
