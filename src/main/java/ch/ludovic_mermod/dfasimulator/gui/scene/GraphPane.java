@@ -33,6 +33,8 @@ public class GraphPane extends Region
     private final ListProperty<Node> nodes;
     private final ListProperty<Edge> edges;
 
+    private final StringProperty filenameProperty;
+
     private ContextMenu menu;
     private MainPane mainPane;
 
@@ -53,9 +55,10 @@ public class GraphPane extends Region
         nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
         edges = new SimpleListProperty<>(FXCollections.observableArrayList());
 
+        filenameProperty = new SimpleStringProperty();
+
         tool = Tool.EDIT;
     }
-
 
     public void create(MainPane mainPane)
     {
@@ -158,9 +161,16 @@ public class GraphPane extends Region
         return object;
     }
 
-    void saveToFile(String filename)
+    public void save()
     {
-        File file = new File(filename);
+        if (filenameProperty.isEmpty().get() || filenameProperty.get().isEmpty())
+        {
+            String str = mainPane.getSimulatorMenuBar().chooseSaveFile();
+            if (str == null) return;
+            filenameProperty.set(str);
+        }
+
+        File file = new File(filenameProperty.get());
         try
         {
             if (!file.exists()) file.createNewFile();
@@ -174,21 +184,40 @@ public class GraphPane extends Region
             e.printStackTrace();
         }
     }
-    void loadFromFile(String filename)
+    public void saveAs(String filename)
     {
+        filenameProperty.set(filename);
+        save();
+    }
+    public void open(String filename)
+    {
+        filenameProperty.set(filename);
+
         try
         {
-            JsonObject object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            var nodes = object.get("nodes").getAsJsonArray();
-            var links = object.get("edges").getAsJsonArray();
+            JsonObject object = JsonParser.parseReader(new FileReader(filenameProperty.get())).getAsJsonObject();
+            var nodesArray = object.get("nodes").getAsJsonArray();
+            var edgesArray = object.get("edges").getAsJsonArray();
 
-            nodes.forEach(e -> addState(Node.fromJSONObject(e.getAsJsonObject(), this)));
-            links.forEach(e -> addLink(Edge.fromJSONObject(e.getAsJsonObject(), this)));
+            nodes.clear();
+            edges.clear();
+            getChildren().clear();
+
+            nodesArray.forEach(e -> addState(Node.fromJSONObject(e.getAsJsonObject(), this)));
+            edgesArray.forEach(e -> addLink(Edge.fromJSONObject(e.getAsJsonObject(), this)));
         }
         catch (FileNotFoundException e)
         {
             e.printStackTrace();
         }
+    }
+    public void openNew()
+    {
+        nodes.clear();
+        edges.clear();
+        getChildren().clear();
+
+        filenameProperty.set(null);
     }
 
     /**
