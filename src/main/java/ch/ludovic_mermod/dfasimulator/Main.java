@@ -10,9 +10,6 @@ public class Main extends Application
 {
     public static final System.Logger logger = new Logger();
 
-    private MainPane mainPane;
-    private Stage primaryStage;
-
     public static void main(String[] args)
     {
         launch(args);
@@ -21,8 +18,7 @@ public class Main extends Application
     @Override
     public void start(Stage primaryStage)
     {
-        this.primaryStage = primaryStage;
-        mainPane = new MainPane();
+        MainPane mainPane = new MainPane();
 
         Strings.format("window.title", primaryStage.titleProperty(), mainPane.getSimulation().ioManager().filenameProperty());
 

@@ -1,10 +1,5 @@
-module ch.thechi2000.dfasimulator {
+module ch.ludovic_mermod.dfasimulator {
     requires javafx.controls;
-    requires javafx.fxml;
-
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires validatorfx;
     requires com.google.gson;
 
     exports ch.ludovic_mermod.dfasimulator;

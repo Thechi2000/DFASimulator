@@ -28,12 +28,6 @@ public class Edge extends Group
     private ContextMenu menu;
     private MenuItem deleteMenuItem;
 
-    /**
-     * Constructs a link between two StateNodes representing the given Path
-     *
-     * @param source source Node
-     * @param target target Node
-     */
     public Edge(Link link, GraphPane graphPane)
     {
         this.link = link;
