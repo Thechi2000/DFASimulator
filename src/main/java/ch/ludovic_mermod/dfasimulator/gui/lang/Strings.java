@@ -3,9 +3,13 @@ package ch.ludovic_mermod.dfasimulator.gui.lang;
 import ch.ludovic_mermod.dfasimulator.Main;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class Strings
 {
@@ -26,7 +30,7 @@ public class Strings
     {
         if (!map.containsKey(id))
         {
-            Main.logger.log(System.Logger.Level.WARNING, String.format("Could not find translated string for \"%s\"", id));
+            Main.logger.log(System.Logger.Level.WARNING, String.format("Could not find translated string for \"%s\"", id.replace("%s", "%%s")));
             set(id, id);
         }
 
@@ -43,6 +47,25 @@ public class Strings
     {
         target.set(get(id).get());
         target.bind(get(id));
+    }
+
+    public static void format(String id, StringProperty target, Object... objects)
+    {
+        StringProperty format = get(id);
+
+        int occ = (format.get().length() - format.get().replace("%s", "").length()) / 2;
+        if (objects.length != occ)
+            Main.logger.log(System.Logger.Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
+
+        Set<ObservableValue<?>> properties = Arrays.stream(objects)
+                .filter(o -> o instanceof ObservableValue<?>)
+                .map(o -> (ObservableValue<?>) o)
+                .collect(Collectors.toSet());
+
+        properties.add(format);
+
+        target.set(String.format(format.get(), Arrays.stream(objects).map(o -> o instanceof ObservableValue<?> ? ((ObservableValue<?>) o).getValue() : o).toArray()));
+        properties.forEach(p -> p.addListener((obs, ov, nv) -> target.set(String.format(format.get(), Arrays.stream(objects).map(o -> o instanceof ObservableValue<?> ? ((ObservableValue<?>) o).getValue() : o).toArray()))));
     }
 
     /**
