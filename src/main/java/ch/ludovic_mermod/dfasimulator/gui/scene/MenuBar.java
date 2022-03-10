@@ -33,7 +33,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem newItem = new MenuItem();
             Strings.bind("menu.file.new", newItem.textProperty());
-            newItem.setOnAction(event -> mainPane.getGraphPane().openNew());
+            newItem.setOnAction(event -> mainPane.getGraphPane().ioManager().openNew());
             newItem.acceleratorProperty().bind(Controls.newFile);
             fileMenu.getItems().add(newItem);
 
@@ -48,7 +48,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem save = new MenuItem();
             Strings.bind("menu.file.save", save.textProperty());
-            save.setOnAction(event -> mainPane.getGraphPane().save());
+            save.setOnAction(event -> mainPane.getGraphPane().ioManager().save());
             save.acceleratorProperty().bind(Controls.save);
             fileMenu.getItems().add(save);
 
@@ -90,13 +90,13 @@ public class MenuBar extends javafx.scene.control.MenuBar
         fileChooser.setTitle(Strings.get("menu.file.open").get());
         File f = fileChooser.showOpenDialog(getScene().getWindow());
         saveLastFilePath(f);
-        if (f != null) mainPane.getGraphPane().open(f.getAbsolutePath());
+        if (f != null) mainPane.getGraphPane().ioManager().open(f.getAbsolutePath());
     }
 
     private void saveAs()
     {
         String path = chooseSaveFile();
-        if (path != null) mainPane.getGraphPane().saveAs(path);
+        if (path != null) mainPane.getGraphPane().ioManager().saveAs(path);
     }
 
     public String chooseSaveFile()

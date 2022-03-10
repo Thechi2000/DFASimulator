@@ -4,16 +4,14 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +31,7 @@ public class GraphPane extends Region
     private final ListProperty<Node> nodes;
     private final ListProperty<Edge> edges;
 
-    private final StringProperty filenameProperty;
+    private final IOManager ioManager;
 
     private ContextMenu menu;
     private MainPane mainPane;
@@ -55,9 +53,9 @@ public class GraphPane extends Region
         nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
         edges = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-        filenameProperty = new SimpleStringProperty();
-
         tool = Tool.EDIT;
+
+        ioManager = new IOManager(this);
     }
 
     public void create(MainPane mainPane)
@@ -77,7 +75,7 @@ public class GraphPane extends Region
     {
         return nodes;
     }
-    protected ReadOnlyListProperty<Edge> getLinks()
+    protected ReadOnlyListProperty<Edge> getEdges()
     {
         return edges;
     }
@@ -147,7 +145,7 @@ public class GraphPane extends Region
         edges.add(edge);
     }
 
-    private JsonElement toJSONObject()
+    protected JsonElement toJSONObject()
     {
         JsonObject object = new JsonObject();
         JsonArray nodesArray = new JsonArray(),
@@ -159,65 +157,6 @@ public class GraphPane extends Region
         object.add("nodes", nodesArray);
         object.add("edges", linksArray);
         return object;
-    }
-
-    public void save()
-    {
-        if (filenameProperty.isEmpty().get() || filenameProperty.get().isEmpty())
-        {
-            String str = mainPane.getSimulatorMenuBar().chooseSaveFile();
-            if (str == null) return;
-            filenameProperty.set(str);
-        }
-
-        File file = new File(filenameProperty.get());
-        try
-        {
-            if (!file.exists()) file.createNewFile();
-            try (FileOutputStream o = new FileOutputStream(file))
-            {
-                o.write(toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    public void saveAs(String filename)
-    {
-        filenameProperty.set(filename);
-        save();
-    }
-    public void open(String filename)
-    {
-        filenameProperty.set(filename);
-
-        try
-        {
-            JsonObject object = JsonParser.parseReader(new FileReader(filenameProperty.get())).getAsJsonObject();
-            var nodesArray = object.get("nodes").getAsJsonArray();
-            var edgesArray = object.get("edges").getAsJsonArray();
-
-            nodes.clear();
-            edges.clear();
-            getChildren().clear();
-
-            nodesArray.forEach(e -> addState(Node.fromJSONObject(e.getAsJsonObject(), this)));
-            edgesArray.forEach(e -> addLink(Edge.fromJSONObject(e.getAsJsonObject(), this)));
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    public void openNew()
-    {
-        nodes.clear();
-        edges.clear();
-        getChildren().clear();
-
-        filenameProperty.set(null);
     }
 
     /**
@@ -441,6 +380,20 @@ public class GraphPane extends Region
     public Set<Character> getAlphabet()
     {
         return edges.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
+    }
+
+    public MainPane getMainPane()
+    {
+        return mainPane;
+    }
+    public ObservableList<javafx.scene.Node> children()
+    {
+        return getChildren();
+    }
+
+    public IOManager ioManager()
+    {
+        return ioManager;
     }
 
     public enum ErrorCode
