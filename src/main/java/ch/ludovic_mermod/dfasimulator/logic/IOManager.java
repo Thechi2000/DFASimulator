@@ -6,6 +6,7 @@ import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
 import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -15,24 +16,27 @@ import java.nio.charset.StandardCharsets;
 public class IOManager
 {
     private final GraphPane graphPane;
-    private final StringProperty filenameProperty;
+    private final StringProperty filenameProperty, filepathProperty;
 
     public IOManager(GraphPane graphPane)
     {
         this.graphPane = graphPane;
         filenameProperty = new SimpleStringProperty();
+        filepathProperty = new SimpleStringProperty();
+
+        filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(new File(filepathProperty.get()).getName()));
     }
 
     public void save()
     {
-        if (filenameProperty.isEmpty().get() || filenameProperty.get().isEmpty())
+        if (filepathProperty.isEmpty().get() || filepathProperty.get().isEmpty())
         {
             String str = graphPane.getMainPane().getSimulatorMenuBar().chooseSaveFile();
             if (str == null) return;
-            filenameProperty.set(str);
+            filepathProperty.set(str);
         }
 
-        File file = new File(filenameProperty.get());
+        File file = new File(filepathProperty.get());
         try
         {
             if (!file.exists() && file.createNewFile())
@@ -50,16 +54,16 @@ public class IOManager
     }
     public void saveAs(String filename)
     {
-        filenameProperty.set(filename);
+        filepathProperty.set(filename);
         save();
     }
     public void open(String filename)
     {
-        filenameProperty.set(filename);
+        filepathProperty.set(filename);
 
         try
         {
-            JsonObject object = JsonParser.parseReader(new FileReader(filenameProperty.get())).getAsJsonObject();
+            JsonObject object = JsonParser.parseReader(new FileReader(filepathProperty.get())).getAsJsonObject();
             var nodesArray = object.get("nodes").getAsJsonArray();
             var edgesArray = object.get("edges").getAsJsonArray();
 
@@ -81,6 +85,15 @@ public class IOManager
         graphPane.getEdges().clear();
         graphPane.children().clear();
 
-        filenameProperty.set(null);
+        filepathProperty.set(null);
+    }
+
+    public ReadOnlyStringProperty filepathProperty()
+    {
+        return filepathProperty;
+    }
+    public ReadOnlyStringProperty filenameProperty()
+    {
+        return filenameProperty;
     }
 }
