@@ -64,8 +64,8 @@ public class EdgeEditPane extends EditPane
             sourceNodeBox.setValue(edge.getSourceName());
             targetNodeBox.setValue(edge.getTargetName());
 
-            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getSource().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
-            targetNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow()));
+            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getSource().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow().getState()));
+            targetNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow().getState()));
 
             Text linkingText = new Text();
             Strings.bind("edit_pane.edge.nodes_linking", linkingText.textProperty());

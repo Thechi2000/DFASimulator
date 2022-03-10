@@ -22,31 +22,25 @@ import javafx.scene.text.TextAlignment;
 
 public class Node extends StackPane
 {
-    private final ListProperty<Edge> outgoingLinksProperty;
-    private final StringProperty nameProperty;
-    private final BooleanProperty initialProperty, acceptingProperty;
-
     private final Position pos;
     private final ContextMenu menu;
     private final GraphPane graphPane;
+    private final State state;
     private MenuItem deleteMenuItem;
 
     public Node(String name, GraphPane graphPane)
     {
+        state = new State(name, this);
         this.graphPane = graphPane;
-        outgoingLinksProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-        initialProperty = new SimpleBooleanProperty(false);
-        acceptingProperty = new SimpleBooleanProperty(false);
 
         setAlignment(Pos.CENTER);
 
-        nameProperty = new SimpleStringProperty(name);
         menu = createContextMenu();
         pos = new Position();
 
         Circle innerCircle = new Circle();
         innerCircle.radiusProperty().bind(Constants.Node.Circle.radius);
-        initialProperty.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        state.initialProperty.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.currentColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.initialColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.color.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
@@ -58,11 +52,11 @@ public class Node extends StackPane
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
         outerCircle.setFill(Color.TRANSPARENT);
-        outerCircle.visibleProperty().bind(acceptingProperty);
+        outerCircle.visibleProperty().bind(state.acceptingProperty);
 
         Text text = new Text();
         text.fontProperty().bind(Constants.Node.Text.font);
-        text.textProperty().bind(nameProperty);
+        text.textProperty().bind(state.nameProperty);
         text.setTextAlignment(TextAlignment.CENTER);
 
         getChildren().addAll(outerCircle, innerCircle, text);
@@ -77,17 +71,17 @@ public class Node extends StackPane
     public static Node fromJSONObject(JsonObject object, GraphPane graphPane)
     {
         Node node = new Node(object.get("name").getAsString(), graphPane);
-        node.initialProperty.set(object.get("initial").getAsBoolean());
-        node.acceptingProperty.set(object.get("accepting").getAsBoolean());
+        node.state.initialProperty.set(object.get("initial").getAsBoolean());
+        node.state.acceptingProperty.set(object.get("accepting").getAsBoolean());
         node.relocate(object.get("x_coord").getAsDouble(), object.get("y_coord").getAsDouble());
         return node;
     }
     public JsonElement toJSONObject()
     {
         JsonObject object = new JsonObject();
-        object.addProperty("name", nameProperty.get());
-        object.addProperty("initial", initialProperty.get());
-        object.addProperty("accepting", acceptingProperty.get());
+        object.addProperty("name", state.nameProperty.get());
+        object.addProperty("initial", state.initialProperty.get());
+        object.addProperty("accepting", state.acceptingProperty.get());
         object.addProperty("x_coord", getLayoutX());
         object.addProperty("y_coord", getLayoutY());
         return object;
@@ -95,23 +89,27 @@ public class Node extends StackPane
 
     protected StringProperty nameProperty()
     {
-        return nameProperty;
+        return state.nameProperty;
     }
-    public ListProperty<Edge> outgoingLinksProperty()
+    public ListProperty<Edge.Link> outgoingLinksProperty()
     {
-        return outgoingLinksProperty;
+        return state.outgoingLinksProperty;
     }
     public BooleanProperty initialProperty()
     {
-        return initialProperty;
+        return state.initialProperty;
     }
     public BooleanProperty acceptingProperty()
     {
-        return acceptingProperty;
+        return state.acceptingProperty;
     }
     public String getName()
     {
-        return nameProperty.get();
+        return state.nameProperty.get();
+    }
+    public State getState()
+    {
+        return state;
     }
 
     protected void bindSimulationPane(GraphPane graphPane)
@@ -119,18 +117,13 @@ public class Node extends StackPane
         deleteMenuItem.disableProperty().bind(graphPane.getSimulationProperty());
     }
 
-    protected void addLink(Edge edge)
-    {
-        outgoingLinksProperty.add(edge);
-    }
-    protected void removeLink(Edge edge)
-    {
-        outgoingLinksProperty.remove(edge);
-    }
-
     private void updateCircleColor(Circle c)
     {
-        c.setFill(graphPane.currentStateProperty().get() == this ? Constants.Node.Circle.currentColor.get() : initialProperty.get() ? Constants.Node.Circle.initialColor.get() : Constants.Node.Circle.color.get());
+        c.setFill(graphPane.currentStateProperty().get() == state
+                ? Constants.Node.Circle.currentColor.get()
+                : state.initialProperty.get()
+                ? Constants.Node.Circle.initialColor.get()
+                : Constants.Node.Circle.color.get());
     }
 
     private void addEventHandlers()
@@ -188,7 +181,7 @@ public class Node extends StackPane
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
-                content.putString(nameProperty.get());
+                content.putString(state.nameProperty.get());
                 db.setContent(content);
             }
 
@@ -203,7 +196,7 @@ public class Node extends StackPane
         setOnDragDropped(event ->
         {
             if (getParent() instanceof GraphPane && event.getGestureSource() instanceof Node)
-                ((GraphPane) getParent()).createLink(event.getDragboard().getString(), nameProperty.get());
+                ((GraphPane) getParent()).createLink(event.getDragboard().getString(), state.nameProperty.get());
         });
     }
 
@@ -226,4 +219,55 @@ public class Node extends StackPane
         double y;
     }
 
+    public static class State
+    {
+        private final ListProperty<Edge.Link> outgoingLinksProperty;
+        private final StringProperty nameProperty;
+        private final BooleanProperty initialProperty, acceptingProperty;
+        private final Node node;
+
+        public State(String name, Node node)
+        {
+            this.node = node;
+            outgoingLinksProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+            nameProperty = new SimpleStringProperty(name);
+            initialProperty = new SimpleBooleanProperty(false);
+            acceptingProperty = new SimpleBooleanProperty(false);
+        }
+
+        public Node getNode()
+        {
+            return node;
+        }
+
+        protected void addLink(Edge.Link link)
+        {
+            outgoingLinksProperty.add(link);
+        }
+        protected void removeLink(Edge.Link link)
+        {
+            outgoingLinksProperty.remove(link);
+        }
+
+        protected StringProperty nameProperty()
+        {
+            return nameProperty;
+        }
+        public ListProperty<Edge.Link> outgoingLinksProperty()
+        {
+            return outgoingLinksProperty;
+        }
+        public BooleanProperty initialProperty()
+        {
+            return initialProperty;
+        }
+        public BooleanProperty acceptingProperty()
+        {
+            return acceptingProperty;
+        }
+        public String getName()
+        {
+            return nameProperty.get();
+        }
+    }
 }

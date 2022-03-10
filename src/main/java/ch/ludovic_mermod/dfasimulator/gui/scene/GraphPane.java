@@ -66,11 +66,11 @@ public class GraphPane extends Region
         return edges;
     }
 
-    public ReadOnlyObjectProperty<Node> currentStateProperty()
+    public ReadOnlyObjectProperty<Node.State> currentStateProperty()
     {
         return simulation.currentStateProperty;
     }
-    public ReadOnlyObjectProperty<Edge> lastUsedLinkProperty()
+    public ReadOnlyObjectProperty<Edge.Link> lastUsedLinkProperty()
     {
         return simulation.lastUsedLinkProperty;
     }
@@ -126,7 +126,7 @@ public class GraphPane extends Region
     }
     public void addLink(Edge edge)
     {
-        edge.getSource().get().addLink(edge);
+        edge.getSource().get().addLink(edge.getLink());
         getChildren().add(edge);
         edges.add(edge);
     }
@@ -186,7 +186,7 @@ public class GraphPane extends Region
 
     protected void deleteLink(Edge edge)
     {
-        edge.getSource().get().removeLink(edge);
+        edge.getSource().get().removeLink(edge.getLink());
         edges.remove(edge);
         getChildren().remove(edge);
     }
@@ -313,8 +313,8 @@ public class GraphPane extends Region
 
     public static class Simulation
     {
-        private final ObjectProperty<Node> currentStateProperty;
-        private final ObjectProperty<Edge> lastUsedLinkProperty;
+        private final ObjectProperty<Node.State> currentStateProperty;
+        private final ObjectProperty<Edge.Link> lastUsedLinkProperty;
         private final StringProperty remainingInputProperty;
         private final BooleanProperty isSimulatingProperty;
 
@@ -471,9 +471,9 @@ public class GraphPane extends Region
             }, 1000);
         }
 
-        public Node getInitialState()
+        public Node.State getInitialState()
         {
-            return graphPane.getNodes().stream().filter(n -> n.initialProperty().get()).findAny().orElse(null);
+            return graphPane.getNodes().stream().filter(n -> n.initialProperty().get()).findAny().orElseThrow().getState();
         }
         public Set<Character> getAlphabet()
         {

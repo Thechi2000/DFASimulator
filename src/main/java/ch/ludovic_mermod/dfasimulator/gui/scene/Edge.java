@@ -25,8 +25,7 @@ import java.util.stream.Collectors;
 
 public class Edge extends Group
 {
-    private final ObjectProperty<Node> source, target;
-    private final SetProperty<Character> alphabetProperty;
+    private final Link link;
 
     private final Line line, leftLine, rightLine;
     private final Text alphabetDisplay;
@@ -47,9 +46,7 @@ public class Edge extends Group
      */
     public Edge(Node source, Node target, Set<Character> alphabet, GraphPane graphPane)
     {
-        alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabet)));
-        this.source = new SimpleObjectProperty<>(source);
-        this.target = new SimpleObjectProperty<>(target);
+        link = new Link(source.getState(), target.getState(), alphabet);
 
         menu = createContextMenu();
 
@@ -66,13 +63,13 @@ public class Edge extends Group
         rightLine.strokeWidthProperty().bind(Constants.Link.Line.width);
 
         alphabetDisplay = new Text();
-        alphabetDisplay.setText(alphabetProperty.stream().map(Object::toString).collect(Collectors.joining(", ")));
-        alphabetProperty.addListener((o, ov, nv) -> alphabetDisplay.setText(nv.stream().map(Object::toString).collect(Collectors.joining(", "))));
+        alphabetDisplay.setText(link.alphabetProperty.stream().map(Object::toString).collect(Collectors.joining(", ")));
+        link.alphabetProperty.addListener((o, ov, nv) -> alphabetDisplay.setText(nv.stream().map(Object::toString).collect(Collectors.joining(", "))));
 
         updatePositions();
 
-        this.source.addListener((o, ov, nv) -> updatePositions());
-        this.target.addListener((o, ov, nv) -> updatePositions());
+        link.source.addListener((o, ov, nv) -> updatePositions());
+        link.target.addListener((o, ov, nv) -> updatePositions());
 
         var updatePos = new ChangeListener<Number>()
         {
@@ -114,11 +111,11 @@ public class Edge extends Group
     public JsonElement toJSONObject()
     {
         JsonObject object = new JsonObject();
-        object.addProperty("source_name", source.get().getName());
-        object.addProperty("target_name", target.get().getName());
+        object.addProperty("source_name", link.source.get().getName());
+        object.addProperty("target_name", link.target.get().getName());
 
         JsonArray alphabetArray = new JsonArray();
-        alphabetProperty.forEach(c -> alphabetArray.add(c.toString()));
+        link.alphabetProperty.forEach(c -> alphabetArray.add(c.toString()));
 
         object.add("alphabet", alphabetArray);
         return object;
@@ -126,11 +123,11 @@ public class Edge extends Group
 
     public String getSourceName()
     {
-        return source.get().getName();
+        return link.source.get().getName();
     }
     public String getTargetName()
     {
-        return target.get().getName();
+        return link.target.get().getName();
     }
     public GraphPane getSimulatorParent()
     {
@@ -160,8 +157,8 @@ public class Edge extends Group
     private void updatePositions()
     {
         double radius = Constants.Node.Circle.radius.get();
-        Point2D startCenter = new Point2D(source.get().getLayoutX() + radius, source.get().getLayoutY() + radius),
-                endCenter = new Point2D(target.get().getLayoutX() + radius, target.get().getLayoutY() + radius),
+        Point2D startCenter = new Point2D(link.source.get().getNode().getLayoutX() + radius, link.source.get().getNode().getLayoutY() + radius),
+                endCenter = new Point2D(link.target.get().getNode().getLayoutX() + radius, link.target.get().getNode().getLayoutY() + radius),
                 director = endCenter.subtract(startCenter).normalize(),
                 normal = new Point2D(director.getY(), -director.getX()),
                 start = startCenter.add(director.multiply(Constants.Node.Circle.radius.get())),
@@ -205,15 +202,45 @@ public class Edge extends Group
 
     protected SetProperty<Character> alphabetProperty()
     {
-        return alphabetProperty;
+        return link.alphabetProperty;
     }
 
-    protected ObjectProperty<Node> getSource()
+    protected ObjectProperty<Node.State> getSource()
     {
-        return source;
+        return link.source;
     }
-    protected ObjectProperty<Node> getTarget()
+    protected ObjectProperty<Node.State> getTarget()
     {
-        return target;
+        return link.target;
+    }
+    public Link getLink()
+    {
+        return link;
+    }
+
+    public static class Link
+    {
+        private final ObjectProperty<Node.State> source, target;
+        private final SetProperty<Character> alphabetProperty;
+
+        public Link(Node.State source, Node.State target, Set<Character> alphabetProperty)
+        {
+            this.source = new SimpleObjectProperty<>(source);
+            this.target = new SimpleObjectProperty<>(target);
+            this.alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabetProperty)));
+        }
+
+        protected SetProperty<Character> alphabetProperty()
+        {
+            return alphabetProperty;
+        }
+        protected ObjectProperty<Node.State> getSource()
+        {
+            return source;
+        }
+        protected ObjectProperty<Node.State> getTarget()
+        {
+            return target;
+        }
     }
 }
