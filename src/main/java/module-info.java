@@ -8,7 +8,9 @@ module ch.thechi2000.dfasimulator {
     requires com.google.gson;
 
     exports ch.ludovic_mermod.dfasimulator;
-    opens ch.ludovic_mermod.dfasimulator.gui to javafx.fxml;
+    exports ch.ludovic_mermod.dfasimulator.logic;
     exports ch.ludovic_mermod.dfasimulator.gui.scene;
+
+    opens ch.ludovic_mermod.dfasimulator.gui to javafx.fxml;
     opens ch.ludovic_mermod.dfasimulator.gui.scene to javafx.fxml;
 }

@@ -2,11 +2,12 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.logic.Link;
+import ch.ludovic_mermod.dfasimulator.logic.State;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
@@ -40,7 +41,7 @@ public class Node extends StackPane
 
         Circle innerCircle = new Circle();
         innerCircle.radiusProperty().bind(Constants.Node.Circle.radius);
-        state.initialProperty.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        state.initialProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.currentColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.initialColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.color.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
@@ -52,11 +53,11 @@ public class Node extends StackPane
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
         outerCircle.setFill(Color.TRANSPARENT);
-        outerCircle.visibleProperty().bind(state.acceptingProperty);
+        outerCircle.visibleProperty().bind(state.acceptingProperty());
 
         Text text = new Text();
         text.fontProperty().bind(Constants.Node.Text.font);
-        text.textProperty().bind(state.nameProperty);
+        text.textProperty().bind(state.nameProperty());
         text.setTextAlignment(TextAlignment.CENTER);
 
         getChildren().addAll(outerCircle, innerCircle, text);
@@ -71,17 +72,17 @@ public class Node extends StackPane
     public static Node fromJSONObject(JsonObject object, GraphPane graphPane)
     {
         Node node = new Node(object.get("name").getAsString(), graphPane);
-        node.state.initialProperty.set(object.get("initial").getAsBoolean());
-        node.state.acceptingProperty.set(object.get("accepting").getAsBoolean());
+        node.state.initialProperty().set(object.get("initial").getAsBoolean());
+        node.state.acceptingProperty().set(object.get("accepting").getAsBoolean());
         node.relocate(object.get("x_coord").getAsDouble(), object.get("y_coord").getAsDouble());
         return node;
     }
     public JsonElement toJSONObject()
     {
         JsonObject object = new JsonObject();
-        object.addProperty("name", state.nameProperty.get());
-        object.addProperty("initial", state.initialProperty.get());
-        object.addProperty("accepting", state.acceptingProperty.get());
+        object.addProperty("name", state.nameProperty().get());
+        object.addProperty("initial", state.initialProperty().get());
+        object.addProperty("accepting", state.acceptingProperty().get());
         object.addProperty("x_coord", getLayoutX());
         object.addProperty("y_coord", getLayoutY());
         return object;
@@ -89,23 +90,23 @@ public class Node extends StackPane
 
     protected StringProperty nameProperty()
     {
-        return state.nameProperty;
+        return state.nameProperty();
     }
-    public ListProperty<Edge.Link> outgoingLinksProperty()
+    public ListProperty<Link> outgoingLinksProperty()
     {
-        return state.outgoingLinksProperty;
+        return state.outgoingLinksProperty();
     }
     public BooleanProperty initialProperty()
     {
-        return state.initialProperty;
+        return state.initialProperty();
     }
     public BooleanProperty acceptingProperty()
     {
-        return state.acceptingProperty;
+        return state.acceptingProperty();
     }
     public String getName()
     {
-        return state.nameProperty.get();
+        return state.nameProperty().get();
     }
     public State getState()
     {
@@ -121,7 +122,7 @@ public class Node extends StackPane
     {
         c.setFill(graphPane.currentStateProperty().get() == state
                 ? Constants.Node.Circle.currentColor.get()
-                : state.initialProperty.get()
+                : state.initialProperty().get()
                 ? Constants.Node.Circle.initialColor.get()
                 : Constants.Node.Circle.color.get());
     }
@@ -181,7 +182,7 @@ public class Node extends StackPane
             {
                 Dragboard db = startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
-                content.putString(state.nameProperty.get());
+                content.putString(state.nameProperty().get());
                 db.setContent(content);
             }
 
@@ -196,7 +197,7 @@ public class Node extends StackPane
         setOnDragDropped(event ->
         {
             if (getParent() instanceof GraphPane && event.getGestureSource() instanceof Node)
-                ((GraphPane) getParent()).createLink(event.getDragboard().getString(), state.nameProperty.get());
+                ((GraphPane) getParent()).createLink(event.getDragboard().getString(), state.nameProperty().get());
         });
     }
 
@@ -219,55 +220,4 @@ public class Node extends StackPane
         double y;
     }
 
-    public static class State
-    {
-        private final ListProperty<Edge.Link> outgoingLinksProperty;
-        private final StringProperty nameProperty;
-        private final BooleanProperty initialProperty, acceptingProperty;
-        private final Node node;
-
-        public State(String name, Node node)
-        {
-            this.node = node;
-            outgoingLinksProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-            nameProperty = new SimpleStringProperty(name);
-            initialProperty = new SimpleBooleanProperty(false);
-            acceptingProperty = new SimpleBooleanProperty(false);
-        }
-
-        public Node getNode()
-        {
-            return node;
-        }
-
-        protected void addLink(Edge.Link link)
-        {
-            outgoingLinksProperty.add(link);
-        }
-        protected void removeLink(Edge.Link link)
-        {
-            outgoingLinksProperty.remove(link);
-        }
-
-        protected StringProperty nameProperty()
-        {
-            return nameProperty;
-        }
-        public ListProperty<Edge.Link> outgoingLinksProperty()
-        {
-            return outgoingLinksProperty;
-        }
-        public BooleanProperty initialProperty()
-        {
-            return initialProperty;
-        }
-        public BooleanProperty acceptingProperty()
-        {
-            return acceptingProperty;
-        }
-        public String getName()
-        {
-            return nameProperty.get();
-        }
-    }
 }
