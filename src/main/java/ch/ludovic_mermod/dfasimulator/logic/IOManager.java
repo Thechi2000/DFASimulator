@@ -2,7 +2,6 @@ package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.gui.scene.Edge;
-import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
 import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -15,12 +14,12 @@ import java.nio.charset.StandardCharsets;
 
 public class IOManager
 {
-    private final GraphPane graphPane;
+    private final Simulation simulation;
     private final StringProperty filenameProperty, filepathProperty;
 
-    public IOManager(GraphPane graphPane)
+    public IOManager(Simulation simulation)
     {
-        this.graphPane = graphPane;
+        this.simulation = simulation;
         filenameProperty = new SimpleStringProperty();
         filepathProperty = new SimpleStringProperty();
 
@@ -31,7 +30,7 @@ public class IOManager
     {
         if (filepathProperty.isEmpty().get() || filepathProperty.get().isEmpty())
         {
-            String str = graphPane.getMainPane().getSimulatorMenuBar().chooseSaveFile();
+            String str = simulation.getGraphPane().getMainPane().getSimulatorMenuBar().chooseSaveFile();
             if (str == null) return;
             filepathProperty.set(str);
         }
@@ -42,7 +41,7 @@ public class IOManager
             if (!file.exists() && file.createNewFile())
                 try (FileOutputStream o = new FileOutputStream(file))
                 {
-                    o.write(graphPane.toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
+                    o.write(simulation.toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
                 }
             else
                 Main.logger.log(System.Logger.Level.ERROR, "Could not create file " + file.getAbsolutePath());
@@ -67,12 +66,10 @@ public class IOManager
             var nodesArray = object.get("nodes").getAsJsonArray();
             var edgesArray = object.get("edges").getAsJsonArray();
 
-            graphPane.getNodes().clear();
-            graphPane.getEdges().clear();
-            graphPane.children().clear();
+            simulation.clear();
 
-            nodesArray.forEach(e -> graphPane.addState(Node.fromJSONObject(e.getAsJsonObject(), graphPane)));
-            edgesArray.forEach(e -> graphPane.addLink(Edge.fromJSONObject(e.getAsJsonObject(), graphPane)));
+            nodesArray.forEach(e -> simulation.addState(State.fromJSONObject(e.getAsJsonObject(), simulation)));
+            edgesArray.forEach(e -> simulation.addLink(Link.fromJSONObject(e.getAsJsonObject(), simulation)));
         }
         catch (FileNotFoundException e)
         {
@@ -81,10 +78,7 @@ public class IOManager
     }
     public void openNew()
     {
-        graphPane.getNodes().clear();
-        graphPane.getEdges().clear();
-        graphPane.children().clear();
-
+        simulation.clear();
         filepathProperty.set(null);
     }
 

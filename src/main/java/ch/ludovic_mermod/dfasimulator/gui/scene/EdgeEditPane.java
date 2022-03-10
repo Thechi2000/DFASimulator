@@ -77,7 +77,7 @@ public class EdgeEditPane extends EditPane
         Strings.bind("delete", deleteButton.textProperty());
         deleteButton.setOnAction(event ->
         {
-            graphPane.deleteLink(edge);
+            graphPane.getSimulation().deleteLink(edge.getLink());
             graphPane.getMainPane().removeEditPane();
         });
 

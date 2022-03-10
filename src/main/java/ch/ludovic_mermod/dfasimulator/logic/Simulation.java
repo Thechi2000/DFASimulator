@@ -2,13 +2,23 @@ package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
 import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation
 {
+    private final IOManager ioManager;
+
+    private final SetProperty<State> states;
+    private final SetProperty<Link> links;
+
     private final ObjectProperty<State> currentStateProperty;
     private final ObjectProperty<Link> lastUsedLinkProperty;
     private final StringProperty remainingInputProperty;
@@ -20,9 +30,14 @@ public class Simulation
 
     private final GraphPane graphPane;
 
-    public Simulation(GraphPane graphPane)
+    public Simulation()
     {
-        this.graphPane = graphPane;
+        ioManager = new IOManager(this);
+
+        states = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(Comparator.comparing(State::getName))));
+        links = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
+
+        this.graphPane = new GraphPane(this);
         currentStateProperty = new SimpleObjectProperty<>();
         lastUsedLinkProperty = new SimpleObjectProperty<>();
         remainingInputProperty = new SimpleStringProperty();
@@ -61,6 +76,107 @@ public class Simulation
     public ReadOnlyBooleanProperty simulationEndedProperty()
     {
         return simulationEndedProperty;
+    }
+
+
+    /**
+     * Create and add a link between two StateNodes
+     *
+     * @param from the name of the source state
+     * @param to   the name of the target state
+     */
+    public void createLink(String from, String to)
+    {
+        if (!hasState(from) || !hasState(to))
+        {
+            System.out.println("Could not link " + from + " and " + to);
+            System.out.println("{" + hasState(from) + ", " + hasState(to) + "}");
+            return;
+        }
+
+        Link link = new Link(getState(from), getState(to), Set.of(), this);
+        addLink(link);
+    }
+    /**
+     * Create and add a node at the given coordinates
+     *
+     * @param x coordinate
+     * @param y coordinate
+     */
+    public void createNode(double x, double y)
+    {
+        int i = 0;
+        if (hasState("new"))
+            do
+            {
+                ++i;
+            }
+            while (hasState("new" + i));
+
+        State state = new State("new" + (i == 0 ? "" : Integer.toString(i)), this);
+        state.getNode().relocate(x, y);
+        addState(state);
+    }
+
+    public void addState(State state)
+    {
+        graphPane.children().add(state.getNode());
+        states.add(state);
+    }
+    public void addLink(Link link)
+    {
+        link.source().get().addLink(link);
+        graphPane.children().add(link.getEdge());
+        links.add(link);
+    }
+
+    public void deleteLink(Link link)
+    {
+        link.source().get().removeLink(link);
+        links.remove(link);
+        graphPane.children().remove(link.getEdge());
+    }
+    public void deleteState(State state)
+    {
+        graphPane.children().remove(state.getNode());
+        states.remove(state);
+
+        String name = state.getName();
+        links.stream().filter(l -> l.source().get().getName().equals(name) || l.target().get().getName().equals(name)).forEach(l ->
+        {
+            graphPane.children().remove(l.getEdge());
+            links.remove(l);
+        });
+    }
+    public void clear()
+    {
+        states.clear();
+        links.clear();
+        graphPane.children().clear();
+    }
+
+
+    public JsonElement toJSONObject()
+    {
+        JsonObject object = new JsonObject();
+        JsonArray nodesArray = new JsonArray(),
+                linksArray = new JsonArray();
+
+        states.stream().map(State::toJSONObject).forEach(nodesArray::add);
+        links.stream().map(Link::toJSONObject).forEach(linksArray::add);
+
+        object.add("nodes", nodesArray);
+        object.add("edges", linksArray);
+        return object;
+    }
+
+    private boolean hasState(String name)
+    {
+        return states.stream().anyMatch(s -> s.getName().equals(name));
+    }
+    State getState(String name)
+    {
+        return states.stream().filter(s -> s.getName().equals(name)).findAny().orElseThrow();
     }
 
     public boolean isValidDFA()
@@ -204,6 +320,24 @@ public class Simulation
     public Set<Character> getAlphabet()
     {
         return graphPane.getEdges().stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
+    }
+
+    public GraphPane getGraphPane()
+    {
+        return graphPane;
+    }
+
+    public ObservableSet<Link> getLinks()
+    {
+        return links;
+    }
+    public ObservableSet<State> getStates()
+    {
+        return states;
+    }
+    public IOManager ioManager()
+    {
+        return ioManager;
     }
 
     public enum ErrorCode

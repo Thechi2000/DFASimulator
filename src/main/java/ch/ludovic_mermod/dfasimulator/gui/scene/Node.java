@@ -4,8 +4,6 @@ import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.Link;
 import ch.ludovic_mermod.dfasimulator.logic.State;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -31,9 +29,9 @@ public class Node extends StackPane
     private final State state;
     private MenuItem deleteMenuItem;
 
-    public Node(String name, GraphPane graphPane)
+    public Node(State state, GraphPane graphPane)
     {
-        state = new State(name, this);
+        this.state = state;
         this.graphPane = graphPane;
 
         setAlignment(Pos.CENTER);
@@ -69,25 +67,6 @@ public class Node extends StackPane
             menu.show(this, event.getScreenX(), event.getScreenY());
             event.consume();
         });
-    }
-
-    public static Node fromJSONObject(JsonObject object, GraphPane graphPane)
-    {
-        Node node = new Node(object.get("name").getAsString(), graphPane);
-        node.state.initialProperty().set(object.get("initial").getAsBoolean());
-        node.state.acceptingProperty().set(object.get("accepting").getAsBoolean());
-        node.relocate(object.get("x_coord").getAsDouble(), object.get("y_coord").getAsDouble());
-        return node;
-    }
-    public JsonElement toJSONObject()
-    {
-        JsonObject object = new JsonObject();
-        object.addProperty("name", state.nameProperty().get());
-        object.addProperty("initial", state.initialProperty().get());
-        object.addProperty("accepting", state.acceptingProperty().get());
-        object.addProperty("x_coord", getLayoutX());
-        object.addProperty("y_coord", getLayoutY());
-        return object;
     }
 
     protected StringProperty nameProperty()
@@ -199,7 +178,7 @@ public class Node extends StackPane
         setOnDragDropped(event ->
         {
             if (getParent() instanceof GraphPane && event.getGestureSource() instanceof Node)
-                ((GraphPane) getParent()).createLink(event.getDragboard().getString(), state.nameProperty().get());
+                graphPane.getSimulation().createLink(event.getDragboard().getString(), state.nameProperty().get());
         });
     }
 
@@ -209,7 +188,7 @@ public class Node extends StackPane
 
         deleteMenuItem = new MenuItem();
         Strings.bind("delete", deleteMenuItem.textProperty());
-        deleteMenuItem.setOnAction(event -> ((GraphPane) getParent()).deleteNode(this));
+        deleteMenuItem.setOnAction(event -> graphPane.getSimulation().deleteState(getState()));
         //delete.disableProperty().bind(graphPane.getSimulationProperty());
         menu.getItems().add(deleteMenuItem);
 

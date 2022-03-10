@@ -1,5 +1,8 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
+import ch.ludovic_mermod.dfasimulator.logic.Link;
+import ch.ludovic_mermod.dfasimulator.logic.Simulation;
+import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
@@ -11,6 +14,8 @@ import java.util.Set;
 
 public class MainPane extends BorderPane
 {
+    private final Simulation simulation;
+
     private final ObjectProperty<EditPane> editPaneProperty;
     private final MenuBar menuBar;
     private final ConsolePane consolePane;
@@ -20,10 +25,12 @@ public class MainPane extends BorderPane
 
     public MainPane()
     {
+        simulation = new Simulation();
+        
         editPaneProperty = new SimpleObjectProperty<>(null);
         menuBar = new MenuBar();
         consolePane = new ConsolePane();
-        graphPane = new GraphPane();
+        graphPane = simulation.getGraphPane();
         simulationPane = new SimulationPane();
         rightSplitPane = new SplitPane();
 
@@ -46,7 +53,7 @@ public class MainPane extends BorderPane
         rightSplitPane.getItems().addAll(simulationPane);
 
         //fillGraphPane();
-        graphPane.ioManager().open("default.json");
+        simulation.ioManager().open("default.json");
 
         setRight(rightSplitPane);
         setTop(menuBar);
@@ -81,29 +88,29 @@ public class MainPane extends BorderPane
 
     private void fillGraphPane()
     {
-        var stateNode1 = new Node("source", graphPane);
-        stateNode1.relocate(50, 50);
+        var stateNode1 = new State("source", simulation);
+        stateNode1.getNode().relocate(50, 50);
         stateNode1.acceptingProperty().set(true);
 
-        var stateNode2 = new Node("target", graphPane);
-        stateNode2.relocate(300, 50);
+        var stateNode2 = new State("target", simulation);
+        stateNode2.getNode().relocate(300, 50);
         stateNode2.initialProperty().set(true);
 
-        var stateNode3 = new Node("other", graphPane);
-        stateNode3.relocate(50, 300);
+        var stateNode3 = new State("other", simulation);
+        stateNode3.getNode().relocate(50, 300);
 
-        var link1 = new Edge(stateNode1, stateNode2, Set.of('0', '1'), graphPane);
-        var link2 = new Edge(stateNode2, stateNode3, Set.of('0', '1'), graphPane);
-        var link3 = new Edge(stateNode3, stateNode1, Set.of('0', '1'), graphPane);
+        var link1 = new Link(stateNode1, stateNode2, Set.of('0', '1'), simulation);
+        var link2 = new Link(stateNode2, stateNode3, Set.of('0', '1'), simulation);
+        var link3 = new Link(stateNode3, stateNode1, Set.of('0', '1'), simulation);
 
-        graphPane.addState(stateNode1);
-        graphPane.addState(stateNode2);
-        graphPane.addState(stateNode3);
-        graphPane.addLink(link1);
-        graphPane.addLink(link2);
-        graphPane.addLink(link3);
+        simulation.addState(stateNode1);
+        simulation.addState(stateNode2);
+        simulation.addState(stateNode3);
+        simulation.addLink(link1);
+        simulation.addLink(link2);
+        simulation.addLink(link3);
 
-        graphPane.ioManager().saveAs("default.json");
+        simulation.ioManager().saveAs("default.json");
     }
 
     protected void bindEditPane(Edge edge)
@@ -123,5 +130,9 @@ public class MainPane extends BorderPane
     protected void removeEditPane()
     {
         editPaneProperty.set(null);
+    }
+    public Simulation getSimulation()
+    {
+        return simulation;
     }
 }

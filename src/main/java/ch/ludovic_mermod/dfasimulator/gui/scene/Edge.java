@@ -28,14 +28,10 @@ public class Edge extends Group
 
     private final Line line, leftLine, rightLine;
     private final Text alphabetDisplay;
+    private final GraphPane graphPane;
 
     private ContextMenu menu;
     private MenuItem deleteMenuItem;
-
-    public Edge(Node source, Node target, GraphPane graphPane)
-    {
-        this(source, target, Set.of(), graphPane);
-    }
 
     /**
      * Constructs a link between two StateNodes representing the given Path
@@ -43,10 +39,10 @@ public class Edge extends Group
      * @param source source Node
      * @param target target Node
      */
-    public Edge(Node source, Node target, Set<Character> alphabet, GraphPane graphPane)
+    public Edge(Link link, GraphPane graphPane)
     {
-        link = new Link(source.getState(), target.getState(), alphabet);
-
+        this.link = link;
+        this.graphPane = graphPane;
         menu = createContextMenu();
 
         line = new Line();
@@ -79,11 +75,11 @@ public class Edge extends Group
             }
         };
 
-        source.layoutXProperty().addListener(updatePos);
-        source.layoutYProperty().addListener(updatePos);
+        link.source().get().getNode().layoutXProperty().addListener(updatePos);
+        link.source().get().getNode().layoutYProperty().addListener(updatePos);
 
-        target.layoutXProperty().addListener(updatePos);
-        target.layoutYProperty().addListener(updatePos);
+        link.target().get().getNode().layoutXProperty().addListener(updatePos);
+        link.target().get().getNode().layoutYProperty().addListener(updatePos);
 
         Constants.Node.Circle.radius.addListener(updatePos);
         Constants.Link.Text.distanceFromLine.addListener(updatePos);
@@ -94,32 +90,6 @@ public class Edge extends Group
         setOnMousePressed(event -> graphPane.getMainPane().bindEditPane(this));
     }
 
-    public static Edge fromJSONObject(JsonObject object, GraphPane graphPane)
-    {
-        Set<Character> alphabet = new TreeSet<>();
-        JsonArray alphabetArray = object.get("alphabet").getAsJsonArray();
-        for (int i = 0; i < alphabetArray.size(); ++i)
-            alphabet.add(alphabetArray.get(i).getAsString().charAt(0));
-
-        return new Edge(
-                graphPane.getNode(object.get("source_name").getAsString()),
-                graphPane.getNode(object.get("target_name").getAsString()),
-                alphabet,
-                graphPane);
-    }
-    public JsonElement toJSONObject()
-    {
-        JsonObject object = new JsonObject();
-        object.addProperty("source_name", link.source().get().getName());
-        object.addProperty("target_name", link.target().get().getName());
-
-        JsonArray alphabetArray = new JsonArray();
-        link.alphabetProperty().forEach(c -> alphabetArray.add(c.toString()));
-
-        object.add("alphabet", alphabetArray);
-        return object;
-    }
-
     public String getSourceName()
     {
         return link.source().get().getName();
@@ -127,10 +97,6 @@ public class Edge extends Group
     public String getTargetName()
     {
         return link.target().get().getName();
-    }
-    public GraphPane getSimulatorParent()
-    {
-        return ((GraphPane) getParent());
     }
 
     protected void bindSimulationPane(GraphPane graphPane)
@@ -144,7 +110,7 @@ public class Edge extends Group
 
         deleteMenuItem = new MenuItem();
         Strings.bind("delete", deleteMenuItem.textProperty());
-        deleteMenuItem.setOnAction(event -> getSimulatorParent().deleteLink(this));
+        deleteMenuItem.setOnAction(event -> graphPane.getSimulation().deleteLink(link));
         //delete.disableProperty().bind(getSimulatorParent().getSimulationProperty());
 
         setOnMousePressed(event -> menu.hide());

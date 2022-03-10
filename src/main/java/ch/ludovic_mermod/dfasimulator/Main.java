@@ -10,7 +10,7 @@ public class Main extends Application
 {
     public static final System.Logger logger = new Logger();
 
-    private MainPane mainPane            ;
+    private MainPane mainPane;
     private Stage primaryStage;
 
     public static void main(String[] args)
@@ -24,7 +24,7 @@ public class Main extends Application
         this.primaryStage = primaryStage;
         mainPane = new MainPane();
 
-        Strings.format("window.title", primaryStage.titleProperty(), mainPane.getGraphPane().ioManager().filenameProperty());
+        Strings.format("window.title", primaryStage.titleProperty(), mainPane.getSimulation().ioManager().filenameProperty());
 
         primaryStage.setScene(new Scene(mainPane, 800, 600));
         primaryStage.show();
