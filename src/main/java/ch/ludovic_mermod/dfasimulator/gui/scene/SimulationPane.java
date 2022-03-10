@@ -29,7 +29,7 @@ public class SimulationPane extends VBox
             Button compileButton = new Button();
             Strings.bind("simulation_pane.compile_button", compileButton.textProperty());
             compileButton.disableProperty().bind(mainPane.getGraphPane().isSimulatingProperty());
-            compileButton.setOnAction(event -> mainPane.getGraphPane().compileDFA());
+            compileButton.setOnAction(event -> mainPane.getGraphPane().getSimulation().compileDFA());
             getChildren().add(compileButton);
         }
 
@@ -38,7 +38,7 @@ public class SimulationPane extends VBox
             Button simulateButton = new Button();
             Strings.bind("simulation_pane.simulate_button", simulateButton.textProperty());
             simulateButton.disableProperty().bind(mainPane.getGraphPane().isSimulatingProperty());
-            simulateButton.setOnAction(event -> mainPane.getGraphPane().startSimulation(inputTextField.getText()));
+            simulateButton.setOnAction(event -> mainPane.getGraphPane().getSimulation().startSimulation(inputTextField.getText()));
             getChildren().add(simulateButton);
         }
 
@@ -57,7 +57,7 @@ public class SimulationPane extends VBox
             Button nextStepButton = new Button();
             nextStepButton.disableProperty().bind(mainPane.getGraphPane().isSimulatingProperty().not());
             Strings.bind("simulation_pane.next_step", nextStepButton.textProperty());
-            nextStepButton.setOnAction(event -> mainPane.getGraphPane().nextSimulationStep());
+            nextStepButton.setOnAction(event -> mainPane.getGraphPane().getSimulation().nextSimulationStep());
             getChildren().add(nextStepButton);
         }
 
@@ -66,7 +66,7 @@ public class SimulationPane extends VBox
             Button finishButton = new Button();
             finishButton.disableProperty().bind(mainPane.getGraphPane().isSimulatingProperty().not());
             Strings.bind("simulation_pane.finish", finishButton.textProperty());
-            finishButton.setOnAction(event -> mainPane.getGraphPane().finish());
+            finishButton.setOnAction(event -> mainPane.getGraphPane().getSimulation().finish());
             getChildren().add(finishButton);
         }
 

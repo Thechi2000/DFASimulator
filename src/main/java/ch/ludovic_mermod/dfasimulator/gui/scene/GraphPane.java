@@ -12,11 +12,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane.ErrorCode.TOO_MANY_INITIAL_STATES;
-
 public class GraphPane extends Region
 {
     private final ObjectProperty<Node> currentStateProperty;
@@ -32,6 +27,7 @@ public class GraphPane extends Region
     private final ListProperty<Edge> edges;
 
     private final IOManager ioManager;
+    private final Simulation simulation;
 
     private ContextMenu menu;
     private MainPane mainPane;
@@ -56,6 +52,7 @@ public class GraphPane extends Region
         tool = Tool.EDIT;
 
         ioManager = new IOManager(this);
+        simulation = new Simulation(this);
     }
 
     public void create(MainPane mainPane)
@@ -240,148 +237,6 @@ public class GraphPane extends Region
         return menu;
     }
 
-    public boolean isValidDFA()
-    {
-        return checkDFA().isEmpty();
-    }
-
-    public List<Error> checkDFA()
-    {
-        List<Error> errors = new ArrayList<>();
-        Set<Character> alphabet = getAlphabet();
-
-        for (Node node : nodes)
-        {
-            List<Character> elements = node.outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
-
-            if (elements.size() != alphabet.size())
-            {
-                if (elements.size() < alphabet.size())
-                {
-                    var missingElements = new TreeSet<>(alphabet);
-                    elements.forEach(missingElements::remove);
-                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, false, missingElements}));
-                }
-                else
-                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, true}));
-            }
-        }
-
-
-        var initialNodes = nodes.stream().filter(n -> n.initialProperty().get()).toList();
-        if (initialNodes.size() == 0)
-            errors.add(new Error(ErrorCode.NO_INITIAL_STATE, null));
-        else if (initialNodes.size() > 1)
-            errors.add(new Error(TOO_MANY_INITIAL_STATES, initialNodes.toArray()));
-
-        return errors;
-    }
-
-    public List<Error> checkDFA(String input)
-    {
-        Set<Character> alphabet = getAlphabet();
-        List<Error> errors = checkDFA();
-
-        if (alphabet.stream().anyMatch(c -> !alphabet.contains(c)))
-            errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, new Object[]{alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())}));
-
-        return errors;
-    }
-
-    public boolean compileDFA()
-    {
-        var errors = checkDFA();
-        mainPane.getConsolePane().clear();
-        errors.forEach(e ->
-        {
-            switch (e.code())
-            {
-                case TOO_MANY_INITIAL_STATES -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((Node) o).getName()).collect(Collectors.joining(", ")));
-
-                case NO_INITIAL_STATE -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "No initial state");
-
-                case NODE_DOES_NOT_MATCH_ALPHABET -> {
-                    if (((boolean) e.data()[1]))
-                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" has too many outputs", ((Node) e.data()[0]).getName());
-                    else
-                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" is missing outputs { %s }",
-                                ((Node) e.data()[0]).getName(),
-                                ((Set<Character>) e.data()[2]).stream()
-                                        .map(Object::toString)
-                                        .collect(Collectors.joining(", ")));
-                }
-
-                default -> throw new IllegalStateException("Unexpected value: " + e.code());
-            }
-        });
-
-        if (errors.size() == 0)
-            mainPane.getConsolePane().log(System.Logger.Level.INFO, "DFA is valid");
-
-        return errors.size() == 0;
-    }
-
-    public void startSimulation(String input)
-    {
-        if (!compileDFA()) return;
-
-        isSimulatingProperty.set(true);
-        simulationEndedProperty.set(false);
-        currentStateProperty.set(getInitialState());
-        remainingInputProperty.set(input);
-        lastUsedLinkProperty.set(null);
-        initialInputProperty.set(input);
-    }
-
-    public void nextSimulationStep()
-    {
-        if (remainingInputProperty.get().length() == 0)
-        {
-            currentStateProperty.set(null);
-            lastUsedLinkProperty.set(null);
-            isSimulatingProperty.set(false);
-            return;
-        }
-
-        String input = remainingInputProperty.get();
-        char c = input.charAt(0);
-        remainingInputProperty.set(input.substring(1));
-
-        for (var l : currentStateProperty.get().outgoingLinksProperty().get())
-            if (l.alphabetProperty().contains(c))
-            {
-                currentStateProperty.set(l.getTarget().get());
-                break;
-            }
-
-        if (remainingInputProperty.get().length() == 0)
-            simulationEndedProperty.set(true);
-    }
-
-    public void finish()
-    {
-        if (!isSimulatingProperty.get()) return;
-
-        nextSimulationStep();
-        new Timer().schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                finish();
-            }
-        }, 1000);
-    }
-
-    private Node getInitialState()
-    {
-        return nodes.stream().filter(n -> n.initialProperty().get()).findAny().orElse(null);
-    }
-    public Set<Character> getAlphabet()
-    {
-        return edges.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
-    }
-
     public MainPane getMainPane()
     {
         return mainPane;
@@ -395,23 +250,16 @@ public class GraphPane extends Region
     {
         return ioManager;
     }
-
-    public enum ErrorCode
+    public Simulation getSimulation()
     {
-        TOO_MANY_INITIAL_STATES,
-        NO_INITIAL_STATE,
-        NODE_DOES_NOT_MATCH_ALPHABET,
-        STRING_DOES_NOT_MATCH_ALPHABET
+        return simulation;
     }
+
 
     public enum Tool
     {
         EDIT,
         DRAG,
         LINK
-    }
-
-    public record Error(ErrorCode code, Object[] data)
-    {
     }
 }
