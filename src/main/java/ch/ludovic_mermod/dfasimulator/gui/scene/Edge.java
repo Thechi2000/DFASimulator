@@ -4,9 +4,6 @@ import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.Link;
 import ch.ludovic_mermod.dfasimulator.logic.State;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.value.ChangeListener;
@@ -18,8 +15,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class Edge extends Group

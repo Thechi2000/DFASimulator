@@ -1,8 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.Main;
-import ch.ludovic_mermod.dfasimulator.gui.scene.Edge;
-import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.beans.property.ReadOnlyStringProperty;

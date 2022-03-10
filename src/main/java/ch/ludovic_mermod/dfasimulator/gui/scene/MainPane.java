@@ -26,7 +26,7 @@ public class MainPane extends BorderPane
     public MainPane()
     {
         simulation = new Simulation();
-        
+
         editPaneProperty = new SimpleObjectProperty<>(null);
         menuBar = new MenuBar();
         consolePane = new ConsolePane();
