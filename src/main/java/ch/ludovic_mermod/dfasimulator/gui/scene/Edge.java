@@ -34,9 +34,9 @@ public class Edge extends Group
     private ContextMenu menu;
     private MenuItem deleteMenuItem;
 
-    public Edge(Node source, Node target)
+    public Edge(Node source, Node target, GraphPane graphPane)
     {
-        this(source, target, Set.of());
+        this(source, target, Set.of(), graphPane);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Edge extends Group
      * @param source source Node
      * @param target target Node
      */
-    public Edge(Node source, Node target, Set<Character> alphabet)
+    public Edge(Node source, Node target, Set<Character> alphabet, GraphPane graphPane)
     {
         alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabet)));
         this.source = new SimpleObjectProperty<>(source);
@@ -95,7 +95,7 @@ public class Edge extends Group
 
         getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
 
-        setOnMousePressed(event -> getSimulatorParent().bindEditPane(this));
+        setOnMousePressed(event -> graphPane.getMainPane().bindEditPane(this));
     }
 
     public static Edge fromJSONObject(JsonObject object, GraphPane graphPane)
@@ -108,7 +108,8 @@ public class Edge extends Group
         return new Edge(
                 graphPane.getNode(object.get("source_name").getAsString()),
                 graphPane.getNode(object.get("target_name").getAsString()),
-                alphabet);
+                alphabet,
+                graphPane);
     }
     public JsonElement toJSONObject()
     {

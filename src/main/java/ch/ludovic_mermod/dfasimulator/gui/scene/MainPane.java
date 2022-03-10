@@ -92,9 +92,9 @@ public class MainPane extends BorderPane
         var stateNode3 = new Node("other", graphPane);
         stateNode3.relocate(50, 300);
 
-        var link1 = new Edge(stateNode1, stateNode2, Set.of('0', '1'));
-        var link2 = new Edge(stateNode2, stateNode3, Set.of('0', '1'));
-        var link3 = new Edge(stateNode3, stateNode1, Set.of('0', '1'));
+        var link1 = new Edge(stateNode1, stateNode2, Set.of('0', '1'), graphPane);
+        var link2 = new Edge(stateNode2, stateNode3, Set.of('0', '1'), graphPane);
+        var link3 = new Edge(stateNode3, stateNode1, Set.of('0', '1'), graphPane);
 
         graphPane.addState(stateNode1);
         graphPane.addState(stateNode2);
