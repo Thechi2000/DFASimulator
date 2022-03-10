@@ -1,5 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
+import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,15 +21,6 @@ import java.util.stream.Collectors;
 
 public class GraphPane extends Region
 {
-    private final ObjectProperty<Node> currentStateProperty;
-    private final ObjectProperty<Edge> lastUsedLinkProperty;
-    private final StringProperty remainingInputProperty;
-    private final BooleanProperty isSimulatingProperty;
-
-    private final StringProperty initialInputProperty;
-    private final BooleanProperty resultProperty;
-    private final BooleanProperty simulationEndedProperty;
-
     private final ListProperty<Node> nodes;
     private final ListProperty<Edge> edges;
 
@@ -43,15 +35,6 @@ public class GraphPane extends Region
 
     public GraphPane()
     {
-        currentStateProperty = new SimpleObjectProperty<>();
-        lastUsedLinkProperty = new SimpleObjectProperty<>();
-        remainingInputProperty = new SimpleStringProperty();
-        isSimulatingProperty = new SimpleBooleanProperty(false);
-
-        initialInputProperty = new SimpleStringProperty("");
-        resultProperty = new SimpleBooleanProperty(false);
-        simulationEndedProperty = new SimpleBooleanProperty(false);
-
         nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
         edges = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -85,32 +68,32 @@ public class GraphPane extends Region
 
     public ReadOnlyObjectProperty<Node> currentStateProperty()
     {
-        return currentStateProperty;
+        return simulation.currentStateProperty;
     }
     public ReadOnlyObjectProperty<Edge> lastUsedLinkProperty()
     {
-        return lastUsedLinkProperty;
+        return simulation.lastUsedLinkProperty;
     }
-    public StringProperty remainingInputProperty()
+    public ReadOnlyStringProperty remainingInputProperty()
     {
-        return remainingInputProperty;
+        return simulation.remainingInputProperty;
     }
-    public BooleanProperty isSimulatingProperty()
+    public ReadOnlyBooleanProperty isSimulatingProperty()
     {
-        return isSimulatingProperty;
+        return simulation.isSimulatingProperty;
     }
 
-    public StringProperty initialInputProperty()
+    public ReadOnlyStringProperty initialInputProperty()
     {
-        return initialInputProperty;
+        return simulation.initialInputProperty;
     }
-    public BooleanProperty resultProperty()
+    public ReadOnlyBooleanProperty resultProperty()
     {
-        return resultProperty;
+        return simulation.resultProperty;
     }
-    public BooleanProperty simulationEndedProperty()
+    public ReadOnlyBooleanProperty simulationEndedProperty()
     {
-        return simulationEndedProperty;
+        return simulation.simulationEndedProperty;
     }
 
     public Tool getTool()
@@ -124,7 +107,7 @@ public class GraphPane extends Region
 
     public ReadOnlyBooleanProperty getSimulationProperty()
     {
-        return isSimulatingProperty;
+        return simulation.isSimulatingProperty;
     }
 
     protected boolean hasNode(String name)
@@ -177,7 +160,7 @@ public class GraphPane extends Region
             return;
         }
 
-        Edge lnk = new Edge(getNode(from), getNode(to));
+        Edge lnk = new Edge(getNode(from), getNode(to), this);
         addLink(lnk);
     }
     /**
@@ -217,19 +200,6 @@ public class GraphPane extends Region
         edges.removeIf(l -> l.getSourceName().equals(name) || l.getTargetName().equals(name));
     }
 
-    protected void bindEditPane(Edge edge)
-    {
-        ((MainPane) getParent()).bindEditPane(edge);
-    }
-    protected void bindEditPane(Node node)
-    {
-        ((MainPane) getParent()).bindEditPane(node);
-    }
-    protected void removeEditPane()
-    {
-        ((MainPane) getParent()).removeEditPane();
-    }
-
     private ContextMenu createContextMenu()
     {
         ContextMenu menu = new ContextMenu();
@@ -237,7 +207,7 @@ public class GraphPane extends Region
         MenuItem create = new MenuItem();
         Strings.bind("create", create.textProperty());
         create.setOnAction(event -> createNode(menuPosition.getX(), menuPosition.getY()));
-        create.disableProperty().bind(isSimulatingProperty);
+        create.disableProperty().bind(simulation.isSimulatingProperty);
         menu.getItems().add(create);
 
         return menu;
@@ -260,7 +230,6 @@ public class GraphPane extends Region
     {
         return simulation;
     }
-
 
     public enum Tool
     {
@@ -292,15 +261,17 @@ public class GraphPane extends Region
             File file = new File(filenameProperty.get());
             try
             {
-                if (!file.exists()) file.createNewFile();
-                try (FileOutputStream o = new FileOutputStream(file))
-                {
-                    o.write(graphPane.toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
-                }
+                if (!file.exists() && file.createNewFile())
+                    try (FileOutputStream o = new FileOutputStream(file))
+                    {
+                        o.write(graphPane.toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
+                    }
+                else
+                    Main.logger.log(System.Logger.Level.ERROR, "Could not create file " + file.getAbsolutePath());
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                Main.logger.log(System.Logger.Level.ERROR, "Could not save DFA", e);
             }
         }
         public void saveAs(String filename)
@@ -414,6 +385,7 @@ public class GraphPane extends Region
             return errors;
         }
 
+        @SuppressWarnings("unchecked")
         public boolean compileDFA()
         {
             var errors = checkDFA();
@@ -499,43 +471,13 @@ public class GraphPane extends Region
             }, 1000);
         }
 
-        private Node getInitialState()
+        public Node getInitialState()
         {
             return graphPane.getNodes().stream().filter(n -> n.initialProperty().get()).findAny().orElse(null);
         }
         public Set<Character> getAlphabet()
         {
             return graphPane.getEdges().stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
-        }
-
-        public ReadOnlyObjectProperty<Node> currentStateProperty()
-        {
-            return currentStateProperty;
-        }
-        public ReadOnlyObjectProperty<Edge> lastUsedLinkProperty()
-        {
-            return lastUsedLinkProperty;
-        }
-        public ReadOnlyStringProperty remainingInputProperty()
-        {
-            return remainingInputProperty;
-        }
-        public ReadOnlyBooleanProperty isSimulatingProperty()
-        {
-            return isSimulatingProperty;
-        }
-
-        public ReadOnlyStringProperty initialInputProperty()
-        {
-            return initialInputProperty;
-        }
-        public ReadOnlyBooleanProperty resultProperty()
-        {
-            return resultProperty;
-        }
-        public ReadOnlyBooleanProperty simulationEndedProperty()
-        {
-            return simulationEndedProperty;
         }
 
         public enum ErrorCode

@@ -51,7 +51,7 @@ public class NodeEditPane extends EditPane
             deleteButton.setOnAction(event ->
             {
                 graphPane.deleteNode(node);
-                graphPane.removeEditPane();
+                graphPane.getMainPane().removeEditPane();
             });
             getChildren().add(deleteButton);
         }
