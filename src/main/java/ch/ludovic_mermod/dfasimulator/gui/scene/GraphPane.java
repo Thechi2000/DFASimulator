@@ -4,8 +4,9 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.Link;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -14,9 +15,6 @@ import javafx.scene.layout.Region;
 
 public class GraphPane extends Region
 {
-    private final ListProperty<Node> nodes;
-    private final ListProperty<Edge> edges;
-
     private final Simulation simulation;
 
     private ContextMenu menu;
@@ -28,9 +26,6 @@ public class GraphPane extends Region
     public GraphPane(Simulation simulation)
     {
         this.simulation = simulation;
-        nodes = new SimpleListProperty<>(FXCollections.observableArrayList());
-        edges = new SimpleListProperty<>(FXCollections.observableArrayList());
-
         tool = Tool.EDIT;
     }
 
@@ -45,15 +40,6 @@ public class GraphPane extends Region
             menuPosition = new Point2D(event.getX(), event.getY());
             menu.show(this, event.getScreenX(), event.getScreenY());
         });
-    }
-
-    public ReadOnlyListProperty<Node> getNodes()
-    {
-        return nodes;
-    }
-    public ReadOnlyListProperty<Edge> getEdges()
-    {
-        return edges;
     }
 
     public ReadOnlyObjectProperty<State> currentStateProperty()
@@ -98,15 +84,6 @@ public class GraphPane extends Region
     public ReadOnlyBooleanProperty getSimulationProperty()
     {
         return simulation.isSimulatingProperty();
-    }
-
-    protected boolean hasNode(String name)
-    {
-        return nodes.stream().anyMatch(n -> n.getName().equals(name));
-    }
-    protected Node getNode(String name)
-    {
-        return nodes.stream().filter(n -> n.getName().equals(name)).findAny().orElse(null);
     }
 
     private ContextMenu createContextMenu()
