@@ -74,7 +74,6 @@ public class SimulationPane extends VBox
         {
             Text resultText = new Text();
             mainPane.getGraphPane().resultProperty().addListener((o, ov, nv) -> updateResultText(resultText));
-            mainPane.getGraphPane().initialInputProperty().addListener((o, ov, nv) -> updateResultText(resultText));
             mainPane.getGraphPane().simulationEndedProperty().addListener((o, ov, nv) -> updateResultText(resultText));
             Strings.get("simulation_pane.result_false").addListener((o, ov, nv) -> updateResultText(resultText));
             Strings.get("simulation_pane.result_true").addListener((o, ov, nv) -> updateResultText(resultText));
@@ -91,6 +90,6 @@ public class SimulationPane extends VBox
         }
 
         resultText.setVisible(true);
-        resultText.setText(Strings.get("simulation_state_pane.result_" + mainPane.getGraphPane().resultProperty().get()).get().formatted(mainPane.getGraphPane().initialInputProperty()));
+        Strings.format("simulation_state_pane.result_" + mainPane.getGraphPane().resultProperty().get(), resultText.textProperty(), mainPane.getGraphPane().initialInputProperty().get());
     }
 }

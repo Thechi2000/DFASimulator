@@ -45,6 +45,15 @@ public class Simulation
         initialInputProperty = new SimpleStringProperty("");
         resultProperty = new SimpleBooleanProperty(false);
         simulationEndedProperty = new SimpleBooleanProperty(false);
+
+        simulationEndedProperty.addListener((o, ov, nv) -> updateResult());
+        currentStateProperty.addListener((o, ov, nv) -> updateResult());
+    }
+
+    private void updateResult()
+    {
+        if (currentStateProperty.get() != null)
+            resultProperty.set(currentStateProperty.get().acceptingProperty().get() && simulationEndedProperty.get());
     }
 
     public ReadOnlyObjectProperty<State> currentStateProperty()
@@ -79,7 +88,7 @@ public class Simulation
 
 
     /**
-     * Create and add a link between two StateNodes
+     * Create and add a link between two states
      *
      * @param from the name of the source state
      * @param to   the name of the target state
@@ -276,7 +285,6 @@ public class Simulation
     {
         if (remainingInputProperty.get().length() == 0)
         {
-            resultProperty.set(currentStateProperty.get().acceptingProperty().get());
             currentStateProperty.set(null);
             lastUsedLinkProperty.set(null);
             isSimulatingProperty.set(false);
