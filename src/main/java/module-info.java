@@ -3,6 +3,7 @@ module ch.ludovic_mermod.dfasimulator {
     requires com.google.gson;
 
     exports ch.ludovic_mermod.dfasimulator;
+    exports ch.ludovic_mermod.dfasimulator.json;
     exports ch.ludovic_mermod.dfasimulator.logic;
     exports ch.ludovic_mermod.dfasimulator.gui.scene;
 
