@@ -1,10 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
-import ch.ludovic_mermod.dfasimulator.JsonObjectProperty;
 import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 

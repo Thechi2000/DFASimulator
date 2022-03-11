@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.json;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
@@ -60,32 +61,48 @@ public abstract class JSONElement
     }
 
     public abstract JSONElement deepCopy();
-    
-    public JSONObject getAsJSONObject() {
-        if (this.isJSONObject()) {
-            return (JSONObject)this;
-        } else {
+
+    public JSONObject getAsJSONObject()
+    {
+        if (this.isJSONObject())
+        {
+            return (JSONObject) this;
+        }
+        else
+        {
             throw new IllegalStateException("Not a JSON Object: " + this);
         }
     }
-    public JSONArray getAsJSONArray() {
-        if (this.isJSONArray()) {
-            return (JSONArray)this;
-        } else {
+    public JSONArray getAsJSONArray()
+    {
+        if (this.isJSONArray())
+        {
+            return (JSONArray) this;
+        }
+        else
+        {
             throw new IllegalStateException("Not a JSON Array: " + this);
         }
     }
-    public JSONPrimitive getAsJSONPrimitive() {
-        if (this.isJSONPrimitive()) {
-            return (JSONPrimitive)this;
-        } else {
+    public JSONPrimitive getAsJSONPrimitive()
+    {
+        if (this.isJSONPrimitive())
+        {
+            return (JSONPrimitive) this;
+        }
+        else
+        {
             throw new IllegalStateException("Not a JSON Primitive: " + this);
         }
     }
-    public JSONNull getAsJSONNull() {
-        if (this.isJSONNull()) {
-            return (JSONNull)this;
-        } else {
+    public JSONNull getAsJSONNull()
+    {
+        if (this.isJSONNull())
+        {
+            return (JSONNull) this;
+        }
+        else
+        {
             throw new IllegalStateException("Not a JSON Null: " + this);
         }
     }

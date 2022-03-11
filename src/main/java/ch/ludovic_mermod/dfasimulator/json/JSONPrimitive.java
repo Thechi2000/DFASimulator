@@ -30,11 +30,12 @@ public class JSONPrimitive extends JSONElement
     public JSONPrimitive(JsonPrimitive primitive)
     {
         Object val = null;
-        if(primitive.isBoolean()) val = primitive.getAsBoolean();
-        if(primitive.isNumber()) {
+        if (primitive.isBoolean()) val = primitive.getAsBoolean();
+        if (primitive.isNumber())
+        {
             val = primitive.getAsNumber();
-        };
-        if(primitive.isString()) val = primitive.getAsString();
+        }
+        if (primitive.isString()) val = primitive.getAsString();
         value = val;
     }
 
