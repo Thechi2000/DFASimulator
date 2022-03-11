@@ -1,7 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
-import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -189,9 +188,9 @@ public class Simulation
         List<Error> errors = new ArrayList<>();
         Set<Character> alphabet = getAlphabet();
 
-        for (Node node : graphPane.getNodes())
+        for (State state : states)
         {
-            List<Character> elements = node.outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
+            List<Character> elements = state.outgoingLinksProperty().stream().map(l -> l.alphabetProperty().get()).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
 
             if (elements.size() != alphabet.size())
             {
@@ -199,19 +198,19 @@ public class Simulation
                 {
                     var missingElements = new TreeSet<>(alphabet);
                     elements.forEach(missingElements::remove);
-                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, false, missingElements}));
+                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{state, false, missingElements}));
                 }
                 else
-                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{node, true}));
+                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{state, true}));
             }
         }
 
 
-        var initialNodes = graphPane.getNodes().stream().filter(n -> n.initialProperty().get()).toList();
-        if (initialNodes.size() == 0)
+        var initialStates = states.stream().filter(n -> n.initialProperty().get()).toList();
+        if (initialStates.size() == 0)
             errors.add(new Error(ErrorCode.NO_INITIAL_STATE, null));
-        else if (initialNodes.size() > 1)
-            errors.add(new Error(ErrorCode.TOO_MANY_INITIAL_STATES, initialNodes.toArray()));
+        else if (initialStates.size() > 1)
+            errors.add(new Error(ErrorCode.TOO_MANY_INITIAL_STATES, initialStates.toArray()));
 
         return errors;
     }
@@ -236,16 +235,16 @@ public class Simulation
         {
             switch (e.code())
             {
-                case TOO_MANY_INITIAL_STATES -> graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((Node) o).getName()).collect(Collectors.joining(", ")));
+                case TOO_MANY_INITIAL_STATES -> graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((State) o).getName()).collect(Collectors.joining(", ")));
 
                 case NO_INITIAL_STATE -> graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "No initial state");
 
                 case NODE_DOES_NOT_MATCH_ALPHABET -> {
                     if (((boolean) e.data()[1]))
-                        graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" has too many outputs", ((Node) e.data()[0]).getName());
+                        graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "Error: State \"%s\" has too many outputs", ((State) e.data()[0]).getName());
                     else
-                        graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "Error: Node \"%s\" is missing outputs { %s }",
-                                ((Node) e.data()[0]).getName(),
+                        graphPane.getMainPane().getConsolePane().log(System.Logger.Level.ERROR, "Error: State \"%s\" is missing outputs { %s }",
+                                ((State) e.data()[0]).getName(),
                                 ((Set<Character>) e.data()[2]).stream()
                                         .map(Object::toString)
                                         .collect(Collectors.joining(", ")));
@@ -315,7 +314,7 @@ public class Simulation
 
     public State getInitialState()
     {
-        return graphPane.getNodes().stream().filter(n -> n.initialProperty().get()).findAny().orElseThrow().getState();
+        return states.stream().filter(state -> state.initialProperty().get()).findAny().orElseThrow();
     }
     public Set<Character> getAlphabet()
     {
