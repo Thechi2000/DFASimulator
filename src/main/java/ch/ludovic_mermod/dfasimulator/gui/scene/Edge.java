@@ -76,7 +76,7 @@ public class Edge extends Group
 
         getChildren().addAll(line, leftLine, rightLine, alphabetDisplay);
 
-        setOnMousePressed(event -> graphPane.getMainPane().bindEditPane(this));
+        setOnMousePressed(event -> graphPane.getMainPane().bindEditPane(link));
     }
 
     public String getSourceName()

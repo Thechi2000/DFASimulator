@@ -169,11 +169,11 @@ public class Simulation
         return object;
     }
 
-    private boolean hasState(String name)
+    public boolean hasState(String name)
     {
         return states.stream().anyMatch(s -> s.getName().equals(name));
     }
-    State getState(String name)
+    public State getState(String name)
     {
         return states.stream().filter(s -> s.getName().equals(name)).findAny().orElseThrow();
     }
@@ -276,6 +276,7 @@ public class Simulation
     {
         if (remainingInputProperty.get().length() == 0)
         {
+            resultProperty.set(currentStateProperty.get().acceptingProperty().get());
             currentStateProperty.set(null);
             lastUsedLinkProperty.set(null);
             isSimulatingProperty.set(false);
@@ -318,7 +319,7 @@ public class Simulation
     }
     public Set<Character> getAlphabet()
     {
-        return graphPane.getEdges().stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
+        return links.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
     }
 
     public GraphPane getGraphPane()

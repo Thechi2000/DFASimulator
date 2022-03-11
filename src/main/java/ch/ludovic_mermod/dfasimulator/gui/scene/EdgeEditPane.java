@@ -1,8 +1,11 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.logic.Link;
+import ch.ludovic_mermod.dfasimulator.logic.Simulation;
+import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -16,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class EdgeEditPane extends EditPane
 {
-    public EdgeEditPane(GraphPane graphPane, Edge edge)
+    public EdgeEditPane(Simulation simulation, Link link)
     {
         // Setup alphabet edit
         {
@@ -34,11 +37,11 @@ public class EdgeEditPane extends EditPane
 
                 if (elements.stream().allMatch(s -> s.length() == 1))
                 {
-                    edge.alphabetProperty().clear();
-                    edge.alphabetProperty().addAll(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
+                    link.alphabetProperty().clear();
+                    link.alphabetProperty().addAll(elements.stream().map(s -> s.charAt(0)).collect(Collectors.toSet()));
                 }
             });
-            alphabetField.setText(edge.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
+            alphabetField.setText(link.alphabetProperty().get().stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
             getChildren().add(new HBox(alphabetText, alphabetField));
         }
@@ -48,24 +51,23 @@ public class EdgeEditPane extends EditPane
             ComboBox<String> sourceNodeBox = new ComboBox<>();
             ComboBox<String> targetNodeBox = new ComboBox<>();
 
-            var items = FXCollections.observableList(new ArrayList<>(graphPane.getNodes().stream().map(Node::getName).toList()));
+            var items = FXCollections.observableList(new ArrayList<>(simulation.getStates().stream().map(State::getName).toList()));
             sourceNodeBox.setItems(items);
             targetNodeBox.setItems(items);
 
-            graphPane.getNodes().addListener((ListChangeListener<Node>) change ->
+            simulation.getStates().addListener((SetChangeListener<? super State>) change ->
             {
-                change.next();
-                if (change.getAddedSize() > 0)
-                    items.addAll(change.getAddedSubList().stream().map(Node::getName).toList());
+                if (change.wasAdded())
+                    items.add(change.getElementAdded().getName());
 
-                if (change.getRemovedSize() > 0)
-                    items.removeAll(change.getRemoved().stream().map(Node::getName).toList());
+                if (change.wasRemoved())
+                    items.add(change.getElementRemoved().getName());
             });
-            sourceNodeBox.setValue(edge.getSourceName());
-            targetNodeBox.setValue(edge.getTargetName());
+            sourceNodeBox.setValue(link.source().get().getName());
+            targetNodeBox.setValue(link.target().get().getName());
 
-            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getSource().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow().getState()));
-            targetNodeBox.valueProperty().addListener((o, ov, nv) -> edge.getTarget().set(graphPane.getNodes().stream().filter(n -> n.getName().equals(nv)).findAny().orElseThrow().getState()));
+            sourceNodeBox.valueProperty().addListener((o, ov, nv) -> link.source().set(simulation.getState(nv)));
+            targetNodeBox.valueProperty().addListener((o, ov, nv) -> link.target().set(simulation.getState(nv)));
 
             Text linkingText = new Text();
             Strings.bind("edit_pane.edge.nodes_linking", linkingText.textProperty());
@@ -77,8 +79,8 @@ public class EdgeEditPane extends EditPane
         Strings.bind("delete", deleteButton.textProperty());
         deleteButton.setOnAction(event ->
         {
-            graphPane.getSimulation().deleteLink(edge.getLink());
-            graphPane.getMainPane().removeEditPane();
+            simulation.deleteLink(link);
+            simulation.getGraphPane().getMainPane().removeEditPane();
         });
 
         getChildren().add(deleteButton);

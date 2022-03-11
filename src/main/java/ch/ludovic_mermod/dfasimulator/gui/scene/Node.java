@@ -125,7 +125,7 @@ public class Node extends StackPane
                 switch (graphPane.getTool())
                 {
                     case EDIT:
-                        graphPane.getMainPane().bindEditPane(this);
+                        graphPane.getMainPane().bindEditPane(state);
                         break;
 
                     case LINK:

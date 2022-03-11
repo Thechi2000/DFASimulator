@@ -1,17 +1,19 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.logic.Simulation;
+import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
 public class NodeEditPane extends EditPane
 {
-    private final Node node;
+    private final State node;
 
-    public NodeEditPane(GraphPane graphPane, Node node)
+    public NodeEditPane(Simulation simulation, State state)
     {
-        this.node = node;
+        this.node = state;
 
         // Name
         {
@@ -20,7 +22,7 @@ public class NodeEditPane extends EditPane
             nameField.setText(node.getName());
             nameField.setOnAction(event ->
             {
-                if (graphPane.getNodes().stream().noneMatch(n -> n.getName().equals(nameField.getText())))
+                if (!simulation.hasState(nameField.getText()))
                     node.nameProperty().set(nameField.getText());
             });
             getChildren().add(nameField);
@@ -50,8 +52,8 @@ public class NodeEditPane extends EditPane
             Strings.bind("delete", deleteButton.textProperty());
             deleteButton.setOnAction(event ->
             {
-                graphPane.getSimulation().deleteState(node.getState());
-                graphPane.getMainPane().removeEditPane();
+                simulation.deleteState(state);
+                simulation.getGraphPane().getMainPane().removeEditPane();
             });
             getChildren().add(deleteButton);
         }
