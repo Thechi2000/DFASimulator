@@ -49,7 +49,7 @@ public class Strings
         target.bind(get(id));
     }
 
-    public static void format(String id, StringProperty target, Object... objects)
+    public static void bindFormat(String id, StringProperty target, Object... objects)
     {
         StringProperty format = get(id);
 
@@ -66,6 +66,17 @@ public class Strings
 
         target.set(String.format(format.get(), Arrays.stream(objects).map(o -> o instanceof ObservableValue<?> ? ((ObservableValue<?>) o).getValue() : o).toArray()));
         properties.forEach(p -> p.addListener((obs, ov, nv) -> target.set(String.format(format.get(), Arrays.stream(objects).map(o -> o instanceof ObservableValue<?> ? ((ObservableValue<?>) o).getValue() : o).toArray()))));
+    }
+
+    public static String format(String id, Object... objects)
+    {
+        String format = get(id).get();
+
+        int occ = (format.length() - format.replace("%s", "").length()) / 2;
+        if (objects.length != occ)
+            Main.logger.log(System.Logger.Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
+
+        return String.format(format, objects);
     }
 
     /**
