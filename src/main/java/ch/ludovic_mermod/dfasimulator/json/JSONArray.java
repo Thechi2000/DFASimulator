@@ -31,7 +31,7 @@ public class JSONArray extends JSONElement implements ObservableList<JSONElement
 
     public JSONArray deepCopy()
     {
-        return elements.stream().collect(JSONArray::new, JSONArray::add, JSONArray::addAll);
+        return elements.stream().map(JSONElement::deepCopy).collect(JSONArray::new, JSONArray::add, JSONArray::addAll);
     }
     public boolean getAsBoolean()
     {

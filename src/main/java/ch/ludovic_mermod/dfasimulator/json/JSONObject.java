@@ -52,6 +52,8 @@ public class JSONObject extends JSONElement implements Observable
         if (members.get(property) instanceof ObservableBooleanValue)
             ((ObservableBooleanValue) members.get(property)).removeListener((o, ov, nv) -> addProperty(property, nv));
 
+        JSONElement remove = members.remove(property);
+
         setChangeListeners.forEach(l -> l.onChanged(new SetChangeListener.Change<>(FXCollections.observableSet(entrySet()))
         {
             @Override
@@ -75,11 +77,15 @@ public class JSONObject extends JSONElement implements Observable
                 return Map.entry(property, members.get(property));
             }
         }));
-        return members.remove(property);
+        childUpdateListeners.forEach(l -> l.onChildUpdate(this));
+
+        return remove;
     }
     public void add(String property, JSONElement value)
     {
         bindListeners(value, this, childUpdateListeners);
+
+        members.put(property, value == null ? JSONNull.INSTANCE : value);
 
         if (!members.containsKey(property))
             setChangeListeners.forEach(l -> l.onChanged(new SetChangeListener.Change<>(FXCollections.observableSet(entrySet()))
@@ -107,9 +113,8 @@ public class JSONObject extends JSONElement implements Observable
             }));
         else propertyChangeListeners.forEach(l -> l.onPropertyChange(property, members.get(property), value));
         childUpdateListeners.forEach(l -> l.onChildUpdate(this));
-
-        members.put(property, value == null ? JSONNull.INSTANCE : value);
     }
+
     public void addProperty(String property, String value)
     {
         add(property, value == null ? JSONNull.INSTANCE : new JSONPrimitive(value));
