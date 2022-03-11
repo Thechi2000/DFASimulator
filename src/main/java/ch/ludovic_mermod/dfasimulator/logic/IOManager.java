@@ -1,19 +1,21 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.Main;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import ch.ludovic_mermod.dfasimulator.json.JSONElement;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public class IOManager
 {
     private final Simulation simulation;
     private final StringProperty filenameProperty, filepathProperty;
+    private JSONElement savedFile;
 
     public IOManager(Simulation simulation)
     {
@@ -39,7 +41,7 @@ public class IOManager
             if (!file.exists() && file.createNewFile())
                 try (FileOutputStream o = new FileOutputStream(file))
                 {
-                    o.write(simulation.toJSONObject().toString().getBytes(StandardCharsets.UTF_8));
+                    o.write((savedFile = simulation.getJSONObject()).toString().getBytes(StandardCharsets.UTF_8));
                 }
             else
                 Main.logger.log(System.Logger.Level.ERROR, "Could not create file " + file.getAbsolutePath());
@@ -60,14 +62,16 @@ public class IOManager
 
         try
         {
-            JsonObject object = JsonParser.parseReader(new FileReader(filepathProperty.get())).getAsJsonObject();
-            var nodesArray = object.get("nodes").getAsJsonArray();
-            var edgesArray = object.get("edges").getAsJsonArray();
+            JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
+            var nodesArray = object.get("states").getAsJSONArray();
+            var edgesArray = object.get("links").getAsJSONArray();
 
             simulation.clear();
 
-            nodesArray.forEach(e -> simulation.addState(State.fromJSONObject(e.getAsJsonObject(), simulation)));
-            edgesArray.forEach(e -> simulation.addLink(Link.fromJSONObject(e.getAsJsonObject(), simulation)));
+            nodesArray.forEach(e -> simulation.addState(State.fromJSONObject(e.getAsJSONObject(), simulation)));
+            edgesArray.forEach(e -> simulation.addLink(Link.fromJSONObject(e.getAsJSONObject(), simulation)));
+
+            savedFile = object;
         }
         catch (FileNotFoundException e)
         {
@@ -76,8 +80,14 @@ public class IOManager
     }
     public void openNew()
     {
+        savedFile = new JSONObject();
         simulation.clear();
         filepathProperty.set(null);
+    }
+
+    public boolean isSaved()
+    {
+        return savedFile.equals(simulation.getJSONObject());
     }
 
     public ReadOnlyStringProperty filepathProperty()

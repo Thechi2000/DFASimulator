@@ -1,18 +1,20 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import ch.ludovic_mermod.dfasimulator.json.JSONArray;
+import ch.ludovic_mermod.dfasimulator.json.JSONElement;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation
 {
+    private final JSONObject jsonObject;
     private final IOManager ioManager;
 
     private final SetProperty<State> states;
@@ -31,6 +33,10 @@ public class Simulation
 
     public Simulation()
     {
+        jsonObject = new JSONObject();
+        jsonObject.add("states", new JSONArray());
+        jsonObject.add("links", new JSONArray());
+
         ioManager = new IOManager(this);
 
         states = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(Comparator.comparing(State::getName))));
@@ -48,6 +54,25 @@ public class Simulation
 
         simulationEndedProperty.addListener((o, ov, nv) -> updateResult());
         currentStateProperty.addListener((o, ov, nv) -> updateResult());
+
+        states.addListener((SetChangeListener<? super State>) change ->
+        {
+            if (change.wasAdded())
+                jsonObject.get("states").getAsJSONArray().add(change.getElementAdded().toJSONObject());
+
+            if (change.wasRemoved())
+                jsonObject.get("states").getAsJSONArray().remove(change.getElementRemoved().toJSONObject());
+        });
+        links.addListener((SetChangeListener<? super Link>) change ->
+        {
+            if (change.wasAdded())
+                jsonObject.get("links").getAsJSONArray().add(change.getElementAdded().toJSONObject());
+
+            if (change.wasRemoved())
+                jsonObject.get("links").getAsJSONArray().remove(change.getElementRemoved().toJSONObject());
+        });
+
+        jsonObject.addListener((JSONElement.ChildUpdateListener) System.out::println);
     }
 
     private void updateResult()
@@ -153,9 +178,10 @@ public class Simulation
         links.stream().filter(l -> l.source().get().getName().equals(name) || l.target().get().getName().equals(name)).forEach(l ->
         {
             graphPane.children().remove(l.getEdge());
-            links.remove(l);
         });
+        links.removeAll(links.stream().filter(l -> l.source().get().getName().equals(name) || l.target().get().getName().equals(name)).toList());
     }
+
     public void clear()
     {
         states.clear();
@@ -163,19 +189,9 @@ public class Simulation
         graphPane.children().clear();
     }
 
-
-    public JsonElement toJSONObject()
+    public JSONElement getJSONObject()
     {
-        JsonObject object = new JsonObject();
-        JsonArray nodesArray = new JsonArray(),
-                linksArray = new JsonArray();
-
-        states.stream().map(State::toJSONObject).forEach(nodesArray::add);
-        links.stream().map(Link::toJSONObject).forEach(linksArray::add);
-
-        object.add("nodes", nodesArray);
-        object.add("edges", linksArray);
-        return object;
+        return jsonObject;
     }
 
     public boolean hasState(String name)

@@ -1,9 +1,8 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.scene.Edge;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import ch.ludovic_mermod.dfasimulator.json.JSONArray;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -12,45 +11,42 @@ import javafx.collections.FXCollections;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class Link
 {
+    private final JSONObject jsonObject;
     private final ObjectProperty<State> source, target;
     private final SetProperty<Character> alphabetProperty;
     private final Edge edge;
 
-    public Link(State source, State target, Set<Character> alphabetProperty, Simulation simulation)
+    public Link(State source, State target, Set<Character> alphabet, Simulation simulation)
     {
+        jsonObject = new JSONObject();
+
         this.source = new SimpleObjectProperty<>(source);
         this.target = new SimpleObjectProperty<>(target);
-        this.alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabetProperty)));
+        this.alphabetProperty = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>(alphabet)));
         edge = new Edge(this, simulation.getGraphPane());
+
+        jsonObject.addProperty("source_name", this.source.get().nameProperty());
+        jsonObject.addProperty("target_name", this.target.get().nameProperty());
+        jsonObject.add("alphabet", alphabet.stream().map(Object::toString).collect(JSONArray::new, JSONArray::add, JSONArray::addAll));
+
+        alphabetProperty.addListener((o, ov, nv) -> jsonObject.add("alphabet", alphabetProperty.stream().map(Object::toString).collect(JSONArray::new, JSONArray::add, JSONArray::addAll)));
     }
 
-    public static Link fromJSONObject(JsonObject object, Simulation simulation)
+    public static Link fromJSONObject(JSONObject object, Simulation simulation)
     {
-        Set<Character> alphabet = new TreeSet<>();
-        JsonArray alphabetArray = object.get("alphabet").getAsJsonArray();
-        for (int i = 0; i < alphabetArray.size(); ++i)
-            alphabet.add(alphabetArray.get(i).getAsString().charAt(0));
-
         return new Link(
                 simulation.getState(object.get("source_name").getAsString()),
                 simulation.getState(object.get("target_name").getAsString()),
-                alphabet,
+                object.get("alphabet").getAsJSONArray().stream().map(e -> e.getAsString().charAt(0)).collect(Collectors.toSet()),
                 simulation);
     }
-    public JsonElement toJSONObject()
+    public JSONObject toJSONObject()
     {
-        JsonObject object = new JsonObject();
-        object.addProperty("source_name", source.get().getName());
-        object.addProperty("target_name", target.get().getName());
-
-        JsonArray alphabetArray = new JsonArray();
-        alphabetProperty.forEach(c -> alphabetArray.add(c.toString()));
-
-        object.add("alphabet", alphabetArray);
-        return object;
+        return jsonObject;
     }
 
     public SetProperty<Character> alphabetProperty()
