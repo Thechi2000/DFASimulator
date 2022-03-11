@@ -90,6 +90,6 @@ public class SimulationPane extends VBox
         }
 
         resultText.setVisible(true);
-        Strings.format("simulation_state_pane.result_" + mainPane.getGraphPane().resultProperty().get(), resultText.textProperty(), mainPane.getGraphPane().initialInputProperty().get());
+        Strings.bindFormat("simulation_state_pane.result_" + mainPane.getGraphPane().resultProperty().get(), resultText.textProperty(), mainPane.getGraphPane().initialInputProperty().get());
     }
 }

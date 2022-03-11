@@ -1,5 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
+import ch.ludovic_mermod.dfasimulator.gui.CustomBindings;
+import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.Link;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
@@ -9,6 +11,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 import java.util.Set;
 
@@ -33,7 +36,10 @@ public class MainPane extends BorderPane
         graphPane = simulation.getGraphPane();
         simulationPane = new SimulationPane();
         rightSplitPane = new SplitPane();
+    }
 
+    public void create(Stage primaryStage)
+    {
         menuBar.create(this);
         consolePane.create(this);
         graphPane.create(this);
@@ -59,6 +65,12 @@ public class MainPane extends BorderPane
         setTop(menuBar);
         setBottom(consolePane);
         setCenter(graphPane);
+
+        getScene().getWindow().setOnCloseRequest(request -> {
+            if(!simulation.ioManager().close())
+                request.consume();
+        });
+        Strings.bindFormat("window.title%s %s", primaryStage.titleProperty(), simulation.ioManager().filenameProperty(), CustomBindings.ternary(simulation.ioManager().isSavedProperty(), "", "*"));
     }
 
     public ObjectProperty<EditPane> editPaneProperty()

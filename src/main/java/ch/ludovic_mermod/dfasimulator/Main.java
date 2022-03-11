@@ -20,9 +20,9 @@ public class Main extends Application
     {
         MainPane mainPane = new MainPane();
 
-        Strings.format("window.title", primaryStage.titleProperty(), mainPane.getSimulation().ioManager().filenameProperty());
-
         primaryStage.setScene(new Scene(mainPane, 800, 600));
         primaryStage.show();
+
+        mainPane.create(primaryStage);
     }
 }
