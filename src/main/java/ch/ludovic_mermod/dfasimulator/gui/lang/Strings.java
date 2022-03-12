@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class Strings
@@ -30,7 +31,7 @@ public class Strings
     {
         if (!map.containsKey(id))
         {
-            Main.logger.log(System.Logger.Level.WARNING, String.format("Could not find translated string for \"%s\"", id.replace("%s", "%%s")));
+            Main.log(Level.WARNING, String.format("Could not find translated string for \"%s\"", id.replace("%s", "%%s")));
             set(id, id);
         }
 
@@ -55,7 +56,7 @@ public class Strings
 
         int occ = (format.get().length() - format.get().replace("%s", "").length()) / 2;
         if (objects.length != occ)
-            Main.logger.log(System.Logger.Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
+            Main.log(Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
 
         Set<ObservableValue<?>> properties = Arrays.stream(objects)
                 .filter(o -> o instanceof ObservableValue<?>)
@@ -74,7 +75,7 @@ public class Strings
 
         int occ = (format.length() - format.replace("%s", "").length()) / 2;
         if (objects.length != occ)
-            Main.logger.log(System.Logger.Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
+            Main.log(Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
 
         return String.format(format, objects);
     }

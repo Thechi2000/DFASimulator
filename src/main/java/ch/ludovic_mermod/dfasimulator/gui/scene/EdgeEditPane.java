@@ -32,7 +32,6 @@ public class EdgeEditPane extends EditPane
 
             alphabetField.setOnAction(event ->
             {
-                System.out.println("test");
                 var elements = Arrays.stream(alphabetField.getText().replace(" ", "").split(",")).toList();
 
                 if (elements.stream().allMatch(s -> s.length() == 1))

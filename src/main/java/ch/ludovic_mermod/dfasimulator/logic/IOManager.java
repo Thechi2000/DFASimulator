@@ -12,7 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class IOManager
@@ -33,14 +33,6 @@ public class IOManager
         filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(new File(filepathProperty.get()).getName()));
 
         simulation.getJSONObject().getAsJSONObject().addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
-        /*TIMER.scheduleAtFixedRate(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                updateSavedProperty();
-            }
-        }, 0, 1000);*/
     }
 
     public void save()
@@ -63,11 +55,11 @@ public class IOManager
                     o.write((copy).toString().getBytes(StandardCharsets.UTF_8));
                 }
             else
-                Main.logger.log(System.Logger.Level.ERROR, "Could not create file " + file.getAbsolutePath());
+                Main.log(Level.SEVERE, "Could not create file " + file.getAbsolutePath());
         }
         catch (IOException e)
         {
-            Main.logger.log(System.Logger.Level.ERROR, "Could not save DFA", e);
+            Main.log(Level.SEVERE, "Could not save DFA", e);
         }
 
         updateSavedProperty();
@@ -119,7 +111,10 @@ public class IOManager
     {
         return savedFile == null || savedFile.equals(simulation.getJSONObject());
     }
-    public ReadOnlyBooleanProperty isSavedProperty(){return isSavedProperty;}
+    public ReadOnlyBooleanProperty isSavedProperty()
+    {
+        return isSavedProperty;
+    }
 
     public boolean close()
     {

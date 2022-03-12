@@ -1,5 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
+import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
@@ -10,6 +11,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class Simulation
@@ -71,8 +73,6 @@ public class Simulation
             if (change.wasRemoved())
                 jsonObject.get("links").getAsJSONArray().remove(change.getElementRemoved().toJSONObject());
         });
-
-        jsonObject.addListener((JSONElement.ChildUpdateListener) System.out::println);
     }
 
     private void updateResult()
@@ -121,14 +121,9 @@ public class Simulation
     public void createLink(String from, String to)
     {
         if (!hasState(from) || !hasState(to))
-        {
-            System.out.println("Could not link " + from + " and " + to);
-            System.out.println("{" + hasState(from) + ", " + hasState(to) + "}");
-            return;
-        }
-
-        Link link = new Link(getState(from), getState(to), Set.of(), this);
-        addLink(link);
+            Main.log(Level.WARNING, "Could not link %s(%b) to %s(%b)", from, to, hasState(from), hasState(to));
+        else
+            addLink(new Link(getState(from), getState(to), Set.of(), this));
     }
     /**
      * Create and add a node at the given coordinates
