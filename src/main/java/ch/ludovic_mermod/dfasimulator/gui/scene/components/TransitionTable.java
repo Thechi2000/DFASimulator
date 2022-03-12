@@ -3,20 +3,20 @@ package ch.ludovic_mermod.dfasimulator.gui.scene.components;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.DFA;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.Region;
 
 import java.util.Map;
 
-public class TransitionTable extends Region
+public class TransitionTable extends ScrollPane
 {
     private final TableView<Map<Character, String>> tableView;
 
     public TransitionTable()
     {
         tableView = new TableView<>();
-        getChildren().add(tableView);
+        setContent(tableView);
     }
 
     public TransitionTable(DFA dfa)

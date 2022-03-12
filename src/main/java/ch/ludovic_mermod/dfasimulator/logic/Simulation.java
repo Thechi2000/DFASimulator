@@ -9,6 +9,7 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.util.Pair;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -339,6 +340,31 @@ public class Simulation
     public Set<Character> getAlphabet()
     {
         return links.stream().map(l -> l.alphabetProperty().get()).collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
+    }
+
+    public DFA generateDFA()
+    {
+        if (!isValidDFA()) return null;
+
+        return new DFA(getInitialState().getName(),
+                states.stream()
+                        .map(State::getName)
+                        .collect(Collectors.toSet()),
+                states.stream()
+                        .filter(s -> s.acceptingProperty().get())
+                        .map(State::getName)
+                        .collect(Collectors.toSet()),
+                getAlphabet(),
+                states.stream().map(s -> new Pair<>(s,
+                                s.outgoingLinksProperty()
+                                        .stream()
+                                        .collect(TreeMap<Character, String>::new,
+                                                (m, l) -> l.alphabetProperty().forEach(c -> m.put(c, l.target().get().getName())),
+                                                TreeMap::putAll)))
+                        .collect(TreeMap::new,
+                                (m, p) -> m.put(p.getKey().getName(), p.getValue()),
+                                TreeMap::putAll)
+        );
     }
 
     public GraphPane getGraphPane()
