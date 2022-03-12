@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
-import ch.ludovic_mermod.dfasimulator.gui.scene.Edge;
+import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.ObjectProperty;

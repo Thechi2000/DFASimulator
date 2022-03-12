@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
-import ch.ludovic_mermod.dfasimulator.gui.scene.Node;
+import ch.ludovic_mermod.dfasimulator.gui.scene.components.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
