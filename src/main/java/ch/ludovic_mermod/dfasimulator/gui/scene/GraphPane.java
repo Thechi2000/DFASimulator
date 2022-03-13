@@ -1,7 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import ch.ludovic_mermod.dfasimulator.logic.Link;
+import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -13,25 +13,30 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class GraphPane extends Region
 {
-    private final Simulation simulation;
+    private final Set<Edge> edges;
 
     private ContextMenu menu;
     private MainPane mainPane;
 
     private Point2D menuPosition;
     private Tool tool;
+    private Simulation simulation;
 
-    public GraphPane(Simulation simulation)
+    public GraphPane(MainPane mainPane)
     {
-        this.simulation = simulation;
+        this.mainPane = mainPane;
+        edges = new HashSet<>();
         tool = Tool.EDIT;
     }
 
     public void create(MainPane mainPane)
     {
-        this.mainPane = mainPane;
+        simulation = mainPane.getSimulation();
         menu = createContextMenu();
 
         setOnMousePressed(event -> menu.hide());
@@ -45,10 +50,6 @@ public class GraphPane extends Region
     public ReadOnlyObjectProperty<State> currentStateProperty()
     {
         return simulation.currentStateProperty();
-    }
-    public ReadOnlyObjectProperty<Link> lastUsedLinkProperty()
-    {
-        return simulation.lastUsedLinkProperty();
     }
     public ReadOnlyStringProperty remainingInputProperty()
     {
@@ -71,6 +72,10 @@ public class GraphPane extends Region
     {
         return simulation.simulationEndedProperty();
     }
+    public ReadOnlyBooleanProperty getSimulationProperty()
+    {
+        return simulation.isSimulatingProperty();
+    }
 
     public Tool getTool()
     {
@@ -81,9 +86,28 @@ public class GraphPane extends Region
         this.tool = tool;
     }
 
-    public ReadOnlyBooleanProperty getSimulationProperty()
+    public void addState(State state)
     {
-        return simulation.isSimulatingProperty();
+        mainPane.getFiniteAutomaton().states()
+                .stream()
+                .filter(s -> !s.equals(state))
+                .forEach(s ->
+                {
+                    final Edge e1 = new Edge(state, s, this);
+                    edges.add(e1);
+                    getChildren().add(e1);
+
+                    final Edge e2 = new Edge(s, state, this);
+                    edges.add(e2);
+                    getChildren().add(e2);
+                });
+        getChildren().add(state.getNode());
+    }
+    public void removeState(State state)
+    {
+        edges.stream().filter(e -> e.source().equals(state) || e.target().equals(state))
+                .forEach(edges::remove);
+        getChildren().remove(state.getNode());
     }
 
     private ContextMenu createContextMenu()
@@ -92,7 +116,7 @@ public class GraphPane extends Region
 
         MenuItem create = new MenuItem();
         Strings.bind("create", create.textProperty());
-        create.setOnAction(event -> simulation.createNode(menuPosition.getX(), menuPosition.getY()));
+        create.setOnAction(event -> mainPane.getFiniteAutomaton().createNode(menuPosition.getX(), menuPosition.getY()));
         create.disableProperty().bind(simulation.isSimulatingProperty());
         menu.getItems().add(create);
 
@@ -106,11 +130,6 @@ public class GraphPane extends Region
     public ObservableList<javafx.scene.Node> children()
     {
         return getChildren();
-    }
-
-    public Simulation getSimulation()
-    {
-        return simulation;
     }
 
     public enum Tool

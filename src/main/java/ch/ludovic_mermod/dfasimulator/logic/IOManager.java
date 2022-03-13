@@ -2,11 +2,13 @@ package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -18,28 +20,30 @@ import java.util.stream.Collectors;
 public class IOManager
 {
     protected static final Timer TIMER = new Timer();
-    private final Simulation simulation;
+    private final MainPane mainPane;
     private final StringProperty filenameProperty, filepathProperty;
     private final BooleanProperty isSavedProperty;
+    private final FiniteAutomaton finiteAutomaton;
     private JSONElement savedFile;
 
-    public IOManager(Simulation simulation)
+    public IOManager(MainPane mainPane)
     {
-        this.simulation = simulation;
+        this.mainPane = mainPane;
         filenameProperty = new SimpleStringProperty();
         filepathProperty = new SimpleStringProperty();
         isSavedProperty = new SimpleBooleanProperty();
 
         filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(new File(filepathProperty.get()).getName()));
 
-        simulation.getJSONObject().getAsJSONObject().addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
+        mainPane.getFiniteAutomaton().getJSONObject().getAsJSONObject().addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
+        finiteAutomaton = mainPane.getFiniteAutomaton();
     }
 
     public void save()
     {
         if (filepathProperty.isEmpty().get() || filepathProperty.get().isEmpty())
         {
-            String str = simulation.getGraphPane().getMainPane().getSimulatorMenuBar().chooseSaveFile();
+            String str = mainPane.getGraphPane().getMainPane().getSimulatorMenuBar().chooseSaveFile();
             if (str == null) return;
             filepathProperty.set(str);
         }
@@ -50,7 +54,7 @@ public class IOManager
             if (file.exists() || file.createNewFile())
                 try (FileOutputStream o = new FileOutputStream(file))
                 {
-                    final JSONElement copy = simulation.getJSONObject().deepCopy();
+                    final JSONElement copy = finiteAutomaton.getJSONObject().deepCopy();
                     savedFile = copy;
                     o.write((copy).toString().getBytes(StandardCharsets.UTF_8));
                 }
@@ -77,14 +81,17 @@ public class IOManager
         {
             JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
             var nodesArray = object.get("states").getAsJSONArray();
-            var edgesArray = object.get("links").getAsJSONArray();
+            finiteAutomaton.clear();
 
-            simulation.clear();
+            nodesArray.stream()
+                    .map(e -> new Pair<>(State.fromJSONObject(e.getAsJSONObject(), finiteAutomaton), e.getAsJSONObject().get("transitionMap")))
+                    .forEach(p ->
+                    {
+                        p.getKey().loadTransitionMap(p.getValue().getAsJSONObject());
+                        finiteAutomaton.addState(p.getKey());
+                    });
 
-            nodesArray.forEach(e -> simulation.addState(State.fromJSONObject(e.getAsJSONObject(), simulation)));
-            edgesArray.forEach(e -> simulation.addLink(Link.fromJSONObject(e.getAsJSONObject(), simulation)));
-
-            savedFile = simulation.getJSONObject().deepCopy();
+            savedFile = finiteAutomaton.getJSONObject().deepCopy();
         }
         catch (FileNotFoundException e)
         {
@@ -95,9 +102,9 @@ public class IOManager
     }
     public void openNew()
     {
-        simulation.clear();
+        finiteAutomaton.clear();
         filepathProperty.set(null);
-        savedFile = simulation.getJSONObject().deepCopy();
+        savedFile = finiteAutomaton.getJSONObject().deepCopy();
 
         updateSavedProperty();
     }
@@ -109,7 +116,7 @@ public class IOManager
 
     public boolean isSaved()
     {
-        return savedFile == null || savedFile.equals(simulation.getJSONObject());
+        return savedFile == null || savedFile.equals(finiteAutomaton.getJSONObject());
     }
     public ReadOnlyBooleanProperty isSavedProperty()
     {

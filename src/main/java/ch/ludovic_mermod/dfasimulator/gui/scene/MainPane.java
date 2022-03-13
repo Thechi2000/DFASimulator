@@ -2,8 +2,9 @@ package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.gui.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
-import ch.ludovic_mermod.dfasimulator.logic.Link;
+import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
+import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,27 +14,31 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.util.Set;
+import java.util.List;
 
 public class MainPane extends BorderPane
 {
-    private final Simulation simulation;
+    private final FiniteAutomaton finiteAutomaton;
+    private final IOManager ioManager;
+    private final GraphPane graphPane;
 
     private final ObjectProperty<EditPane> editPaneProperty;
     private final MenuBar menuBar;
     private final ConsolePane consolePane;
-    private final GraphPane graphPane;
     private final SimulationPane simulationPane;
     private final SplitPane rightSplitPane;
+    private Simulation simulation;
 
     public MainPane()
     {
-        simulation = new Simulation();
+        finiteAutomaton = new FiniteAutomaton(this);
+        ioManager = new IOManager(this);
+        graphPane = new GraphPane(this);
+        simulation = new Simulation(this);
 
         editPaneProperty = new SimpleObjectProperty<>(null);
         menuBar = new MenuBar();
         consolePane = new ConsolePane();
-        graphPane = simulation.getGraphPane();
         simulationPane = new SimulationPane();
         rightSplitPane = new SplitPane();
     }
@@ -58,19 +63,33 @@ public class MainPane extends BorderPane
         rightSplitPane.setOrientation(Orientation.VERTICAL);
         rightSplitPane.getItems().addAll(simulationPane);
 
-        //fillGraphPane();
-        simulation.ioManager().open("default.json");
+        fillGraphPane();
+        //ioManager.open("default.json");
 
         setRight(rightSplitPane);
         setTop(menuBar);
         setBottom(consolePane);
         setCenter(graphPane);
 
-        getScene().getWindow().setOnCloseRequest(request -> {
-            if(!simulation.ioManager().close())
+        getScene().getWindow().setOnCloseRequest(request ->
+        {
+            if (!ioManager.close())
                 request.consume();
         });
-        Strings.bindFormat("window.title%s %s", primaryStage.titleProperty(), simulation.ioManager().filenameProperty(), CustomBindings.ternary(simulation.ioManager().isSavedProperty(), "", "*"));
+        Strings.bindFormat("window.title%s %s", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
+    }
+
+    public FiniteAutomaton getFiniteAutomaton()
+    {
+        return finiteAutomaton;
+    }
+    public IOManager getIoManager()
+    {
+        return ioManager;
+    }
+    public GraphPane getGraphPane()
+    {
+        return graphPane;
     }
 
     public ObjectProperty<EditPane> editPaneProperty()
@@ -89,10 +108,6 @@ public class MainPane extends BorderPane
     {
         return consolePane;
     }
-    public GraphPane getGraphPane()
-    {
-        return graphPane;
-    }
     public SimulationPane getSimulationStatePane()
     {
         return simulationPane;
@@ -100,38 +115,47 @@ public class MainPane extends BorderPane
 
     private void fillGraphPane()
     {
-        var stateNode1 = new State("source", simulation);
+        finiteAutomaton.alphabet().addAll(List.of('0', '1'));
+
+        var stateNode1 = new State(finiteAutomaton);
+        stateNode1.nameProperty().set("source");
         stateNode1.getNode().relocate(50, 50);
-        stateNode1.acceptingProperty().set(true);
+        stateNode1.isAcceptingProperty().set(true);
 
-        var stateNode2 = new State("target", simulation);
+        var stateNode2 = new State(finiteAutomaton);
+        stateNode2.nameProperty().set("target");
         stateNode2.getNode().relocate(300, 50);
-        stateNode2.initialProperty().set(true);
+        finiteAutomaton.initialStateProperty().set(stateNode2);
 
-        var stateNode3 = new State("other", simulation);
+        var stateNode3 = new State(finiteAutomaton);
+        stateNode3.nameProperty().set("other");
         stateNode3.getNode().relocate(50, 300);
 
-        var link1 = new Link(stateNode1, stateNode2, Set.of('0', '1'), simulation);
-        var link2 = new Link(stateNode2, stateNode3, Set.of('0', '1'), simulation);
-        var link3 = new Link(stateNode3, stateNode1, Set.of('0', '1'), simulation);
 
-        simulation.addState(stateNode1);
-        simulation.addState(stateNode2);
-        simulation.addState(stateNode3);
-        simulation.addLink(link1);
-        simulation.addLink(link2);
-        simulation.addLink(link3);
+        stateNode1.transitionMap().put('0', stateNode2);
+        stateNode1.transitionMap().put('1', stateNode2);
 
-        simulation.ioManager().saveAs("default.json");
+        stateNode2.transitionMap().put('0', stateNode3);
+        stateNode2.transitionMap().put('1', stateNode3);
+
+        stateNode3.transitionMap().put('0', stateNode1);
+        stateNode3.transitionMap().put('1', stateNode1);
+
+
+        finiteAutomaton.addState(stateNode1);
+        finiteAutomaton.addState(stateNode2);
+        finiteAutomaton.addState(stateNode3);
+
+        ioManager.saveAs("default.json");
     }
 
-    public void bindEditPane(Link link)
+    /*public void bindEditPane(Link link)
     {
         bindEditPane(new EdgeEditPane(simulation, link));
-    }
+    }*/
     public void bindEditPane(State state)
     {
-        bindEditPane(new NodeEditPane(simulation, state));
+        bindEditPane(new NodeEditPane(finiteAutomaton, state));
     }
     private void bindEditPane(EditPane pane)
     {

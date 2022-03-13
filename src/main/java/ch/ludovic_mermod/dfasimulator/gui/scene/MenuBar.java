@@ -38,7 +38,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem newItem = new MenuItem();
             Strings.bind("menu.file.new", newItem.textProperty());
-            newItem.setOnAction(event -> mainPane.getSimulation().ioManager().openNew());
+            newItem.setOnAction(event -> mainPane.getIoManager().openNew());
             newItem.acceleratorProperty().bind(Controls.newFile);
             fileMenu.getItems().add(newItem);
 
@@ -53,7 +53,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem save = new MenuItem();
             Strings.bind("menu.file.save", save.textProperty());
-            save.setOnAction(event -> mainPane.getSimulation().ioManager().save());
+            save.setOnAction(event -> mainPane.getIoManager().save());
             save.acceleratorProperty().bind(Controls.save);
             fileMenu.getItems().add(save);
 
@@ -89,7 +89,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
             toolsMenu.getItems().add(link);
         }
 
-        // DFA
+        /*// DFA
         {
             Menu dfaMenu = new Menu();
             Strings.bind("menu.dfa", dfaMenu.textProperty());
@@ -111,7 +111,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
                 stage.show();
             });
             dfaMenu.getItems().add(transitionTableItem);
-        }
+        }*/
     }
 
     private void open()
@@ -119,13 +119,13 @@ public class MenuBar extends javafx.scene.control.MenuBar
         fileChooser.setTitle(Strings.get("menu.file.open").get());
         File f = fileChooser.showOpenDialog(getScene().getWindow());
         saveLastFilePath(f);
-        if (f != null) mainPane.getSimulation().ioManager().open(f.getAbsolutePath());
+        if (f != null) mainPane.getIoManager().open(f.getAbsolutePath());
     }
 
     private void saveAs()
     {
         String path = chooseSaveFile();
-        if (path != null) mainPane.getSimulation().ioManager().saveAs(path);
+        if (path != null) mainPane.getIoManager().saveAs(path);
     }
 
     public String chooseSaveFile()

@@ -3,19 +3,15 @@ package ch.ludovic_mermod.dfasimulator.gui.scene.components;
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
-import ch.ludovic_mermod.dfasimulator.logic.Link;
 import ch.ludovic_mermod.dfasimulator.logic.State;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -42,7 +38,7 @@ public class Node extends StackPane
 
         Circle innerCircle = new Circle();
         innerCircle.radiusProperty().bind(Constants.Node.Circle.radius);
-        state.initialProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        initialBinding().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.currentColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.initialColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.Node.Circle.color.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
@@ -54,7 +50,7 @@ public class Node extends StackPane
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
         outerCircle.setFill(Color.TRANSPARENT);
-        outerCircle.visibleProperty().bind(state.acceptingProperty());
+        outerCircle.visibleProperty().bind(state.isAcceptingProperty());
 
         Text text = new Text();
         text.fontProperty().bind(Constants.Node.Text.font);
@@ -74,17 +70,17 @@ public class Node extends StackPane
     {
         return state.nameProperty();
     }
-    public ListProperty<Link> outgoingLinksProperty()
+    /* public ListProperty<Link> outgoingLinksProperty()
+     {
+         return state.outgoingLinksProperty();
+     }*/
+    public BooleanBinding initialBinding()
     {
-        return state.outgoingLinksProperty();
-    }
-    public BooleanProperty initialProperty()
-    {
-        return state.initialProperty();
+        return state.isInitialBinding();
     }
     public BooleanProperty acceptingProperty()
     {
-        return state.acceptingProperty();
+        return state.isAcceptingProperty();
     }
     public String getName()
     {
@@ -104,7 +100,7 @@ public class Node extends StackPane
     {
         c.setFill(graphPane.currentStateProperty().get() == state
                 ? Constants.Node.Circle.currentColor.get()
-                : state.initialProperty().get()
+                : state.isInitialBinding().get()
                 ? Constants.Node.Circle.initialColor.get()
                 : Constants.Node.Circle.color.get());
     }
@@ -158,7 +154,7 @@ public class Node extends StackPane
         });
 
 
-        setOnDragDetected(event ->
+      /*  setOnDragDetected(event ->
         {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.LINK)
             {
@@ -179,8 +175,8 @@ public class Node extends StackPane
         setOnDragDropped(event ->
         {
             if (getParent() instanceof GraphPane && event.getGestureSource() instanceof Node)
-                graphPane.getSimulation().createLink(event.getDragboard().getString(), state.nameProperty().get());
-        });
+                graphPane.getMainPane().getSimulation().createLink(event.getDragboard().getString(), state.nameProperty().get());
+        });*/
     }
 
     private ContextMenu createContextMenu()
@@ -189,7 +185,7 @@ public class Node extends StackPane
 
         deleteMenuItem = new MenuItem();
         Strings.bind("delete", deleteMenuItem.textProperty());
-        deleteMenuItem.setOnAction(event -> graphPane.getSimulation().deleteState(getState()));
+        deleteMenuItem.setOnAction(event -> graphPane.getMainPane().getFiniteAutomaton().removeState(getState()));
         //delete.disableProperty().bind(graphPane.getSimulationProperty());
         menu.getItems().add(deleteMenuItem);
 

@@ -1,53 +1,110 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.scene.components.Node;
+import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
+
+import java.util.Objects;
+import java.util.TreeMap;
 
 public class State
 {
     private final JSONObject jsonObject;
-    private final ListProperty<Link> outgoingLinksProperty;
-    private final StringProperty nameProperty;
-    private final BooleanProperty initialProperty, acceptingProperty;
-    private final Node node;
 
-    public State(String name, Simulation simulation)
+    private final Node node;
+    private final StringProperty name;
+    private final BooleanBinding isInitialBinding;
+    private final BooleanProperty isAcceptingProperty;
+    private final MapProperty<Character, State> transitionMapProperty;
+    private final FiniteAutomaton finiteAutomaton;
+
+    public State(FiniteAutomaton finiteAutomaton)
     {
+        this.finiteAutomaton = finiteAutomaton;
         jsonObject = new JSONObject();
 
-        outgoingLinksProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-        nameProperty = new SimpleStringProperty(name);
-        initialProperty = new SimpleBooleanProperty(false);
-        acceptingProperty = new SimpleBooleanProperty(false);
-        this.node = new Node(this, simulation.getGraphPane());
+        name = new SimpleStringProperty(this, "name", "");
+        isAcceptingProperty = new SimpleBooleanProperty(this, "isAccepting", false);
+        transitionMapProperty = new SimpleMapProperty<>(this, "transitionMap", FXCollections.observableMap(new TreeMap<>()));
 
+        isInitialBinding = new BooleanBinding()
+        {
+            {
+                super.bind(finiteAutomaton.initialStateProperty(), name);
+            }
 
-        jsonObject.addProperty("name", nameProperty);
-        jsonObject.addProperty("initial", initialProperty);
-        jsonObject.addProperty("accepting", acceptingProperty);
-        jsonObject.addProperty("x_coord", node.layoutXProperty());
-        jsonObject.addProperty("y_coord", node.layoutYProperty());
+            @Override
+            protected boolean computeValue()
+            {
+                return finiteAutomaton.initialState() != null && name().equals(finiteAutomaton.initialState().name());
+            }
+        };
 
-        /*nameProperty.addListener((o, ov, nv) -> jsonObject.addProperty("name", nv));
-        initialProperty.addListener((o, ov, nv) -> jsonObject.addProperty("initial", nv));
-        acceptingProperty.addListener((o, ov, nv) -> jsonObject.addProperty("accepting", nv));
-        node.layoutXProperty().addListener((o, ov, nv) -> jsonObject.addProperty("x_coord", nv));
-        node.layoutYProperty().addListener((o, ov, nv) -> jsonObject.addProperty("y_coord", nv));*/
+        node = new Node(this, finiteAutomaton.getMainPane().getGraphPane());
+
+        jsonObject.addProperty("name", name);
+        jsonObject.addProperty("isAccepting", isAcceptingProperty);
+        jsonObject.add("transitionMap", new JSONObject());
+
+        transitionMapProperty.addListener((MapChangeListener<? super Character, ? super State>) change ->
+        {
+            if (change.wasAdded())
+                jsonObject.getAsJSONObject("transitionMap").addProperty(change.getKey().toString(), change.getValueAdded().nameProperty());
+
+            if (change.wasRemoved())
+                jsonObject.getAsJSONObject("transitionMap").remove(change.getKey().toString());
+        });
     }
 
-    public static State fromJSONObject(JSONObject object, Simulation simulation)
+    public static State fromJSONObject(JSONObject jsonObject, FiniteAutomaton finiteAutomaton)
     {
-        State state = new State(object.get("name").getAsString(), simulation);
-        state.initialProperty.set(object.get("initial").getAsBoolean());
-        state.acceptingProperty.set(object.get("accepting").getAsBoolean());
-        state.getNode().relocate(object.get("x_coord").getAsDouble(), object.get("y_coord").getAsDouble());
+        State state = new State(finiteAutomaton);
+        state.name.set(jsonObject.get("name").getAsString());
+        state.isAcceptingProperty.set(jsonObject.get("isAccepting").getAsBoolean());
         return state;
     }
-    public JSONObject toJSONObject()
+    public void loadTransitionMap(JSONObject jsonObject)
+    {
+        jsonObject.getAsJSONObject("transitionMap").entrySet().forEach(e -> transitionMapProperty.put(e.getKey().charAt(0), finiteAutomaton.getState(e.getValue().getAsString())));
+    }
+
+    public JSONElement getJSONObject()
     {
         return jsonObject;
+    }
+
+    public String name()
+    {
+        return name.get();
+    }
+    public StringProperty nameProperty()
+    {
+        return name;
+    }
+    public BooleanBinding isInitialBinding()
+    {
+        return isInitialBinding;
+    }
+    public BooleanProperty isAcceptingProperty()
+    {
+        return isAcceptingProperty;
+    }
+    public boolean isAccepting()
+    {
+        return isAcceptingProperty.get();
+    }
+    public ObservableMap<Character, State> transitionMap()
+    {
+        return transitionMapProperty.get();
+    }
+    public MapProperty<Character, State> transitionMapProperty()
+    {
+        return transitionMapProperty;
     }
 
     public Node getNode()
@@ -55,33 +112,24 @@ public class State
         return node;
     }
 
-    public void addLink(Link link)
+    @Override
+    public int hashCode()
     {
-        outgoingLinksProperty.add(link);
+        return Objects.hash(name.get());
     }
-    public void removeLink(Link link)
+    @Override
+    public boolean equals(Object o)
     {
-        outgoingLinksProperty.remove(link);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        State state = (State) o;
+        return Objects.equals(name.get(), state.name.get());
     }
-
-    public StringProperty nameProperty()
+    @Override
+    public String toString()
     {
-        return nameProperty;
-    }
-    public ListProperty<Link> outgoingLinksProperty()
-    {
-        return outgoingLinksProperty;
-    }
-    public BooleanProperty initialProperty()
-    {
-        return initialProperty;
-    }
-    public BooleanProperty acceptingProperty()
-    {
-        return acceptingProperty;
-    }
-    public String getName()
-    {
-        return nameProperty.get();
+        return "State{" +
+                "name=" + name.get() +
+                '}';
     }
 }
