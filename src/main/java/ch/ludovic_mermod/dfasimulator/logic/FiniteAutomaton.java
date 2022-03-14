@@ -95,6 +95,12 @@ public class FiniteAutomaton
             Platform.runLater(() -> state.nameProperty().set(oldName));
     }
 
+    public void addState(String name)
+    {
+        State state = new State(this);
+        state.nameProperty().set(name);
+        addState(state);
+    }
     public void addState(State state)
     {
         states.add(state);

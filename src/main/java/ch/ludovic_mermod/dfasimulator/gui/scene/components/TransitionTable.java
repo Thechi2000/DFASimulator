@@ -5,10 +5,11 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
+import javafx.scene.Group;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 
 public class TransitionTable extends ScrollPane
 {
@@ -31,16 +32,43 @@ public class TransitionTable extends ScrollPane
         tableView.getColumns().clear();
         tableView.getItems().clear();
 
-        TableColumn<State, String> nameColumn = new TableColumn<>();
+        TableColumn<State, Group> nameColumn = new TableColumn<>();
         Strings.bind("transition_table.label_column", nameColumn.textProperty());
         nameColumn.setCellValueFactory(cellFeatures ->
         {
+            SimpleObjectProperty<Group> cell = new SimpleObjectProperty<>(new Group());
+
             if (cellFeatures.getValue() == null)
             {
-                return new SimpleObjectProperty<>();
+                TextField addStateField = new TextField();
+                cell.get().getChildren().add(addStateField);
+                addStateField.setVisible(false);
+
+                Button addStateButton = new Button();
+                Strings.bind("transition_table.add_state", addStateButton.textProperty());
+                cell.get().getChildren().add(addStateButton);
+
+                addStateField.focusedProperty().addListener((o, ov, nv) ->
+                {
+                    if(!nv)
+                    {
+                        addStateField.setVisible(false);
+                        addStateButton.setVisible(true);
+                    }
+                });
+                addStateField.setOnAction(event -> finiteAutomaton.addState(addStateField.getText()));
+
+                addStateButton.setOnAction(event ->
+                {
+                    addStateField.setVisible(true);
+                    addStateButton.setVisible(false);
+                    addStateField.requestFocus();
+                });
             }
             else
-                return new SimpleStringProperty(cellFeatures.getValue().name());
+                cell.get().getChildren().add(new Text(cellFeatures.getValue().name()));
+
+            return cell;
         });
         nameColumn.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
         tableView.getColumns().add(nameColumn);
@@ -98,13 +126,16 @@ public class TransitionTable extends ScrollPane
         initialColumn.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
         tableView.getColumns().add(initialColumn);
 
-        finiteAutomaton.states().forEach(state -> tableView.getItems().add(state));
+        tableView.getItems().addAll(finiteAutomaton.states());
         tableView.getItems().add(null);
 
         finiteAutomaton.states().addListener((ListChangeListener<? super State>) change ->
         {
             change.next();
-            tableView.setItems(finiteAutomaton.states());
+
+            tableView.getItems().clear();
+            tableView.getItems().addAll(finiteAutomaton.states());
+            tableView.getItems().add(null);
         });
     }
 
