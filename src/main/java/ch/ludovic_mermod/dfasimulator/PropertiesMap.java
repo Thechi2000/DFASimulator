@@ -36,7 +36,12 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
     public ObjectProperty<V> computeIfAbsent(Object key, V def)
     {
         if (map.containsKey(key)) return map.get(key);
-        else return map.put(((K) key), new SimpleObjectProperty<>(def));
+        else
+        {
+            final SimpleObjectProperty<V> prop = new SimpleObjectProperty<>(def);
+            map.put(((K) key), prop);
+            return prop;
+        }
     }
 
     public ObjectProperty<V> setValue(K key, V value)
