@@ -45,8 +45,7 @@ public class TransitionTable extends ScrollPane
                 ChoiceBox<State> choiceBox = new ChoiceBox<>();
                 choiceBox.setItems(FXCollections.observableList(finiteAutomaton.states().stream().toList()));
                 choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState));
-                choiceBox.setValue(map.getValue().transitionMap().get(character));
-                //choiceBox.setDisable(true);
+                choiceBox.valueProperty().bindBidirectional(map.getValue().transitionMap().get(character));
                 return new SimpleObjectProperty<>(choiceBox);
             });
 
@@ -59,7 +58,7 @@ public class TransitionTable extends ScrollPane
         acceptingColumn.setCellValueFactory(cellFeatures ->
         {
             CheckBox checkBox = new CheckBox();
-            checkBox.setSelected(cellFeatures.getValue().isAccepting());
+            checkBox.selectedProperty().bindBidirectional(cellFeatures.getValue().isAcceptingProperty());
             return new SimpleObjectProperty<>(checkBox);
         });
         acceptingColumn.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
@@ -72,10 +71,23 @@ public class TransitionTable extends ScrollPane
         initialColumn.setCellValueFactory(cellFeatures ->
         {
             Toggle button = new RadioButton();
+            button.setUserData(cellFeatures.getValue());
             button.setToggleGroup(toggleGroup);
             button.setSelected(cellFeatures.getValue().isInitialBinding().get());
             return new SimpleObjectProperty<>(button);
         });
+
+        toggleGroup.selectedToggleProperty().addListener((o, ov, nv) ->
+        {
+            if (!nv.getUserData().equals(finiteAutomaton.initialState()))
+                finiteAutomaton.initialStateProperty().set((State) nv.getUserData());
+        });
+        finiteAutomaton.initialStateProperty().addListener((o, ov, nv) ->
+        {
+            if (!toggleGroup.getSelectedToggle().getUserData().equals(nv))
+                toggleGroup.selectToggle(toggleGroup.getToggles().stream().filter(t -> t.getUserData().equals(nv)).findAny().orElse(null));
+        });
+
         initialColumn.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
         tableView.getColumns().add(initialColumn);
 
