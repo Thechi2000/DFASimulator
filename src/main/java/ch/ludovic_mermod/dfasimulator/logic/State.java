@@ -52,6 +52,8 @@ public class State
         jsonObject.addProperty("y_coord", node.layoutYProperty());
         jsonObject.add("transitionMap", new JSONObject());
 
+        finiteAutomaton.alphabet().forEach(transitionMapProperty::get);
+
         transitionMapProperty.addListener((p, k, o, n) ->
         {
             if (n != null)
