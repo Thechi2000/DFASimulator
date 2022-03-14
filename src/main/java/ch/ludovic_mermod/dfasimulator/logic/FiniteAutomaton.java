@@ -108,7 +108,7 @@ public class FiniteAutomaton
                 {
                     s.transitionMap().forEach((key, value) ->
                     {
-                        if (value.name().equals(state.name()))
+                        if (value.get().name().equals(state.name()))
                             s.transitionMap().put(key, null);
                     });
                 });

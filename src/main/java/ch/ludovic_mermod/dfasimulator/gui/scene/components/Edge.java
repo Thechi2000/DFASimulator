@@ -32,7 +32,7 @@ public class Edge extends Group
 
         alphabetDisplay = new Text();
         updateAlphabetDisplay();
-        source.transitionMap().addListener((MapChangeListener<? super Character, ? super State>) change -> updateAlphabetDisplay());
+        source.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
 
         line = new Line();
         line.fillProperty().bind(Constants.Link.Line.color);
@@ -154,7 +154,7 @@ public class Edge extends Group
         alphabetDisplay.setText(source.transitionMap()
                 .entrySet()
                 .stream()
-                .filter(e -> target.equals(e.getValue()))
+                .filter(e -> target.equals(e.getValue().get()))
                 .map(e -> e.getKey().toString())
                 .sorted()
                 .collect(Collectors.joining(", ")));

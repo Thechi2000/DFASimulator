@@ -1,16 +1,14 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
+import ch.ludovic_mermod.dfasimulator.PropertiesMap;
 import ch.ludovic_mermod.dfasimulator.gui.scene.components.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableMap;
 
 import java.util.Objects;
-import java.util.TreeMap;
 
 public class State
 {
@@ -20,7 +18,7 @@ public class State
     private final StringProperty name;
     private final BooleanBinding isInitialBinding;
     private final BooleanProperty isAcceptingProperty;
-    private final MapProperty<Character, State> transitionMapProperty;
+    private final PropertiesMap<Character, State> transitionMapProperty;
     private final FiniteAutomaton finiteAutomaton;
 
     public State(FiniteAutomaton finiteAutomaton)
@@ -30,7 +28,7 @@ public class State
 
         name = new SimpleStringProperty(this, "name", "");
         isAcceptingProperty = new SimpleBooleanProperty(this, "isAccepting", false);
-        transitionMapProperty = new SimpleMapProperty<>(this, "transitionMap", FXCollections.observableMap(new TreeMap<>()));
+        transitionMapProperty = new PropertiesMap<>();
 
         isInitialBinding = new BooleanBinding()
         {
@@ -53,11 +51,9 @@ public class State
         jsonObject.addProperty("y_coord", node.layoutYProperty());
         jsonObject.add("transitionMap", new JSONObject());
 
-        transitionMapProperty.addListener((MapChangeListener<? super Character, ? super State>) change ->
+        transitionMapProperty.addListener((p, k, o, n) -> jsonObject.getAsJSONObject("transitionMap").addProperty(k.toString(), n.nameProperty()));
+        transitionMapProperty.addListener((MapChangeListener<? super Character, ? super ObjectProperty<State>>) change ->
         {
-            if (change.wasAdded())
-                jsonObject.getAsJSONObject("transitionMap").addProperty(change.getKey().toString(), change.getValueAdded().nameProperty());
-
             if (change.wasRemoved())
                 jsonObject.getAsJSONObject("transitionMap").remove(change.getKey().toString());
         });
@@ -73,7 +69,7 @@ public class State
     }
     public void loadTransitionMap(JSONObject jsonObject)
     {
-        jsonObject.entrySet().forEach(e -> transitionMapProperty.put(e.getKey().charAt(0), finiteAutomaton.getState(e.getValue().getAsString())));
+        jsonObject.entrySet().forEach(e -> transitionMapProperty.setValue(e.getKey().charAt(0), finiteAutomaton.getState(e.getValue().getAsString())));
     }
 
     public JSONElement getJSONObject()
@@ -101,11 +97,7 @@ public class State
     {
         return isAcceptingProperty.get();
     }
-    public ObservableMap<Character, State> transitionMap()
-    {
-        return transitionMapProperty.get();
-    }
-    public MapProperty<Character, State> transitionMapProperty()
+    public PropertiesMap<Character, State> transitionMap()
     {
         return transitionMapProperty;
     }

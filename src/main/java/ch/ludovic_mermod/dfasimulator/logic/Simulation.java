@@ -89,7 +89,7 @@ public class Simulation
         char c = input.charAt(0);
         remainingInputProperty.set(input.substring(1));
 
-        currentStateProperty.set(currentStateProperty.get().transitionMap().get(c));
+        currentStateProperty.set(currentStateProperty.get().transitionMap().getValue(c));
 
         if (remainingInputProperty.get().length() == 0)
             simulationEndedProperty.set(true);

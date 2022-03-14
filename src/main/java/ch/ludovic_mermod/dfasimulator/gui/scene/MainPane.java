@@ -132,14 +132,14 @@ public class MainPane extends BorderPane
         stateNode3.getNode().relocate(50, 300);
 
 
-        stateNode1.transitionMap().put('0', stateNode2);
-        stateNode1.transitionMap().put('1', stateNode2);
+        stateNode1.transitionMap().setValue('0', stateNode2);
+        stateNode1.transitionMap().setValue('1', stateNode2);
 
-        stateNode2.transitionMap().put('0', stateNode3);
-        stateNode2.transitionMap().put('1', stateNode3);
+        stateNode2.transitionMap().setValue('0', stateNode3);
+        stateNode2.transitionMap().setValue('1', stateNode3);
 
-        stateNode3.transitionMap().put('0', stateNode1);
-        stateNode3.transitionMap().put('1', stateNode1);
+        stateNode3.transitionMap().setValue('0', stateNode1);
+        stateNode3.transitionMap().setValue('1', stateNode1);
 
 
         finiteAutomaton.addState(stateNode1);
