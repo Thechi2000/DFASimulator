@@ -8,7 +8,6 @@ import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.util.Pair;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -83,13 +82,8 @@ public class IOManager
             var nodesArray = object.get("states").getAsJSONArray();
             finiteAutomaton.clear();
 
-            nodesArray.stream()
-                    .map(e -> new Pair<>(State.fromJSONObject(e.getAsJSONObject(), finiteAutomaton), e.getAsJSONObject().get("transitionMap")))
-                    .forEach(p ->
-                    {
-                        p.getKey().loadTransitionMap(p.getValue().getAsJSONObject());
-                        finiteAutomaton.addState(p.getKey());
-                    });
+            nodesArray.forEach(e -> finiteAutomaton.addState(State.fromJSONObject(e.getAsJSONObject(), finiteAutomaton)));
+            nodesArray.forEach(e -> finiteAutomaton.getState(e.getAsJSONObject().get("name").getAsString()).loadTransitionMap(e.getAsJSONObject().get("transitionMap").getAsJSONObject()));
 
             savedFile = finiteAutomaton.getJSONObject().deepCopy();
         }

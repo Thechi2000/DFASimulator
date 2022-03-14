@@ -49,6 +49,8 @@ public class State
 
         jsonObject.addProperty("name", name);
         jsonObject.addProperty("isAccepting", isAcceptingProperty);
+        jsonObject.addProperty("x_coord", node.layoutXProperty());
+        jsonObject.addProperty("y_coord", node.layoutYProperty());
         jsonObject.add("transitionMap", new JSONObject());
 
         transitionMapProperty.addListener((MapChangeListener<? super Character, ? super State>) change ->
@@ -66,11 +68,12 @@ public class State
         State state = new State(finiteAutomaton);
         state.name.set(jsonObject.get("name").getAsString());
         state.isAcceptingProperty.set(jsonObject.get("isAccepting").getAsBoolean());
+        state.node.relocate(jsonObject.get("x_coord").getAsDouble(), jsonObject.get("y_coord").getAsDouble());
         return state;
     }
     public void loadTransitionMap(JSONObject jsonObject)
     {
-        jsonObject.getAsJSONObject("transitionMap").entrySet().forEach(e -> transitionMapProperty.put(e.getKey().charAt(0), finiteAutomaton.getState(e.getValue().getAsString())));
+        jsonObject.entrySet().forEach(e -> transitionMapProperty.put(e.getKey().charAt(0), finiteAutomaton.getState(e.getValue().getAsString())));
     }
 
     public JSONElement getJSONObject()

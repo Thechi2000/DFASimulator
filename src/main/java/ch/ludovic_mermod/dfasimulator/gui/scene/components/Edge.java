@@ -154,7 +154,7 @@ public class Edge extends Group
         alphabetDisplay.setText(source.transitionMap()
                 .entrySet()
                 .stream()
-                .filter(e -> e.getValue().equals(target))
+                .filter(e -> target.equals(e.getValue()))
                 .map(e -> e.getKey().toString())
                 .sorted()
                 .collect(Collectors.joining(", ")));

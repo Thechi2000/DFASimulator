@@ -115,6 +115,19 @@ public class FiniteAutomaton
         states.remove(state);
         mainPane.getGraphPane().removeState(state);
     }
+    public void createNode(double x, double y)
+    {
+        State state = new State(this);
+        addState(state);
+        state.getNode().relocate(x, y);
+    }
+    public void clear()
+    {
+        initialState.set(null);
+        alphabet.clear();
+        states.clear();
+        mainPane.getGraphPane().children().clear();
+    }
 
     public MainPane getMainPane()
     {
@@ -126,15 +139,6 @@ public class FiniteAutomaton
         return jsonObject;
     }
 
-    public void clear()
-    {
-        // TODO: 13.03.2022 implement
-    }
-
-    public void createNode(double x, double y)
-    {
-        // TODO: 13.03.2022 implement
-    }
     public State getState(String name)
     {
         return states.stream().filter(s -> s.name().equals(name)).findAny().orElse(null);
