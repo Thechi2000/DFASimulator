@@ -57,7 +57,7 @@ public class FiniteAutomaton
         alphabet.addListener((SetChangeListener<? super Character>) change ->
         {
             if (change.wasAdded())
-                states.forEach(s -> s.transitionMap().put(change.getElementAdded(), null));
+                states.forEach(s -> s.transitionMap().setValue(change.getElementAdded(), null));
 
             if (change.wasRemoved())
                 states.forEach(s -> s.transitionMap().remove(change.getElementRemoved()));

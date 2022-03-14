@@ -86,19 +86,19 @@ public class Utils
         };
     }
 
-    public static <T> StringConverter<T> stringConverter(Function<T, String> toString, Function<String, T> fromString)
+    public static <T> StringConverter<T> stringConverter(Function<T, String> toString, Function<String, T> fromString, String nullString)
     {
         return new StringConverter<T>()
         {
             @Override
             public String toString(T t)
             {
-                return toString.apply(t);
+                return t == null ? nullString : toString.apply(t);
             }
             @Override
             public T fromString(String s)
             {
-                return fromString.apply(s);
+                return s.equals(nullString) ? null : fromString.apply(s);
             }
         };
     }

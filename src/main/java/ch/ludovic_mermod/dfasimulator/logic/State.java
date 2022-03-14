@@ -3,6 +3,7 @@ package ch.ludovic_mermod.dfasimulator.logic;
 import ch.ludovic_mermod.dfasimulator.PropertiesMap;
 import ch.ludovic_mermod.dfasimulator.gui.scene.components.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
+import ch.ludovic_mermod.dfasimulator.json.JSONNull;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
@@ -51,7 +52,12 @@ public class State
         jsonObject.addProperty("y_coord", node.layoutYProperty());
         jsonObject.add("transitionMap", new JSONObject());
 
-        transitionMapProperty.addListener((p, k, o, n) -> jsonObject.getAsJSONObject("transitionMap").addProperty(k.toString(), n.nameProperty()));
+        transitionMapProperty.addListener((p, k, o, n) ->
+        {
+            if (n != null)
+                jsonObject.getAsJSONObject("transitionMap").addProperty(k.toString(), n.nameProperty());
+            else jsonObject.getAsJSONObject("transitionMap").add(k.toString(), JSONNull.INSTANCE);
+        });
         transitionMapProperty.addListener((MapChangeListener<? super Character, ? super ObjectProperty<State>>) change ->
         {
             if (change.wasRemoved())

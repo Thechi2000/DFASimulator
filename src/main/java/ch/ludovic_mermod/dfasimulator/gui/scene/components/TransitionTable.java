@@ -7,6 +7,7 @@ import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.*;
 
 public class TransitionTable extends ScrollPane
@@ -36,22 +37,7 @@ public class TransitionTable extends ScrollPane
         nameColumn.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
         tableView.getColumns().add(nameColumn);
 
-        finiteAutomaton.alphabet().stream().sorted().forEach(character ->
-        {
-            TableColumn<State, ChoiceBox<State>> column = new TableColumn<>(character.toString());
-
-            column.setCellValueFactory(map ->
-            {
-                ChoiceBox<State> choiceBox = new ChoiceBox<>();
-                choiceBox.setItems(FXCollections.observableList(finiteAutomaton.states().stream().toList()));
-                choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState));
-                choiceBox.valueProperty().bindBidirectional(map.getValue().transitionMap().get(character));
-                return new SimpleObjectProperty<>(choiceBox);
-            });
-
-            column.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
-            tableView.getColumns().add(column);
-        });
+        finiteAutomaton.alphabet().stream().sorted().forEach(character -> addColumn(character, finiteAutomaton));
 
         TableColumn<State, CheckBox> acceptingColumn = new TableColumn<>();
         Strings.bind("transition_table.accepting_column", acceptingColumn.textProperty());
@@ -63,6 +49,15 @@ public class TransitionTable extends ScrollPane
         });
         acceptingColumn.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
         tableView.getColumns().add(acceptingColumn);
+
+        finiteAutomaton.alphabet().addListener((SetChangeListener<? super Character>) change ->
+        {
+            if (change.wasAdded())
+                addColumn(change.getElementAdded(), finiteAutomaton);
+
+            if (change.wasRemoved())
+                tableView.getColumns().removeIf(c -> c.getText().equals(change.getElementRemoved().toString()));
+        });
 
         TableColumn<State, Toggle> initialColumn = new TableColumn<>();
         Strings.bind("transition_table.initial_column", initialColumn.textProperty());
@@ -92,5 +87,22 @@ public class TransitionTable extends ScrollPane
         tableView.getColumns().add(initialColumn);
 
         finiteAutomaton.states().forEach(state -> tableView.getItems().add(state));
+    }
+
+    private void addColumn(Character character, FiniteAutomaton finiteAutomaton)
+    {
+        TableColumn<State, ChoiceBox<State>> column = new TableColumn<>(character.toString());
+
+        column.setCellValueFactory(map ->
+        {
+            ChoiceBox<State> choiceBox = new ChoiceBox<>();
+            choiceBox.setItems(FXCollections.observableList(finiteAutomaton.states().stream().toList()));
+            choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""));
+            choiceBox.valueProperty().bindBidirectional(map.getValue().transitionMap().get(character));
+            return new SimpleObjectProperty<>(choiceBox);
+        });
+
+        column.prefWidthProperty().bind(widthProperty().divide(finiteAutomaton.alphabet().size() + 3));
+        tableView.getColumns().add(column);
     }
 }

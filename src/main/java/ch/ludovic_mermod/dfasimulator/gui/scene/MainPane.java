@@ -146,6 +146,8 @@ public class MainPane extends BorderPane
         finiteAutomaton.addState(stateNode2);
         finiteAutomaton.addState(stateNode3);
 
+        finiteAutomaton.alphabet().add('2');
+
         ioManager.saveAs("default.json");
     }
 
