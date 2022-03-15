@@ -109,15 +109,13 @@ public class FiniteAutomaton
     public void removeState(State state)
     {
         states.stream()
-                .filter(s -> !s.name().equals(state.name()))
+                .filter(s -> !state.equals(s))
                 .forEach(s ->
-                {
-                    s.transitionMap().forEach((key, value) ->
-                    {
-                        if (value.get().name().equals(state.name()))
-                            s.transitionMap().put(key, null);
-                    });
-                });
+                        s.transitionMap().forEach((key, value) ->
+                        {
+                            if (state.equals(value.get()))
+                                s.transitionMap().setValue(key, null);
+                        }));
         states.remove(state);
         mainPane.getGraphPane().removeState(state);
     }

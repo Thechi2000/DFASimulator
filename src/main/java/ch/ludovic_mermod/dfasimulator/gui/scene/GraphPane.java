@@ -15,6 +15,7 @@ import javafx.scene.layout.Region;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GraphPane extends Region
 {
@@ -105,8 +106,10 @@ public class GraphPane extends Region
     }
     public void removeState(State state)
     {
-        edges.stream().filter(e -> e.source().equals(state) || e.target().equals(state))
-                .forEach(edges::remove);
+        var l = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).collect(Collectors.toList());
+        getChildren().removeAll(l);
+        edges.removeAll(l);
+
         getChildren().remove(state.getNode());
     }
 
