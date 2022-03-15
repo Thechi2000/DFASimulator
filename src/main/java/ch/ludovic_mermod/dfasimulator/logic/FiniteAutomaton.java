@@ -22,9 +22,6 @@ public class FiniteAutomaton
 
     public FiniteAutomaton(MainPane mainPane)
     {
-        jsonObject = new JSONObject();
-        jsonObject.add("states", new JSONArray());
-
         this.mainPane = mainPane;
         initialState = new SimpleObjectProperty<>(this, "initialState", null);
         states = new SimpleListProperty<>(this, "states", FXCollections.observableArrayList());
@@ -42,16 +39,7 @@ public class FiniteAutomaton
             if (change.wasAdded())
                 change.getAddedSubList().stream()
                         .filter(Objects::nonNull)
-                        .forEach(s ->
-                        {
-                            s.nameProperty().addListener((o, ov, nv) -> validateNameChange(s, ov));
-                            jsonObject.getAsJSONArray("states").add(s.getJSONObject());
-                        });
-
-            if (change.wasRemoved())
-                change.getRemoved().stream()
-                        .filter(Objects::nonNull)
-                        .forEach(s -> jsonObject.getAsJSONArray("states").remove(s.getJSONObject()));
+                        .forEach(s -> s.nameProperty().addListener((o, ov, nv) -> validateNameChange(s, ov)));
         });
 
         alphabet.addListener((SetChangeListener<? super Character>) change ->
@@ -62,6 +50,9 @@ public class FiniteAutomaton
             if (change.wasRemoved())
                 states.forEach(s -> s.transitionMap().remove(change.getElementRemoved()));
         });
+
+        jsonObject = new JSONObject();
+        jsonObject.add("states", JSONArray.fromObservableList(states, State::getJSONObject));
     }
 
     public State initialState()
