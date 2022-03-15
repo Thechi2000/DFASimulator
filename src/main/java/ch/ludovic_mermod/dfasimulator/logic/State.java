@@ -15,12 +15,13 @@ public class State
 {
     private final JSONObject jsonObject;
 
-    private final Node                            node;
     private final StringProperty                  name;
     private final BooleanBinding                  isInitialBinding;
     private final BooleanProperty                 isAcceptingProperty;
     private final PropertiesMap<Character, State> transitionMapProperty;
-    private final FiniteAutomaton                 finiteAutomaton;
+
+    private final Node            node;
+    private final FiniteAutomaton finiteAutomaton;
 
     public State(FiniteAutomaton finiteAutomaton)
     {
@@ -77,7 +78,7 @@ public class State
     }
     public void loadTransitionMap(JSONObject jsonObject)
     {
-        jsonObject.entrySet().forEach(e -> transitionMapProperty.setValue(e.getKey().charAt(0), finiteAutomaton.getState(e.getValue().getAsString())));
+        jsonObject.entrySet().forEach(e -> transitionMapProperty.setValue(e.getKey().charAt(0), e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString())));
     }
 
     public JSONElement getJSONObject()

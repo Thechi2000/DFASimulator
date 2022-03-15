@@ -92,6 +92,12 @@ public class Edge extends Group
         return jsonObject;
     }
 
+    public void setControlPoint(double x, double y)
+    {
+        curve.setControlX(x);
+        curve.setControlY(y);
+    }
+
     @Override
     public String toString()
     {

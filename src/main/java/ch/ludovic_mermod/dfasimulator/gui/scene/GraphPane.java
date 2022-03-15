@@ -1,7 +1,11 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
+import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
+import ch.ludovic_mermod.dfasimulator.json.JSONArray;
+import ch.ludovic_mermod.dfasimulator.json.JSONElement;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -15,20 +19,18 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
+import java.io.StreamCorruptedException;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.logging.Level;
 
 public class GraphPane extends Region
 {
     private final ObservableSet<Edge> edges;
-
-    private       ContextMenu menu;
-    private final MainPane    mainPane;
-
-    private Point2D    menuPosition;
-    private Tool       tool;
-    private Simulation simulation;
+    private final MainPane            mainPane;
+    private       ContextMenu         menu;
+    private       Point2D             menuPosition;
+    private       Tool                tool;
+    private       Simulation          simulation;
 
     public GraphPane(MainPane mainPane)
     {
@@ -113,6 +115,30 @@ public class GraphPane extends Region
         l.forEach(edges::remove);
 
         getChildren().remove(state.getNode());
+    }
+
+    public void loadEdges(JSONArray array) throws StreamCorruptedException
+    {
+        for (JSONElement element : array)
+        {
+            JSONObject o;
+            if (!element.isJSONObject()
+                || !(o = element.getAsJSONObject()).hasString("source")
+                || !o.hasString("target")
+                || !o.hasNumber("control_x")
+                || !o.hasNumber("control_y"))
+                throw new StreamCorruptedException(String.format("Error while parsing \"%s\" into an edge", element));
+
+            Edge edge = edges.stream().filter(e -> e.getSourceName().equals(o.get("source").getAsString()) && e.getTargetName().equals(o.get("target").getAsString())).findAny().orElse(null);
+
+            if (edge == null)
+            {
+                Main.log(Level.WARNING, "Tried to parse unknown edge between \"%s\" and \"%s\"", o.get("source"), o.get("target"));
+                return;
+            }
+
+            edge.setControlPoint(o.get("control_x").getAsDouble(), o.get("control_y").getAsDouble());
+        }
     }
 
     private ContextMenu createContextMenu()

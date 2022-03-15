@@ -115,6 +115,19 @@ public class JSONObject extends JSONElement implements Observable
         childUpdateListeners.forEach(l -> l.onChildUpdate(this));
     }
 
+    public boolean hasString(String property)
+    {
+        return has(property) && get(property).isJSONPrimitive() && get(property).getAsJSONPrimitive().isString();
+    }
+    public boolean hasNumber(String property)
+    {
+        return has(property) && get(property).isJSONPrimitive() && get(property).getAsJSONPrimitive().isNumber();
+    }
+    public boolean hasArray(String property)
+    {
+        return has(property) && get(property).isJSONArray();
+    }
+
     public void addProperty(String property, String value)
     {
         add(property, value == null ? JSONNull.INSTANCE : new JSONPrimitive(value));

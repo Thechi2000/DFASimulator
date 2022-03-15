@@ -85,9 +85,12 @@ public class IOManager
             nodesArray.forEach(e -> finiteAutomaton.addState(State.fromJSONObject(e.getAsJSONObject(), finiteAutomaton)));
             nodesArray.forEach(e -> finiteAutomaton.getState(e.getAsJSONObject().get("name").getAsString()).loadTransitionMap(e.getAsJSONObject().get("transitionMap").getAsJSONObject()));
 
+            if (object.hasArray("edges"))
+                mainPane.getGraphPane().loadEdges(object.getAsJSONArray("edges"));
+
             savedFile = finiteAutomaton.getJSONObject().deepCopy();
         }
-        catch (FileNotFoundException e)
+        catch (FileNotFoundException | StreamCorruptedException e)
         {
             e.printStackTrace();
         }
