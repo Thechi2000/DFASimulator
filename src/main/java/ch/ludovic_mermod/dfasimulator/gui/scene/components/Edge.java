@@ -159,4 +159,13 @@ public class Edge extends Group
                 .sorted()
                 .collect(Collectors.joining(", ")));
     }
+
+    @Override
+    public String toString()
+    {
+        return "Edge{" +
+                "source=" + source.name() +
+                ", target=" + target.name() +
+                '}';
+    }
 }
