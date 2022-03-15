@@ -92,8 +92,20 @@ public class TransitionTable extends ScrollPane
             });
             nameColumn.prefWidthProperty().bind(columnWidthBinding);
             tableView.getColumns().add(nameColumn);
+        }
 
+        // Alphabet columns
+        {
             finiteAutomaton.alphabet().stream().sorted().forEach(character -> addColumn(character, finiteAutomaton, columnWidthBinding));
+
+            finiteAutomaton.alphabet().addListener((SetChangeListener<? super Character>) change ->
+            {
+                if (change.wasAdded())
+                    addColumn(change.getElementAdded(), finiteAutomaton, columnWidthBinding);
+
+                if (change.wasRemoved())
+                    tableView.getColumns().removeIf(c -> c.getText().equals(change.getElementRemoved().toString()));
+            });
         }
 
         // Accepting column
@@ -110,18 +122,6 @@ public class TransitionTable extends ScrollPane
             });
             acceptingColumn.prefWidthProperty().bind(columnWidthBinding);
             tableView.getColumns().add(acceptingColumn);
-        }
-
-        // Alphabet columns
-        {
-            finiteAutomaton.alphabet().addListener((SetChangeListener<? super Character>) change ->
-            {
-                if (change.wasAdded())
-                    addColumn(change.getElementAdded(), finiteAutomaton, columnWidthBinding);
-
-                if (change.wasRemoved())
-                    tableView.getColumns().removeIf(c -> c.getText().equals(change.getElementRemoved().toString()));
-            });
         }
 
         // Initial column
@@ -160,7 +160,7 @@ public class TransitionTable extends ScrollPane
             TableColumn<State, Button> deleteColumn = new TableColumn<>();
             deleteColumn.setCellValueFactory(cellFeatures ->
             {
-                if(cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
+                if (cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
 
                 Button button = new Button();
                 Strings.bind("transition_pane.delete_button", button.textProperty());
