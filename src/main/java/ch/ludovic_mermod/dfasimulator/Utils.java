@@ -1,5 +1,8 @@
 package ch.ludovic_mermod.dfasimulator;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
 import javafx.util.StringConverter;
 
 import java.util.HashMap;
@@ -101,5 +104,26 @@ public class Utils
                 return s.equals(nullString) ? null : fromString.apply(s);
             }
         };
+    }
+
+    public static DoubleBinding doubleBinding(Supplier<Double> computeValue, Observable... observables)
+    {
+        return new DoubleBinding()
+        {
+            {
+                super.bind(observables);
+            }
+
+            @Override
+            protected double computeValue()
+            {
+                return computeValue.get();
+            }
+        };
+    }
+
+    public static void bindDouble(DoubleProperty property, Supplier<Double> computeValue, Observable... observables)
+    {
+        property.bind(doubleBinding(computeValue, observables));
     }
 }
