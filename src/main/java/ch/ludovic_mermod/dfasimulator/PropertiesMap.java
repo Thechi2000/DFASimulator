@@ -39,7 +39,7 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
         else
         {
             final SimpleObjectProperty<V> prop = new SimpleObjectProperty<>(def);
-            map.put(((K) key), prop);
+            put(((K) key), prop);
             return prop;
         }
     }
