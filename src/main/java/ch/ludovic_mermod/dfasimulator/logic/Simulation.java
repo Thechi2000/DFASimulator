@@ -3,12 +3,13 @@ package ch.ludovic_mermod.dfasimulator.logic;
 import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
 import javafx.beans.property.*;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Simulation
 {
     private final FiniteAutomaton finiteAutomaton;
+    private final MainPane mainPane;
 
     private final ObjectProperty<State> currentStateProperty;
     private final StringProperty remainingInputProperty;
@@ -21,6 +22,7 @@ public class Simulation
     public Simulation(MainPane mainPane)
     {
         finiteAutomaton = mainPane.getFiniteAutomaton();
+        this.mainPane = mainPane;
 
         currentStateProperty = new SimpleObjectProperty<>();
         remainingInputProperty = new SimpleStringProperty();
@@ -66,9 +68,82 @@ public class Simulation
         return simulationEndedProperty;
     }
 
+    public List<Error> checkDFA()
+    {
+        List<Error> errors = new ArrayList<>();
+        Set<Character> alphabet = finiteAutomaton.alphabet();
+        List<State> states = finiteAutomaton.states();
+
+        for (State state : finiteAutomaton.states())
+        {
+            List<Character> elements = state.transitionMap().entrySet().stream().filter(e -> e.getValue().get() != null).map(Map.Entry::getKey).toList();
+
+            if (elements.size() != alphabet.size())
+            {
+                if (elements.size() < alphabet.size())
+                {
+                    var missingElements = new TreeSet<>(alphabet);
+                    elements.forEach(missingElements::remove);
+                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{state, false, missingElements}));
+                }
+                else
+                    errors.add(new Error(ErrorCode.NODE_DOES_NOT_MATCH_ALPHABET, new Object[]{state, true}));
+            }
+        }
+
+        return errors;
+    }
+
+    public List<Error> checkDFA(String input)
+    {
+        Set<Character> alphabet = finiteAutomaton.alphabet();
+        List<Error> errors = checkDFA();
+
+        if (alphabet.stream().anyMatch(c -> !alphabet.contains(c)))
+            errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, new Object[]{alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())}));
+
+        return errors;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean compileDFA()
+    {
+        var errors = checkDFA();
+        mainPane.getConsolePane().clear();
+        errors.forEach(e ->
+        {
+            switch (e.code())
+            {
+                case TOO_MANY_INITIAL_STATES -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: Too many initial states { %s }", Arrays.stream(e.data()).map(o -> ((State) o).name()).collect(Collectors.joining(", ")));
+
+                case NO_INITIAL_STATE -> mainPane.getConsolePane().log(System.Logger.Level.ERROR, "No initial state");
+
+                case NODE_DOES_NOT_MATCH_ALPHABET -> {
+                    if (((boolean) e.data()[1]))
+                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: State \"%s\" has too many outputs", ((State) e.data()[0]).name());
+                    else
+                        mainPane.getConsolePane().log(System.Logger.Level.ERROR, "Error: State \"%s\" is missing outputs { %s }",
+                                ((State) e.data()[0]).name(),
+                                ((Set<Character>) e.data()[2]).stream()
+                                        .map(Object::toString)
+                                        .collect(Collectors.joining(", ")));
+                }
+
+                default -> throw new IllegalStateException("Unexpected value: " + e.code());
+            }
+        });
+
+        if (errors.size() == 0)
+            mainPane.getConsolePane().log(System.Logger.Level.INFO, "DFA is valid");
+
+        return errors.size() == 0;
+    }
+
 
     public void startSimulation(String input)
     {
+        if (!compileDFA()) return;
+
         isSimulatingProperty.set(true);
         simulationEndedProperty.set(false);
         currentStateProperty.set(finiteAutomaton.initialState());
