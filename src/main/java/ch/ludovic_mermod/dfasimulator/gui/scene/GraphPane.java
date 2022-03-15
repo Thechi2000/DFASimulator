@@ -7,18 +7,21 @@ import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GraphPane extends Region
 {
-    private final Set<Edge> edges;
+    private final ObservableSet<Edge> edges;
 
     private       ContextMenu menu;
     private final MainPane    mainPane;
@@ -30,7 +33,7 @@ public class GraphPane extends Region
     public GraphPane(MainPane mainPane)
     {
         this.mainPane = mainPane;
-        edges = new HashSet<>();
+        edges = FXCollections.observableSet(new HashSet<>());
         tool = Tool.EDIT;
     }
 
@@ -132,6 +135,10 @@ public class GraphPane extends Region
     public ObservableList<javafx.scene.Node> children()
     {
         return getChildren();
+    }
+    public ObservableSet<Edge> edges()
+    {
+        return edges;
     }
 
     public enum Tool

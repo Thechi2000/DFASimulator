@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
+import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
@@ -18,11 +19,10 @@ public class FiniteAutomaton
     private final ObjectProperty<State>  initialState;
     private final ListProperty<State>    states;
     private final SetProperty<Character> alphabet;
-    private final MainPane               mainPane;
+    private MainPane               mainPane;
 
-    public FiniteAutomaton(MainPane mainPane)
+    public FiniteAutomaton()
     {
-        this.mainPane = mainPane;
         initialState = new SimpleObjectProperty<>(this, "initialState", null);
         states = new SimpleListProperty<>(this, "states", FXCollections.observableArrayList());
         alphabet = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>()));
@@ -53,6 +53,12 @@ public class FiniteAutomaton
 
         jsonObject = new JSONObject();
         jsonObject.add("states", JSONArray.fromObservableList(states, State::getJSONObject));
+    }
+
+    public void create(MainPane mainPane)
+    {
+        this.mainPane = mainPane;
+        jsonObject.add("edges", JSONArray.fromObservableSet(mainPane.getGraphPane().edges(), Edge::getJSONObject));
     }
 
     public State initialState()

@@ -31,7 +31,7 @@ public class MainPane extends BorderPane
 
     public MainPane()
     {
-        finiteAutomaton = new FiniteAutomaton(this);
+        finiteAutomaton = new FiniteAutomaton();
         ioManager = new IOManager(this);
         graphPane = new GraphPane(this);
         simulation = new Simulation(this);
@@ -49,6 +49,7 @@ public class MainPane extends BorderPane
         consolePane.create(this);
         graphPane.create(this);
         simulationPane.create(this);
+        finiteAutomaton.create(this);
 
         editPaneProperty.addListener((o, ov, nv) ->
         {

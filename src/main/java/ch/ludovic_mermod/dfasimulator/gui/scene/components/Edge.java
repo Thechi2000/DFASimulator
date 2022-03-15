@@ -87,7 +87,7 @@ public class Edge extends Group
         return target.name();
     }
 
-    public JSONObject getJsonObject()
+    public JSONObject getJSONObject()
     {
         return jsonObject;
     }
