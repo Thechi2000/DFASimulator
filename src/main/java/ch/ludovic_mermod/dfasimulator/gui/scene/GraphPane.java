@@ -108,7 +108,7 @@ public class GraphPane extends Region
     {
         var l = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).collect(Collectors.toList());
         getChildren().removeAll(l);
-        edges.removeAll(l);
+        l.forEach(edges::remove);
 
         getChildren().remove(state.getNode());
     }
