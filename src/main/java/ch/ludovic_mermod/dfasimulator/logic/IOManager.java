@@ -12,18 +12,19 @@ import javafx.scene.control.ButtonType;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.Timer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class IOManager
 {
-    protected static final Timer          TIMER = new Timer();
-    private final          MainPane       mainPane;
-    private final          StringProperty filenameProperty, filepathProperty;
-    private final BooleanProperty isSavedProperty;
+    private final MainPane        mainPane;
     private final FiniteAutomaton finiteAutomaton;
-    private       JSONElement     savedFile;
+
+    private final StringProperty filenameProperty, filepathProperty;
+    private final BooleanProperty isSavedProperty;
+
+    private JSONElement savedFile;
+
 
     public IOManager(MainPane mainPane)
     {
@@ -78,19 +79,25 @@ public class IOManager
 
         try
         {
-            JSONObject object     = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
-            var        nodesArray = object.get("states").getAsJSONArray();
+            JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
+
+            if (!object.hasArray("states")) throw new CorruptedFileException("Missing states array");
+            var nodesArray = object.get("states").getAsJSONArray();
+
             finiteAutomaton.clear();
 
-            nodesArray.forEach(e -> finiteAutomaton.addState(State.fromJSONObject(e.getAsJSONObject(), finiteAutomaton)));
-            nodesArray.forEach(e -> finiteAutomaton.getState(e.getAsJSONObject().get("name").getAsString()).loadTransitionMap(e.getAsJSONObject().get("transitionMap").getAsJSONObject()));
+            for (JSONElement jsonElement : nodesArray)
+                finiteAutomaton.addState(State.fromJSONObject(jsonElement.getAsJSONObject(), finiteAutomaton));
+
+            for (JSONElement e : nodesArray)
+                finiteAutomaton.getState(e.getAsJSONObject().get("name").getAsString()).loadTransitionMap(e.getAsJSONObject().get("transitionMap").getAsJSONObject());
 
             if (object.hasArray("edges"))
                 mainPane.getGraphPane().loadEdges(object.getAsJSONArray("edges"));
 
             savedFile = finiteAutomaton.getJSONObject().deepCopy();
         }
-        catch (FileNotFoundException | StreamCorruptedException e)
+        catch (FileNotFoundException | CorruptedFileException e)
         {
             e.printStackTrace();
         }
@@ -141,5 +148,13 @@ public class IOManager
     public ReadOnlyStringProperty filenameProperty()
     {
         return filenameProperty;
+    }
+
+    public static class CorruptedFileException extends Exception
+    {
+        public CorruptedFileException(String format, Object... objects)
+        {
+            super(String.format(format, objects));
+        }
     }
 }

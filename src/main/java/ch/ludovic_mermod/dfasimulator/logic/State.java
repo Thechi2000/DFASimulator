@@ -9,6 +9,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.collections.MapChangeListener;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class State
@@ -68,17 +69,35 @@ public class State
         });
     }
 
-    public static State fromJSONObject(JSONObject jsonObject, FiniteAutomaton finiteAutomaton)
+    public static State fromJSONObject(JSONObject jsonObject, FiniteAutomaton finiteAutomaton) throws IOManager.CorruptedFileException
     {
+        if (!jsonObject.hasString("name")
+            || !jsonObject.hasBoolean("isAccepting")
+            || !jsonObject.hasNumber("x_coord")
+            || !jsonObject.hasNumber("y_coord")
+            || !jsonObject.hasObject("transition_map"))
+            throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a state", jsonObject.toString());
+
         State state = new State(finiteAutomaton);
         state.name.set(jsonObject.get("name").getAsString());
         state.isAcceptingProperty.set(jsonObject.get("isAccepting").getAsBoolean());
         state.node.relocate(jsonObject.get("x_coord").getAsDouble(), jsonObject.get("y_coord").getAsDouble());
         return state;
     }
-    public void loadTransitionMap(JSONObject jsonObject)
+    public void loadTransitionMap(JSONObject jsonObject) throws IOManager.CorruptedFileException
     {
-        jsonObject.entrySet().forEach(e -> transitionMapProperty.setValue(e.getKey().charAt(0), e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString())));
+        for (Map.Entry<String, JSONElement> e : jsonObject.entrySet())
+        {
+            String key = e.getKey();
+
+            if (key.length() != 1
+                || !jsonObject.has(key)
+                || !(jsonObject.get(key).isJSONNull() || jsonObject.hasString(key)))
+                throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a transition map", jsonObject);
+
+
+                transitionMapProperty.setValue(key.charAt(0), e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString()));
+        }
     }
 
     public JSONElement getJSONObject()

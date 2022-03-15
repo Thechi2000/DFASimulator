@@ -6,6 +6,7 @@ import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -117,7 +118,7 @@ public class GraphPane extends Region
         getChildren().remove(state.getNode());
     }
 
-    public void loadEdges(JSONArray array) throws StreamCorruptedException
+    public void loadEdges(JSONArray array) throws IOManager.CorruptedFileException
     {
         for (JSONElement element : array)
         {
@@ -127,7 +128,7 @@ public class GraphPane extends Region
                 || !o.hasString("target")
                 || !o.hasNumber("control_x")
                 || !o.hasNumber("control_y"))
-                throw new StreamCorruptedException(String.format("Error while parsing \"%s\" into an edge", element));
+                throw new IOManager.CorruptedFileException("Could not parse \"%s\" into an edge", element);
 
             Edge edge = edges.stream().filter(e -> e.getSourceName().equals(o.get("source").getAsString()) && e.getTargetName().equals(o.get("target").getAsString())).findAny().orElse(null);
 

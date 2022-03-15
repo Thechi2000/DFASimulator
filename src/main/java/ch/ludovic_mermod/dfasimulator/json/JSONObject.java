@@ -17,9 +17,10 @@ import java.util.stream.Collectors;
 
 public class JSONObject extends JSONElement implements Observable
 {
-    private final Set<PropertyChangeListener>                                    propertyChangeListeners = new HashSet<>();
-    private final Set<ChildUpdateListener>                                       childUpdateListeners    = new HashSet<>();
-    private final Set<SetChangeListener<? super Map.Entry<String, JSONElement>>> setChangeListeners      = new HashSet<>();
+    private final Set<PropertyChangeListener> propertyChangeListeners = new HashSet<>();
+    private final Set<ChildUpdateListener>    childUpdateListeners    = new HashSet<>();
+
+    private final Set<SetChangeListener<? super Map.Entry<String, JSONElement>>> setChangeListeners = new HashSet<>();
 
     private final TreeMap<String, JSONElement> members = new TreeMap<>();
 
@@ -126,6 +127,14 @@ public class JSONObject extends JSONElement implements Observable
     public boolean hasArray(String property)
     {
         return has(property) && get(property).isJSONArray();
+    }
+    public boolean hasBoolean(String property)
+    {
+        return has(property) && get(property).isJSONPrimitive() && get(property).getAsJSONPrimitive().isBoolean();
+    }
+    public boolean hasObject(String property)
+    {
+        return has(property) && get(property).isJSONObject();
     }
 
     public void addProperty(String property, String value)
