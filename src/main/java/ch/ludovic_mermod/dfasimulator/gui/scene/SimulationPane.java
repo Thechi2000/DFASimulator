@@ -10,7 +10,7 @@ import javafx.scene.text.Text;
 
 public class SimulationPane extends VBox
 {
-    private MainPane mainPane;
+    private MainPane  mainPane;
     private TextField inputTextField;
 
     public void create(MainPane mainPane)

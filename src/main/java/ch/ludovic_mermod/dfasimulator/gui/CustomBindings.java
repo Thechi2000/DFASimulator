@@ -1,7 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
 import javafx.beans.binding.Binding;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;

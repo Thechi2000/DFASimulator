@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 
 public class IOManager
 {
-    protected static final Timer TIMER = new Timer();
-    private final MainPane mainPane;
-    private final StringProperty filenameProperty, filepathProperty;
+    protected static final Timer          TIMER = new Timer();
+    private final          MainPane       mainPane;
+    private final          StringProperty filenameProperty, filepathProperty;
     private final BooleanProperty isSavedProperty;
     private final FiniteAutomaton finiteAutomaton;
-    private JSONElement savedFile;
+    private       JSONElement     savedFile;
 
     public IOManager(MainPane mainPane)
     {
@@ -78,8 +78,8 @@ public class IOManager
 
         try
         {
-            JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
-            var nodesArray = object.get("states").getAsJSONArray();
+            JSONObject object     = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
+            var        nodesArray = object.get("states").getAsJSONArray();
             finiteAutomaton.clear();
 
             nodesArray.forEach(e -> finiteAutomaton.addState(State.fromJSONObject(e.getAsJSONObject(), finiteAutomaton)));

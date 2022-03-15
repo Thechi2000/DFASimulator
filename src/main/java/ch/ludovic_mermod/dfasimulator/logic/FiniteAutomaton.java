@@ -15,10 +15,10 @@ public class FiniteAutomaton
 {
     private final JSONObject jsonObject;
 
-    private final ObjectProperty<State> initialState;
-    private final ListProperty<State> states;
+    private final ObjectProperty<State>  initialState;
+    private final ListProperty<State>    states;
     private final SetProperty<Character> alphabet;
-    private final MainPane mainPane;
+    private final MainPane               mainPane;
 
     public FiniteAutomaton(MainPane mainPane)
     {

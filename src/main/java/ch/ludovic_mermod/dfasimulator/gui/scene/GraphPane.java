@@ -20,11 +20,11 @@ public class GraphPane extends Region
 {
     private final Set<Edge> edges;
 
-    private ContextMenu menu;
-    private MainPane mainPane;
+    private       ContextMenu menu;
+    private final MainPane    mainPane;
 
-    private Point2D menuPosition;
-    private Tool tool;
+    private Point2D    menuPosition;
+    private Tool       tool;
     private Simulation simulation;
 
     public GraphPane(MainPane mainPane)

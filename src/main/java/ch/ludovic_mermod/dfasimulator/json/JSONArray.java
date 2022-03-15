@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 
 public class JSONArray extends JSONElement implements ObservableList<JSONElement>
 {
-    private final ObservableList<JSONElement> elements = FXCollections.observableArrayList();
-    private final Set<ChildUpdateListener> childUpdateListenerSet = new HashSet<>();
+    private final ObservableList<JSONElement> elements               = FXCollections.observableArrayList();
+    private final Set<ChildUpdateListener>    childUpdateListenerSet = new HashSet<>();
 
     public JSONArray()
     {

@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 public class JSONObject extends JSONElement implements Observable
 {
-    private final Set<PropertyChangeListener> propertyChangeListeners = new HashSet<>();
-    private final Set<ChildUpdateListener> childUpdateListeners = new HashSet<>();
-    private final Set<SetChangeListener<? super Map.Entry<String, JSONElement>>> setChangeListeners = new HashSet<>();
+    private final Set<PropertyChangeListener>                                    propertyChangeListeners = new HashSet<>();
+    private final Set<ChildUpdateListener>                                       childUpdateListeners    = new HashSet<>();
+    private final Set<SetChangeListener<? super Map.Entry<String, JSONElement>>> setChangeListeners      = new HashSet<>();
 
     private final TreeMap<String, JSONElement> members = new TreeMap<>();
 

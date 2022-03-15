@@ -15,12 +15,12 @@ public class State
 {
     private final JSONObject jsonObject;
 
-    private final Node node;
-    private final StringProperty name;
-    private final BooleanBinding isInitialBinding;
-    private final BooleanProperty isAcceptingProperty;
+    private final Node                            node;
+    private final StringProperty                  name;
+    private final BooleanBinding                  isInitialBinding;
+    private final BooleanProperty                 isAcceptingProperty;
     private final PropertiesMap<Character, State> transitionMapProperty;
-    private final FiniteAutomaton finiteAutomaton;
+    private final FiniteAutomaton                 finiteAutomaton;
 
     public State(FiniteAutomaton finiteAutomaton)
     {
@@ -132,7 +132,7 @@ public class State
     public String toString()
     {
         return "State{" +
-                "name=" + name.get() +
-                '}';
+               "name=" + name.get() +
+               '}';
     }
 }

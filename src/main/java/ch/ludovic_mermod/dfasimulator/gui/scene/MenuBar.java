@@ -15,7 +15,7 @@ import java.io.File;
 public class MenuBar extends javafx.scene.control.MenuBar
 {
     private final FileChooser fileChooser;
-    private MainPane mainPane;
+    private       MainPane    mainPane;
 
     public MenuBar()
     {

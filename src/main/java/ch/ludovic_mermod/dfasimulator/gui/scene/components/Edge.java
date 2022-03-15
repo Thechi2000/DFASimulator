@@ -20,17 +20,17 @@ import java.util.stream.Collectors;
 
 public class Edge extends Group
 {
-    private final State source;
-    private final State target;
+    private final State     source;
+    private final State     target;
     private final GraphPane graphPane;
 
     private final DoubleProperty targetPointX;
     private final DoubleProperty targetPointY;
     private final DoubleProperty targetPointT;
 
-    private final MoveTo moveTo;
+    private final MoveTo      moveTo;
     private final QuadCurveTo curve;
-    private final Path line;
+    private final Path        line;
 
     private final Line leftLine, rightLine;
     private final Text alphabetDisplay;
@@ -104,16 +104,15 @@ public class Edge extends Group
     public String toString()
     {
         return "Edge{" +
-                "source=" + source.name() +
-                ", target=" + target.name() +
-                '}';
+               "source=" + source.name() +
+               ", target=" + target.name() +
+               '}';
     }
 
     private void addEventHandlers()
     {
-        setOnMouseDragged(event ->
-        {
-            if(graphPane.getTool() == GraphPane.Tool.DRAG)
+        setOnMouseDragged(event -> {
+            if (graphPane.getTool() == GraphPane.Tool.DRAG)
             {
                 targetPointX.set(event.getX());
                 targetPointY.set(event.getY());

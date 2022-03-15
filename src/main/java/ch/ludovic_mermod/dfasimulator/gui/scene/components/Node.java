@@ -20,11 +20,11 @@ import javafx.scene.text.TextAlignment;
 
 public class Node extends StackPane
 {
-    private final Position pos;
+    private final Position    pos;
     private final ContextMenu menu;
-    private final GraphPane graphPane;
-    private final State state;
-    private MenuItem deleteMenuItem;
+    private final GraphPane   graphPane;
+    private final State       state;
+    private       MenuItem    deleteMenuItem;
 
     public Node(State state, GraphPane graphPane)
     {
@@ -99,10 +99,10 @@ public class Node extends StackPane
     private void updateCircleColor(Circle c)
     {
         c.setFill(graphPane.currentStateProperty().get() == state
-                ? Constants.Node.Circle.currentColor.get()
-                : state.isInitialBinding().get()
-                ? Constants.Node.Circle.initialColor.get()
-                : Constants.Node.Circle.color.get());
+                  ? Constants.Node.Circle.currentColor.get()
+                  : state.isInitialBinding().get()
+                    ? Constants.Node.Circle.initialColor.get()
+                    : Constants.Node.Circle.color.get());
     }
 
     private void addEventHandlers()

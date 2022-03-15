@@ -26,8 +26,8 @@ public class Main extends Application
     public static void main(String[] args)
     {
         Thread.currentThread().setUncaughtExceptionHandler((t, e) -> logger.log(Level.SEVERE, "Thread " + t.getName(), e));
-        SimpleDateFormat format = new SimpleDateFormat("d_M_HHmmss");
-        FileHandler handler = null;
+        SimpleDateFormat format  = new SimpleDateFormat("d_M_HHmmss");
+        FileHandler      handler = null;
 
         try
         {

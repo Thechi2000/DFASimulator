@@ -19,8 +19,8 @@ public class Constants
     {
         public static class Circle
         {
-            public static final ObservableIntegerValue radius = new SimpleIntegerProperty(50);
-            public static final ObservableObjectValue<Color> color = new SimpleObjectProperty<>(GREEN);
+            public static final ObservableIntegerValue       radius       = new SimpleIntegerProperty(50);
+            public static final ObservableObjectValue<Color> color        = new SimpleObjectProperty<>(GREEN);
             public static final ObservableObjectValue<Color> currentColor = new SimpleObjectProperty<>(RED);
             public static final ObservableObjectValue<Color> initialColor = new SimpleObjectProperty<>(BLUE);
         }
@@ -35,18 +35,18 @@ public class Constants
     {
         public static class Line
         {
-            public static final ObservableIntegerValue width = new SimpleIntegerProperty(10);
-            public static final ObservableObjectValue<Color> color = new SimpleObjectProperty<>(BLACK);
-            public static final ObservableDoubleValue sidelineLength = new SimpleDoubleProperty(20);
+            public static final ObservableIntegerValue       width          = new SimpleIntegerProperty(10);
+            public static final ObservableObjectValue<Color> color          = new SimpleObjectProperty<>(BLACK);
+            public static final ObservableDoubleValue        sidelineLength = new SimpleDoubleProperty(20);
         }
 
         public static class Text
         {
             public static final ObservableDoubleValue distanceFromLine = new SimpleDoubleProperty(25);
 
-            public static final ObservableDoubleValue distanceFromNodeFactor = new SimpleDoubleProperty(0.25);
-            public static final ObservableDoubleValue distanceFromNodeAbsolute = new SimpleDoubleProperty(20);
-            public static final ObservableBooleanValue usesAbsoluteDistance = new SimpleBooleanProperty(true);
+            public static final ObservableDoubleValue  distanceFromNodeFactor   = new SimpleDoubleProperty(0.25);
+            public static final ObservableDoubleValue  distanceFromNodeAbsolute = new SimpleDoubleProperty(20);
+            public static final ObservableBooleanValue usesAbsoluteDistance     = new SimpleBooleanProperty(true);
         }
     }
 }

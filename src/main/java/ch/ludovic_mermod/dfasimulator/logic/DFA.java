@@ -5,10 +5,10 @@ import java.util.stream.Collectors;
 
 public class DFA
 {
-    public final State initialState;
-    public final Set<State> states;
-    public final Set<State> acceptingStates;
-    public final Set<Character> alphabet;
+    public final State                             initialState;
+    public final Set<State>                        states;
+    public final Set<State>                        acceptingStates;
+    public final Set<Character>                    alphabet;
     public final Map<State, Map<Character, State>> transitionMap;
 
     public DFA(String initialState, Set<String> states, Set<String> acceptingStates, Set<Character> alphabet, Map<String, Map<Character, String>> transitionMap)

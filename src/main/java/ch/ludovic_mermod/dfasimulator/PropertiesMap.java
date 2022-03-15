@@ -15,7 +15,7 @@ import java.util.Set;
 public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
 {
     private final ObservableMap<K, ObjectProperty<V>> map;
-    private final Set<PropertyChangeListener<K, V>> listeners;
+    private final Set<PropertyChangeListener<K, V>>   listeners;
 
     public PropertiesMap()
     {

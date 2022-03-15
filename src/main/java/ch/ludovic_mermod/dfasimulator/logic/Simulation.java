@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 public class Simulation
 {
     private final FiniteAutomaton finiteAutomaton;
-    private final MainPane mainPane;
+    private final MainPane        mainPane;
 
     private final ObjectProperty<State> currentStateProperty;
-    private final StringProperty remainingInputProperty;
-    private final BooleanProperty isSimulatingProperty;
+    private final StringProperty        remainingInputProperty;
+    private final BooleanProperty       isSimulatingProperty;
 
-    private final StringProperty initialInputProperty;
+    private final StringProperty  initialInputProperty;
     private final BooleanProperty resultProperty;
     private final BooleanProperty simulationEndedProperty;
 
@@ -70,9 +70,9 @@ public class Simulation
 
     public List<Error> checkDFA()
     {
-        List<Error> errors = new ArrayList<>();
+        List<Error>    errors   = new ArrayList<>();
         Set<Character> alphabet = finiteAutomaton.alphabet();
-        List<State> states = finiteAutomaton.states();
+        List<State>    states   = finiteAutomaton.states();
 
         for (State state : finiteAutomaton.states())
         {
@@ -97,7 +97,7 @@ public class Simulation
     public List<Error> checkDFA(String input)
     {
         Set<Character> alphabet = finiteAutomaton.alphabet();
-        List<Error> errors = checkDFA();
+        List<Error>    errors   = checkDFA();
 
         if (alphabet.stream().anyMatch(c -> !alphabet.contains(c)))
             errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, new Object[]{alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())}));
@@ -161,7 +161,7 @@ public class Simulation
         }
 
         String input = remainingInputProperty.get();
-        char c = input.charAt(0);
+        char   c     = input.charAt(0);
         remainingInputProperty.set(input.substring(1));
 
         currentStateProperty.set(currentStateProperty.get().transitionMap().getValue(c));

@@ -17,8 +17,8 @@ import java.util.Comparator;
 
 public class TransitionTable extends ScrollPane
 {
-    private static final int ADDITIONAL_COLUMNS = 4;
-    private final TableView<State> tableView;
+    private static final int              ADDITIONAL_COLUMNS = 4;
+    private final        TableView<State> tableView;
 
     public TransitionTable()
     {
@@ -178,9 +178,9 @@ public class TransitionTable extends ScrollPane
 
             Comparator<State> stateComparator = (o1, o2) ->
                     o1 == null && o2 == null ? 0 :
-                            o1 == null ? Integer.MAX_VALUE :
-                                    o2 == null ? Integer.MIN_VALUE :
-                                            o1.name().compareTo(o2.name());
+                    o1 == null ? Integer.MAX_VALUE :
+                    o2 == null ? Integer.MIN_VALUE :
+                    o1.name().compareTo(o2.name());
             final ChangeListener<String> nameListener = (o, ov, nv) -> tableView.getItems().sort(stateComparator);
             tableView.getItems().sort(stateComparator);
             finiteAutomaton.states().forEach(s -> s.nameProperty().addListener(nameListener));
