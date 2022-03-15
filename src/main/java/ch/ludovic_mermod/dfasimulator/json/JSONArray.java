@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class JSONArray extends JSONElement implements ObservableList<JSONElement>
@@ -27,6 +28,26 @@ public class JSONArray extends JSONElement implements ObservableList<JSONElement
     {
         this();
         array.forEach(e -> add(JSONElement.convert(e)));
+    }
+
+    public static <T> JSONArray fromObservableList(ObservableList<T> list, Function<T, JSONElement> jsonGetter)
+    {
+        JSONArray array = new JSONArray();
+        list.forEach(e -> array.add(jsonGetter.apply(e)));
+        list.addListener((ListChangeListener<? super T>) change ->
+        {
+            change.next();
+            if (change.wasAdded())
+                change.getAddedSubList().stream()
+                        .filter(Objects::nonNull)
+                        .forEach(e -> array.add(jsonGetter.apply(e)));
+
+            if (change.wasRemoved())
+                change.getRemoved().stream()
+                        .filter(Objects::nonNull)
+                        .forEach(e -> array.remove(jsonGetter.apply(e)));
+        });
+        return array;
     }
 
     public JSONArray deepCopy()
