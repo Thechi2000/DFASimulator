@@ -5,7 +5,10 @@ import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.State;
+import ch.ludovic_mermod.dfasimulator.utils.BezierQuadCurve;
 import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -25,8 +28,11 @@ public class Edge extends Group
     private final State     target;
     private final GraphPane graphPane;
 
-    private final MoveTo      moveTo;
-    private final QuadCurveTo curve;
+    private final DoubleProperty targetT;
+
+    private final MoveTo          moveTo;
+    private final QuadCurveTo     curve;
+    private final BezierQuadCurve bezier;
 
     private final Line leftLine, rightLine;
     private final Text alphabetDisplay;
@@ -36,6 +42,7 @@ public class Edge extends Group
         this.source = source;
         this.target = target;
         this.graphPane = graphPane;
+        targetT = new SimpleDoubleProperty(0.5);
 
         alphabetDisplay = new Text();
         updateAlphabetDisplay();
@@ -68,6 +75,15 @@ public class Edge extends Group
         jsonObject.addProperty("target", target.nameProperty());
         jsonObject.addProperty("control_x", curve.controlXProperty());
         jsonObject.addProperty("control_y", curve.controlYProperty());
+
+        bezier = new BezierQuadCurve(
+                moveTo.xProperty(),
+                moveTo.yProperty(),
+                curve.controlXProperty(),
+                curve.controlYProperty(),
+                curve.xProperty(),
+                curve.yProperty()
+        );
     }
 
     public State source()
@@ -109,11 +125,16 @@ public class Edge extends Group
 
     private void addEventHandlers()
     {
+        setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
+                targetT.set(bezier.findClosest(new Point2D(event.getX(), event.getY())));
+        });
+
         setOnMouseDragged(event -> {
-            if (graphPane.getTool() == GraphPane.Tool.DRAG)
+            if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
             {
-                curve.setControlX(reverseBezierForControl(moveTo.getX(), curve.getX(), 0.5, event.getX()));
-                curve.setControlY(reverseBezierForControl(moveTo.getY(), curve.getY(), 0.5, event.getY()));
+                curve.setControlX(reverseBezierForControl(moveTo.getX(), curve.getX(), targetT.get(), event.getX()));
+                curve.setControlY(reverseBezierForControl(moveTo.getY(), curve.getY(), targetT.get(), event.getY()));
             }
         });
     }
