@@ -5,6 +5,7 @@ import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import com.google.gson.JsonParseException;
 import javafx.beans.property.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -97,9 +98,10 @@ public class IOManager
 
             savedFile = finiteAutomaton.getJSONObject().deepCopy();
         }
-        catch (FileNotFoundException | CorruptedFileException e)
+        catch (FileNotFoundException | CorruptedFileException | JsonParseException e)
         {
-            e.printStackTrace();
+            Main.logger.log(Level.SEVERE, "While reading " + filename, e);
+            finiteAutomaton.clear();
         }
 
         updateSavedProperty();
