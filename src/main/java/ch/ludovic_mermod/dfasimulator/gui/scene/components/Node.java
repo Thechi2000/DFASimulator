@@ -54,7 +54,7 @@ public class Node extends StackPane
         outerCircle.visibleProperty().bind(state.isAcceptingProperty());
 
         Text text = new Text();
-        text.fontProperty().bind(Constants.FONT);
+        text.fontProperty().bind(Constants.NODE_NAME_FONT);
         text.textProperty().bind(state.nameProperty());
         text.setTextAlignment(TextAlignment.CENTER);
 
