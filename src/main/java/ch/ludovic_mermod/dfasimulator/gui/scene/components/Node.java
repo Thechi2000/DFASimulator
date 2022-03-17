@@ -24,6 +24,7 @@ public class Node extends StackPane
     private final ContextMenu menu;
     private final GraphPane   graphPane;
     private final State       state;
+    private final Circle outerCircle;
     private       MenuItem    deleteMenuItem;
 
     public Node(State state, GraphPane graphPane)
@@ -45,7 +46,7 @@ public class Node extends StackPane
         graphPane.currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         updateCircleColor(innerCircle);
 
-        Circle outerCircle = new Circle();
+        outerCircle = new Circle();
         outerCircle.radiusProperty().bind(IntegerBinding.integerExpression(Constants.NODE_OUTER_CIRCLE_RADIUS));
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);

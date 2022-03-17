@@ -64,8 +64,8 @@ public class MainPane extends BorderPane
         rightSplitPane.setOrientation(Orientation.VERTICAL);
         rightSplitPane.getItems().addAll(simulationPane);
 
-        fillGraphPane();
-        //ioManager.open("default.json");
+        //fillGraphPane();
+        ioManager.open("default.json");
 
         setRight(rightSplitPane);
         setTop(menuBar);

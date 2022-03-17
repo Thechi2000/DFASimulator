@@ -6,6 +6,7 @@ import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.application.Platform;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
 import javafx.collections.*;
 
@@ -14,12 +15,14 @@ import java.util.TreeSet;
 
 public class FiniteAutomaton
 {
-    private final JSONObject jsonObject;
+    protected static final String     JSON_INITIAL = "initial";
+    protected static final String     JSON_STATES  = "states";
+    private final          JSONObject jsonObject;
 
     private final ObjectProperty<State>  initialState;
     private final ListProperty<State>    states;
     private final SetProperty<Character> alphabet;
-    private MainPane               mainPane;
+    private       MainPane               mainPane;
 
     public FiniteAutomaton()
     {
@@ -53,6 +56,22 @@ public class FiniteAutomaton
 
         jsonObject = new JSONObject();
         jsonObject.add("states", JSONArray.fromObservableList(states, State::getJSONObject));
+        jsonObject.addProperty(JSON_INITIAL, new StringBinding()
+        {
+            {
+                super.bind(initialState);
+                initialState.addListener((o, ov, nv) -> {
+                    if (ov != null) unbind(ov.nameProperty());
+                    if (nv != null) bind(nv.nameProperty());
+                });
+            }
+
+            @Override
+            protected String computeValue()
+            {
+                return initialState.get() == null ? "null" : initialState.get().name();
+            }
+        });
     }
 
     public void create(MainPane mainPane)

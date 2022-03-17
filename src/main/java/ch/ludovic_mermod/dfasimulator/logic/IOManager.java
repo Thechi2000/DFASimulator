@@ -82,16 +82,19 @@ public class IOManager
         {
             JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
 
-            if (!object.hasArray("states")) throw new CorruptedFileException("Missing states array");
-            var nodesArray = object.get("states").getAsJSONArray();
+            object.checkHasArray(FiniteAutomaton.JSON_STATES);
+            object.checkHasString(FiniteAutomaton.JSON_INITIAL);
+
+            var nodesArray = object.get(FiniteAutomaton.JSON_STATES).getAsJSONArray();
 
             finiteAutomaton.clear();
 
             for (JSONElement jsonElement : nodesArray)
                 finiteAutomaton.addState(State.fromJSONObject(jsonElement.getAsJSONObject(), finiteAutomaton));
+            finiteAutomaton.initialStateProperty().set(finiteAutomaton.getState(object.get(FiniteAutomaton.JSON_INITIAL).getAsString()));
 
             for (JSONElement e : nodesArray)
-                finiteAutomaton.getState(e.getAsJSONObject().get("name").getAsString()).loadTransitionMap(e.getAsJSONObject().get("transitionMap").getAsJSONObject());
+                finiteAutomaton.getState(e.getAsJSONObject().get(State.JSON_NAME).getAsString()).loadTransitionMap(e.getAsJSONObject().get(State.JSON_TRANSITION_MAP).getAsJSONObject());
 
             if (object.hasArray("edges"))
                 mainPane.getGraphPane().loadEdges(object.getAsJSONArray("edges"));

@@ -1,5 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.json;
 
+import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import com.google.gson.JsonObject;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -135,6 +136,31 @@ public class JSONObject extends JSONElement implements Observable
     public boolean hasObject(String property)
     {
         return has(property) && get(property).isJSONObject();
+    }
+
+    public void checkHasString(String property) throws IOManager.CorruptedFileException
+    {
+        if (!hasString(property)) missingProperty(property, "String");
+    }
+    public void checkHasNumber(String property) throws IOManager.CorruptedFileException
+    {
+        if (!hasNumber(property)) missingProperty(property, "Number");
+    }
+    public void checkHasArray(String property) throws IOManager.CorruptedFileException
+    {
+        if (!hasArray(property)) missingProperty(property, "JSONArray");
+    }
+    public void checkHasBoolean(String property) throws IOManager.CorruptedFileException
+    {
+        if (!hasBoolean(property)) missingProperty(property, "Boolean");
+    }
+    public void checkHasObject(String property) throws IOManager.CorruptedFileException
+    {
+        if (!hasObject(property)) missingProperty(property, "JSONObject");
+    }
+    private void missingProperty(String name, String type) throws IOManager.CorruptedFileException
+    {
+        throw new IOManager.CorruptedFileException(String.format("Could not find %s(%s) in \"%s\"", name, type, toString()));
     }
 
     public void addProperty(String property, String value)

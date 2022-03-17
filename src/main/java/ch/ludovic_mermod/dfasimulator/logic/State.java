@@ -14,6 +14,12 @@ import java.util.Objects;
 
 public class State
 {
+    protected static final String JSON_TRANSITION_MAP = "transition_map";
+    protected static final String JSON_X_COORD        = "y_coord";
+    protected static final String JSON_Y_COORD        = "x_coord";
+    protected static final String JSON_IS_ACCEPTING   = "is_accepting";
+    protected static final String JSON_NAME           = "name";
+
     private final JSONObject jsonObject;
 
     private final StringProperty                  name;
@@ -29,8 +35,8 @@ public class State
         this.finiteAutomaton = finiteAutomaton;
         jsonObject = new JSONObject();
 
-        name = new SimpleStringProperty(this, "name", "");
-        isAcceptingProperty = new SimpleBooleanProperty(this, "isAccepting", false);
+        name = new SimpleStringProperty(this, JSON_NAME, "");
+        isAcceptingProperty = new SimpleBooleanProperty(this, JSON_IS_ACCEPTING, false);
         transitionMapProperty = new PropertiesMap<>();
 
         isInitialBinding = new BooleanBinding()
@@ -48,40 +54,39 @@ public class State
 
         node = new Node(this, finiteAutomaton.getMainPane().getGraphPane());
 
-        jsonObject.addProperty("name", name);
-        jsonObject.addProperty("isAccepting", isAcceptingProperty);
-        jsonObject.addProperty("x_coord", node.layoutXProperty());
-        jsonObject.addProperty("y_coord", node.layoutYProperty());
-        jsonObject.add("transitionMap", new JSONObject());
+        jsonObject.addProperty(JSON_NAME, name);
+        jsonObject.addProperty(JSON_IS_ACCEPTING, isAcceptingProperty);
+        jsonObject.addProperty(JSON_X_COORD, node.layoutXProperty());
+        jsonObject.addProperty(JSON_Y_COORD, node.layoutYProperty());
+        jsonObject.add(JSON_TRANSITION_MAP, new JSONObject());
 
         finiteAutomaton.alphabet().forEach(transitionMapProperty::get);
 
         transitionMapProperty.addListener((p, k, o, n) ->
         {
             if (n != null)
-                jsonObject.getAsJSONObject("transitionMap").addProperty(k.toString(), n.nameProperty());
-            else jsonObject.getAsJSONObject("transitionMap").add(k.toString(), JSONNull.INSTANCE);
+                jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).addProperty(k.toString(), n.nameProperty());
+            else jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).add(k.toString(), JSONNull.INSTANCE);
         });
         transitionMapProperty.addListener((MapChangeListener<? super Character, ? super ObjectProperty<State>>) change ->
         {
             if (change.wasRemoved())
-                jsonObject.getAsJSONObject("transitionMap").remove(change.getKey().toString());
+                jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).remove(change.getKey().toString());
         });
     }
 
     public static State fromJSONObject(JSONObject jsonObject, FiniteAutomaton finiteAutomaton) throws IOManager.CorruptedFileException
     {
-        if (!jsonObject.hasString("name")
-            || !jsonObject.hasBoolean("isAccepting")
-            || !jsonObject.hasNumber("x_coord")
-            || !jsonObject.hasNumber("y_coord")
-            || !jsonObject.hasObject("transition_map"))
-            throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a state", jsonObject.toString());
+        jsonObject.checkHasString(JSON_NAME);
+        jsonObject.checkHasBoolean(JSON_IS_ACCEPTING);
+        jsonObject.checkHasNumber(JSON_Y_COORD);
+        jsonObject.checkHasNumber(JSON_X_COORD);
+        jsonObject.checkHasObject(JSON_TRANSITION_MAP);
 
         State state = new State(finiteAutomaton);
-        state.name.set(jsonObject.get("name").getAsString());
-        state.isAcceptingProperty.set(jsonObject.get("isAccepting").getAsBoolean());
-        state.node.relocate(jsonObject.get("x_coord").getAsDouble(), jsonObject.get("y_coord").getAsDouble());
+        state.name.set(jsonObject.get(JSON_NAME).getAsString());
+        state.isAcceptingProperty.set(jsonObject.get(JSON_IS_ACCEPTING).getAsBoolean());
+        state.node.relocate(jsonObject.get(State.JSON_X_COORD).getAsDouble(), jsonObject.get(JSON_Y_COORD).getAsDouble());
         return state;
     }
     public void loadTransitionMap(JSONObject jsonObject) throws IOManager.CorruptedFileException
@@ -96,7 +101,7 @@ public class State
                 throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a transition map", jsonObject);
 
 
-                transitionMapProperty.setValue(key.charAt(0), e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString()));
+            transitionMapProperty.setValue(key.charAt(0), e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString()));
         }
     }
 

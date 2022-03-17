@@ -20,7 +20,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
-import java.io.StreamCorruptedException;
 import java.util.HashSet;
 import java.util.logging.Level;
 
@@ -123,12 +122,14 @@ public class GraphPane extends Region
         for (JSONElement element : array)
         {
             JSONObject o;
-            if (!element.isJSONObject()
-                || !(o = element.getAsJSONObject()).hasString("source")
-                || !o.hasString("target")
-                || !o.hasNumber("control_x")
-                || !o.hasNumber("control_y"))
-                throw new IOManager.CorruptedFileException("Could not parse \"%s\" into an edge", element);
+            if (!element.isJSONObject()) throw new IOManager.CorruptedFileException("Could not parse \"%s\" into an edge", element);
+
+            o = element.getAsJSONObject();
+            o.checkHasString("source");
+            o.checkHasString("target");
+            o.checkHasNumber("control_x");
+            o.checkHasNumber("control_y");
+
 
             Edge edge = edges.stream().filter(e -> e.getSourceName().equals(o.get("source").getAsString()) && e.getTargetName().equals(o.get("target").getAsString())).findAny().orElse(null);
 
