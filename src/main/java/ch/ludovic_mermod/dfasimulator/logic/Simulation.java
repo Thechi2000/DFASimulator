@@ -185,6 +185,16 @@ public class Simulation
         }, 1000);
     }
 
+    public boolean test(String input)
+    {
+        if(!compileDFA()) return false;
+
+        State currentState = finiteAutomaton.initialState();
+        for(char c : input.toCharArray()) currentState = currentState.transitionMap().getValue(c);
+
+        return currentState.isAccepting();
+    }
+
     public enum ErrorCode
     {
         TOO_MANY_INITIAL_STATES,
