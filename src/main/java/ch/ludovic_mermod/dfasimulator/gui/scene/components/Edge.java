@@ -50,19 +50,19 @@ public class Edge extends Group
 
         Path line = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
         line.setFill(Color.TRANSPARENT);
-        line.strokeProperty().bind(Constants.Link.Line.color);
-        line.strokeWidthProperty().bind(Constants.Link.Line.width);
+        line.strokeProperty().bind(Constants.EDGE_LINE_COLOR);
+        line.strokeWidthProperty().bind(Constants.EDGE_LINE_WIDTH);
         line.prefWidth(20);
         line.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
         leftLine = new Line();
-        leftLine.fillProperty().bind(Constants.Link.Line.color);
-        leftLine.strokeWidthProperty().bind(Constants.Link.Line.width);
+        leftLine.fillProperty().bind(Constants.EDGE_LINE_COLOR);
+        leftLine.strokeWidthProperty().bind(Constants.EDGE_LINE_WIDTH);
         leftLine.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
         rightLine = new Line();
-        rightLine.fillProperty().bind(Constants.Link.Line.color);
-        rightLine.strokeWidthProperty().bind(Constants.Link.Line.width);
+        rightLine.fillProperty().bind(Constants.EDGE_LINE_COLOR);
+        rightLine.strokeWidthProperty().bind(Constants.EDGE_LINE_WIDTH);
         rightLine.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
         addEventHandlers();
@@ -148,11 +148,11 @@ public class Edge extends Group
                 sn.layoutXProperty(), sn.layoutYProperty(), sn.widthProperty(), sn.heightProperty(),
                 tn.layoutXProperty(), tn.layoutYProperty(), tn.widthProperty(), tn.heightProperty(),
                 curve.controlXProperty(), curve.controlYProperty(),
-                Constants.Node.Circle.radius,
-                Constants.Link.Line.sidelineLength,
-                Constants.Link.Text.distanceFromNodeFactor,
-                Constants.Link.Text.distanceFromNodeAbsolute,
-                Constants.Link.Text.usesAbsoluteDistance
+                Constants.NODE_INNER_CIRCLE_RADIUS,
+                Constants.EDGE_SIDELINE_LENGTH,
+                Constants.EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR,
+                Constants.EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE,
+                Constants.EDGE_TEXT_USE_ABSOLUTE_DISTANCE
         };
 
         Utils.bindDouble(moveTo.xProperty(), () -> computePoints().start.getX(), observables);
@@ -196,12 +196,12 @@ public class Edge extends Group
                 directorStart = controlPoint.subtract(startCenter).normalize(),
                 directorEnd = endCenter.subtract(controlPoint).normalize(),
                 normalEnd = new Point2D(directorEnd.getY(), -directorEnd.getX()),
-                start = startCenter.add(directorStart.multiply(Constants.Node.Circle.radius.get())),
-                end = endCenter.subtract(directorEnd.multiply(Constants.Node.Circle.radius.get())),
-                projectionPoint = end.subtract(directorEnd.multiply(Constants.Link.Line.sidelineLength.get())),
-                projectionDistance = normalEnd.multiply(Constants.Link.Line.sidelineLength.get()),
-                projectionRelative = start.add(end.subtract(start).multiply(Constants.Link.Text.distanceFromNodeFactor.get())),
-                projectionAbsolute = start.add(directorStart.multiply(Constants.Link.Text.distanceFromNodeAbsolute.get()));
+                start = startCenter.add(directorStart.multiply(Constants.NODE_INNER_CIRCLE_RADIUS.get())),
+                end = endCenter.subtract(directorEnd.multiply(Constants.NODE_INNER_CIRCLE_RADIUS.get())),
+                projectionPoint = end.subtract(directorEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get())),
+                projectionDistance = normalEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get()),
+                projectionRelative = start.add(end.subtract(start).multiply(Constants.EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR.get())),
+                projectionAbsolute = start.add(directorStart.multiply(Constants.EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE.get()));
 
         return new Points(
                 start,
@@ -209,7 +209,7 @@ public class Edge extends Group
                 start.add(end.subtract(start).multiply(0.5)),
                 projectionPoint.add(projectionDistance),
                 projectionPoint.subtract(projectionDistance),
-                (Constants.Link.Text.usesAbsoluteDistance.get() && (projectionRelative.subtract(start).magnitude() > Constants.Link.Text.distanceFromNodeAbsolute.get()) ? projectionAbsolute : projectionRelative).add(normalEnd.multiply(Constants.Link.Text.distanceFromLine.get())));
+                (Constants.EDGE_TEXT_USE_ABSOLUTE_DISTANCE.get() && (projectionRelative.subtract(start).magnitude() > Constants.EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE.get()) ? projectionAbsolute : projectionRelative).add(normalEnd.multiply(Constants.EDGE_TEXT_DISTANCE_FROM_LINE.get())));
     }
 
     private double reverseBezierForControl(double p0, double p2, double t, double target)

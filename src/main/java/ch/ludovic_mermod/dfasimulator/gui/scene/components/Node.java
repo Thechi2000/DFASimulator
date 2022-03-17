@@ -37,23 +37,23 @@ public class Node extends StackPane
         pos = new Position();
 
         Circle innerCircle = new Circle();
-        innerCircle.radiusProperty().bind(Constants.Node.Circle.radius);
+        innerCircle.radiusProperty().bind(Constants.NODE_INNER_CIRCLE_RADIUS);
         initialBinding().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.Node.Circle.currentColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.Node.Circle.initialColor.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.Node.Circle.color.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Constants.NODE_CURRENT_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Constants.NODE_INITIAL_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Constants.NODE_BASE_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         graphPane.currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         updateCircleColor(innerCircle);
 
         Circle outerCircle = new Circle();
-        outerCircle.radiusProperty().bind(IntegerBinding.integerExpression(Constants.Node.Circle.radius).add(10));
+        outerCircle.radiusProperty().bind(IntegerBinding.integerExpression(Constants.NODE_OUTER_CIRCLE_RADIUS));
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
         outerCircle.setFill(Color.TRANSPARENT);
         outerCircle.visibleProperty().bind(state.isAcceptingProperty());
 
         Text text = new Text();
-        text.fontProperty().bind(Constants.Node.Text.font);
+        text.fontProperty().bind(Constants.FONT);
         text.textProperty().bind(state.nameProperty());
         text.setTextAlignment(TextAlignment.CENTER);
 
@@ -70,10 +70,6 @@ public class Node extends StackPane
     {
         return state.nameProperty();
     }
-    /* public ListProperty<Link> outgoingLinksProperty()
-     {
-         return state.outgoingLinksProperty();
-     }*/
     public BooleanBinding initialBinding()
     {
         return state.isInitialBinding();
@@ -99,10 +95,10 @@ public class Node extends StackPane
     private void updateCircleColor(Circle c)
     {
         c.setFill(graphPane.currentStateProperty().get() == state
-                  ? Constants.Node.Circle.currentColor.get()
+                  ? Constants.NODE_CURRENT_COLOR.get()
                   : state.isInitialBinding().get()
-                    ? Constants.Node.Circle.initialColor.get()
-                    : Constants.Node.Circle.color.get());
+                    ? Constants.NODE_INITIAL_COLOR.get()
+                    : Constants.NODE_BASE_COLOR.get());
     }
 
     private void addEventHandlers()
@@ -197,5 +193,4 @@ public class Node extends StackPane
         double x;
         double y;
     }
-
 }
