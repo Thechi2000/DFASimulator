@@ -1,5 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.utils;
 
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -117,7 +118,7 @@ public class Utils
     {
         Stage s = new Stage();
         s.setScene(new Scene(content));
-        s.show();
+        Platform.runLater(s::show);
         return s;
     }
 }
