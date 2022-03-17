@@ -9,7 +9,8 @@ import javafx.scene.control.TextField;
 
 public class NodeEditPane extends EditPane
 {
-    private final State node;
+    private final State    node;
+    private final CheckBox acceptingStateBox;
 
     public NodeEditPane(FiniteAutomaton simulation, State state)
     {
@@ -29,10 +30,10 @@ public class NodeEditPane extends EditPane
 
         // Accepting state
         {
-            CheckBox acceptingStateBox = new CheckBox();
+            acceptingStateBox = new CheckBox();
             Strings.bind("edit_pane.node.accepting_state", acceptingStateBox.textProperty());
             acceptingStateBox.setSelected(node.isAccepting());
-            node.isAcceptingProperty().bind(acceptingStateBox.selectedProperty());
+            node.isAcceptingProperty().bindBidirectional(acceptingStateBox.selectedProperty());
             getChildren().add(acceptingStateBox);
         }
 
@@ -52,6 +53,6 @@ public class NodeEditPane extends EditPane
     @Override
     public void unbind()
     {
-        node.isAcceptingProperty().unbind();
+        node.isAcceptingProperty().unbindBidirectional(acceptingStateBox.selectedProperty());
     }
 }

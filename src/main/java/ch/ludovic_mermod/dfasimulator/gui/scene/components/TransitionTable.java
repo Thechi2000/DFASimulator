@@ -1,9 +1,9 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene.components;
 
-import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.State;
+import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -86,7 +86,11 @@ public class TransitionTable extends ScrollPane
                     });
                 }
                 else
-                    cell.get().getChildren().add(new Text(cellFeatures.getValue().name()));
+                {
+                    Text text = new Text();
+                    text.textProperty().bind(cellFeatures.getValue().nameProperty());
+                    cell.get().getChildren().add(text);
+                }
 
                 return cell;
             });
@@ -218,7 +222,10 @@ public class TransitionTable extends ScrollPane
 
             ChoiceBox<State> choiceBox = new ChoiceBox<>();
             choiceBox.setItems(finiteAutomaton.states());
+
             choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""));
+            finiteAutomaton.states().forEach(s -> s.nameProperty().addListener((o, ov, nv) -> choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""))));
+
             choiceBox.valueProperty().bindBidirectional(cellFeatures.getValue().transitionMap().get(character));
             return new SimpleObjectProperty<>(choiceBox);
         });
