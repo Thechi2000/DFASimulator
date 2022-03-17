@@ -5,6 +5,7 @@ import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.json.JSONPrimitive;
 import javafx.application.Platform;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
@@ -15,9 +16,11 @@ import java.util.TreeSet;
 
 public class FiniteAutomaton
 {
-    protected static final String     JSON_INITIAL = "initial";
-    protected static final String     JSON_STATES  = "states";
-    private final          JSONObject jsonObject;
+    public static final    String JSON_ALPHABET = "alphabet";
+    public static final String JSON_INITIAL  = "initial";
+    public static final String JSON_STATES   = "states";
+
+    private final JSONObject jsonObject;
 
     private final ObjectProperty<State>  initialState;
     private final ListProperty<State>    states;
@@ -56,6 +59,7 @@ public class FiniteAutomaton
 
         jsonObject = new JSONObject();
         jsonObject.add("states", JSONArray.fromObservableList(states, State::getJSONObject));
+        jsonObject.add(JSON_ALPHABET, JSONArray.fromObservableSet(alphabet.get(), c -> new JSONPrimitive(c.toString())));
         jsonObject.addProperty(JSON_INITIAL, new StringBinding()
         {
             {

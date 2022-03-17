@@ -84,10 +84,18 @@ public class IOManager
 
             object.checkHasArray(FiniteAutomaton.JSON_STATES);
             object.checkHasString(FiniteAutomaton.JSON_INITIAL);
+            object.checkHasArray(FiniteAutomaton.JSON_ALPHABET);
 
             var nodesArray = object.get(FiniteAutomaton.JSON_STATES).getAsJSONArray();
 
             finiteAutomaton.clear();
+
+            for (JSONElement e : object.getAsJSONArray(FiniteAutomaton.JSON_ALPHABET))
+            {
+                if(!e.isJSONPrimitive() || ! e.getAsJSONPrimitive().isString() || e.getAsJSONPrimitive().getAsString().length() != 1)
+                    throw new CorruptedFileException("Could not convert \"%s\" to a character", e);
+                finiteAutomaton.alphabet().add(e.getAsString().charAt(0));
+            }
 
             for (JSONElement jsonElement : nodesArray)
                 finiteAutomaton.addState(State.fromJSONObject(jsonElement.getAsJSONObject(), finiteAutomaton));
