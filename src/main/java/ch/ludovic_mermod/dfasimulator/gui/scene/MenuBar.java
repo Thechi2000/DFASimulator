@@ -1,14 +1,13 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
+import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import ch.ludovic_mermod.dfasimulator.gui.Controls;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.scene.components.TransitionTable;
-import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 
@@ -95,17 +94,13 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem transitionTableItem = new MenuItem();
             Strings.bind("menu.dfa.transition_table", transitionTableItem.textProperty());
-            transitionTableItem.setOnAction(event ->
-            {
-                TransitionTable table = new TransitionTable();
-                table.loadFiniteAutomaton(mainPane.getFiniteAutomaton());
-
-                Stage stage = new Stage();
-                stage.setScene(new Scene(table));
-
-                stage.show();
-            });
+            transitionTableItem.setOnAction(event -> Utils.openNewStage(new TransitionTable(mainPane.getFiniteAutomaton())));
             dfaMenu.getItems().add(transitionTableItem);
+
+            MenuItem testItem = new MenuItem();
+            Strings.bind("menu.dfa.test", testItem.textProperty());
+            testItem.setOnAction(event -> Utils.openNewStage(new TestPane(mainPane), 400, 600));
+            dfaMenu.getItems().add(testItem);
         }
     }
 

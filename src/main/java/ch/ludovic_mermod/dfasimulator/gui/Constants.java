@@ -4,11 +4,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableDoubleValue;
-import javafx.beans.value.ObservableIntegerValue;
-import javafx.beans.value.ObservableObjectValue;
+import javafx.beans.value.*;
+import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 import static javafx.scene.paint.Color.*;
@@ -16,6 +15,7 @@ import static javafx.scene.paint.Color.*;
 public class Constants
 {
     public static final ObservableObjectValue<Font> FONT = new SimpleObjectProperty<>(Font.font("Courier", 20));
+    public static final ObservableObjectValue<Font> NODE_NAME_FONT = new SimpleObjectProperty<>(Font.font("Courier", 20));
 
     public static final ObservableIntegerValue       NODE_INNER_CIRCLE_RADIUS = new SimpleIntegerProperty(50);
     public static final ObservableIntegerValue       NODE_OUTER_CIRCLE_RADIUS = new SimpleIntegerProperty(60);
@@ -31,4 +31,9 @@ public class Constants
     public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR   = new SimpleDoubleProperty(0.25);
     public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE = new SimpleDoubleProperty(20);
     public static final ObservableBooleanValue EDGE_TEXT_USE_ABSOLUTE_DISTANCE       = new SimpleBooleanProperty(true);
+
+    public static final ObservableDoubleValue TEST_PANE_INPUT_SPACING = new SimpleDoubleProperty(20);
+    public static final ObservableBooleanValue TEST_PANE_GRID_LINES = new SimpleBooleanProperty(true);
+    public static final ObservableValue<Paint> TEST_PANE_SUCCESS = new SimpleObjectProperty<>(GREEN);
+    public static final ObservableValue<Paint> TEST_PANE_FAILURE = new SimpleObjectProperty<>(RED);
 }
