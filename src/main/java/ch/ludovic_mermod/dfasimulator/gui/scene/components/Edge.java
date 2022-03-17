@@ -1,11 +1,11 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene.components;
 
-import ch.ludovic_mermod.dfasimulator.Utils;
 import ch.ludovic_mermod.dfasimulator.gui.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.BezierQuadCurve;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -155,23 +155,23 @@ public class Edge extends Group
                 Constants.EDGE_TEXT_USE_ABSOLUTE_DISTANCE
         };
 
-        Utils.bindDouble(moveTo.xProperty(), () -> computePoints().start.getX(), observables);
-        Utils.bindDouble(moveTo.yProperty(), () -> computePoints().start.getY(), observables);
-        Utils.bindDouble(curve.xProperty(), () -> computePoints().end.getX(), observables);
-        Utils.bindDouble(curve.yProperty(), () -> computePoints().end.getY(), observables);
+        CustomBindings.bindDouble(moveTo.xProperty(), () -> computePoints().start.getX(), observables);
+        CustomBindings.bindDouble(moveTo.yProperty(), () -> computePoints().start.getY(), observables);
+        CustomBindings.bindDouble(curve.xProperty(), () -> computePoints().end.getX(), observables);
+        CustomBindings.bindDouble(curve.yProperty(), () -> computePoints().end.getY(), observables);
 
-        Utils.bindDouble(leftLine.startXProperty(), () -> computePoints().leftLineStart.getX(), observables);
-        Utils.bindDouble(leftLine.startYProperty(), () -> computePoints().leftLineStart.getY(), observables);
-        Utils.bindDouble(leftLine.endXProperty(), () -> computePoints().end.getX(), observables);
-        Utils.bindDouble(leftLine.endYProperty(), () -> computePoints().end.getY(), observables);
+        CustomBindings.bindDouble(leftLine.startXProperty(), () -> computePoints().leftLineStart.getX(), observables);
+        CustomBindings.bindDouble(leftLine.startYProperty(), () -> computePoints().leftLineStart.getY(), observables);
+        CustomBindings.bindDouble(leftLine.endXProperty(), () -> computePoints().end.getX(), observables);
+        CustomBindings.bindDouble(leftLine.endYProperty(), () -> computePoints().end.getY(), observables);
 
-        Utils.bindDouble(rightLine.startXProperty(), () -> computePoints().rightLineStart.getX(), observables);
-        Utils.bindDouble(rightLine.startYProperty(), () -> computePoints().rightLineStart.getY(), observables);
-        Utils.bindDouble(rightLine.endXProperty(), () -> computePoints().end.getX(), observables);
-        Utils.bindDouble(rightLine.endYProperty(), () -> computePoints().end.getY(), observables);
+        CustomBindings.bindDouble(rightLine.startXProperty(), () -> computePoints().rightLineStart.getX(), observables);
+        CustomBindings.bindDouble(rightLine.startYProperty(), () -> computePoints().rightLineStart.getY(), observables);
+        CustomBindings.bindDouble(rightLine.endXProperty(), () -> computePoints().end.getX(), observables);
+        CustomBindings.bindDouble(rightLine.endYProperty(), () -> computePoints().end.getY(), observables);
 
-        Utils.bindDouble(alphabetDisplay.xProperty(), () -> computePoints().textPos.getX(), observables);
-        Utils.bindDouble(alphabetDisplay.yProperty(), () -> computePoints().textPos.getY(), observables);
+        CustomBindings.bindDouble(alphabetDisplay.xProperty(), () -> computePoints().textPos.getX(), observables);
+        CustomBindings.bindDouble(alphabetDisplay.yProperty(), () -> computePoints().textPos.getY(), observables);
     }
 
     private void updateAlphabetDisplay()

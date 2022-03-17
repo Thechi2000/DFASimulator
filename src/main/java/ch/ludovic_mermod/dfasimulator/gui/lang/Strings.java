@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui.lang;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.PropertiesMap;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -51,21 +52,7 @@ public class Strings
 
     public static void bindFormat(String id, StringProperty target, Object... objects)
     {
-        ObjectProperty<String> format = get(id);
-
-        int occ = (format.get().length() - format.get().replace("%s", "").length()) / 2;
-        if (objects.length != occ)
-            Main.log(Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", id, objects.length, occ);
-
-        Set<ObservableValue<?>> properties = Arrays.stream(objects)
-                .filter(o -> o instanceof ObservableValue<?>)
-                .map(o -> (ObservableValue<?>) o)
-                .collect(Collectors.toSet());
-
-        properties.add(format);
-
-        target.set(String.format(format.get(), Arrays.stream(objects).map(o -> o instanceof ObservableValue<?> ? ((ObservableValue<?>) o).getValue() : o).toArray()));
-        properties.forEach(p -> p.addListener((obs, ov, nv) -> target.set(String.format(format.get(), Arrays.stream(objects).map(o -> o instanceof ObservableValue<?> ? ((ObservableValue<?>) o).getValue() : o).toArray()))));
+        target.bind(CustomBindings.format(get(id), objects));
     }
 
     public static String format(String id, Object... objects)

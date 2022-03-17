@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene.components;
 
-import ch.ludovic_mermod.dfasimulator.Utils;
+import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.State;

@@ -1,8 +1,8 @@
-package ch.ludovic_mermod.dfasimulator;
+package ch.ludovic_mermod.dfasimulator.utils;
 
-import javafx.beans.Observable;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.DoubleProperty;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.util.HashMap;
@@ -106,24 +106,18 @@ public class Utils
         };
     }
 
-    public static DoubleBinding doubleBinding(Supplier<Double> computeValue, Observable... observables)
+    public static Stage openNewStage(Parent content, double width, double height)
     {
-        return new DoubleBinding()
-        {
-            {
-                super.bind(observables);
-            }
-
-            @Override
-            protected double computeValue()
-            {
-                return computeValue.get();
-            }
-        };
+        Stage s = new Stage();
+        s.setScene(new Scene(content, width, height));
+        s.show();
+        return s;
     }
-
-    public static void bindDouble(DoubleProperty property, Supplier<Double> computeValue, Observable... observables)
+    public static Stage openNewStage(Parent content)
     {
-        property.bind(doubleBinding(computeValue, observables));
+        Stage s = new Stage();
+        s.setScene(new Scene(content));
+        s.show();
+        return s;
     }
 }
