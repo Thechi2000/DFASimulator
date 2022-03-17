@@ -6,7 +6,9 @@ import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.json.JSONPrimitive;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.application.Platform;
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
 import javafx.collections.*;
@@ -16,7 +18,7 @@ import java.util.TreeSet;
 
 public class FiniteAutomaton
 {
-    public static final    String JSON_ALPHABET = "alphabet";
+    public static final String JSON_ALPHABET = "alphabet";
     public static final String JSON_INITIAL  = "initial";
     public static final String JSON_STATES   = "states";
 
@@ -107,6 +109,11 @@ public class FiniteAutomaton
     public SetProperty<Character> alphabetProperty()
     {
         return alphabet;
+    }
+
+    public Binding<Boolean> hasBinaryAlphabet()
+    {
+        return CustomBindings.binding(() -> alphabet.size() == 2 && alphabet.contains('0') && alphabet.contains('1'), alphabet);
     }
 
     private void validateNameChange(State state, String oldName)
