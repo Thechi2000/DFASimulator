@@ -1,4 +1,4 @@
-package ch.ludovic_mermod.dfasimulator.gui;
+package ch.ludovic_mermod.dfasimulator.constants;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;

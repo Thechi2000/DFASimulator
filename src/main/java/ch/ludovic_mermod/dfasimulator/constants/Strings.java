@@ -1,15 +1,13 @@
-package ch.ludovic_mermod.dfasimulator.gui.lang;
+package ch.ludovic_mermod.dfasimulator.constants;
 
 import ch.ludovic_mermod.dfasimulator.Main;
-import ch.ludovic_mermod.dfasimulator.PropertiesMap;
+import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 
 import java.util.*;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class Strings
 {

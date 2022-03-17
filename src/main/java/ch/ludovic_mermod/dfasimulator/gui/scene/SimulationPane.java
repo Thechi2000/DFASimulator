@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
-import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;

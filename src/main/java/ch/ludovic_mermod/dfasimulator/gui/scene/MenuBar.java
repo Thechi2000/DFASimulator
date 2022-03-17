@@ -1,8 +1,8 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
 import ch.ludovic_mermod.dfasimulator.utils.Utils;
-import ch.ludovic_mermod.dfasimulator.gui.Controls;
-import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.Controls;
+import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.scene.components.TransitionTable;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;

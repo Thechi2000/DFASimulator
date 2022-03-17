@@ -1,7 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui.scene;
 
-import ch.ludovic_mermod.dfasimulator.gui.Constants;
-import ch.ludovic_mermod.dfasimulator.gui.lang.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import javafx.collections.FXCollections;

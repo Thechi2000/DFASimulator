@@ -1,4 +1,4 @@
-package ch.ludovic_mermod.dfasimulator;
+package ch.ludovic_mermod.dfasimulator.utils;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;

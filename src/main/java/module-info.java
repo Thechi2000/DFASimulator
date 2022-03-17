@@ -13,4 +13,6 @@ module ch.ludovic_mermod.dfasimulator {
     opens ch.ludovic_mermod.dfasimulator.gui.scene.components to javafx.fxml;
     opens ch.ludovic_mermod.dfasimulator.utils to javafx.fxml;
     exports ch.ludovic_mermod.dfasimulator.utils;
+    exports ch.ludovic_mermod.dfasimulator.constants;
+    opens ch.ludovic_mermod.dfasimulator.constants to javafx.fxml;
 }
