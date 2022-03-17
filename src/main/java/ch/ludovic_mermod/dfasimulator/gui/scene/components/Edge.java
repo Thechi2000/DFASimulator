@@ -125,10 +125,10 @@ public class Edge extends Group
 
     private void addEventHandlers()
     {
-        setOnMousePressed(event -> {
+        /*setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
                 targetT.set(bezier.findClosest(new Point2D(event.getX(), event.getY())));
-        });
+        });*/
 
         setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
