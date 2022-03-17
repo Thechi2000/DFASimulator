@@ -77,7 +77,7 @@ public class MainPane extends BorderPane
             if (!ioManager.close())
                 request.consume();
         });
-        Strings.bindFormat("window.title%s %s", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
+        Strings.bindFormat("window.title", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
     }
 
     public FiniteAutomaton getFiniteAutomaton()

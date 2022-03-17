@@ -1,24 +1,23 @@
 package ch.ludovic_mermod.dfasimulator.gui.lang;
 
 import ch.ludovic_mermod.dfasimulator.Main;
-import javafx.beans.property.SimpleStringProperty;
+import ch.ludovic_mermod.dfasimulator.PropertiesMap;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class Strings
 {
-    private static final Map<String, StringProperty> map;
+    private static final PropertiesMap<String, String> map;
 
     static
     {
-        map = new TreeMap<>();
+        map = new PropertiesMap<>();
+        loadLocale(Locale.ENGLISH);
     }
 
     /**
@@ -27,7 +26,7 @@ public class Strings
      * @param id the StringProperty queried
      * @return the StringProperty associated with the given id
      */
-    public static StringProperty get(String id)
+    public static ObjectProperty<String> get(String id)
     {
         if (!map.containsKey(id))
         {
@@ -52,7 +51,7 @@ public class Strings
 
     public static void bindFormat(String id, StringProperty target, Object... objects)
     {
-        StringProperty format = get(id);
+        ObjectProperty<String> format = get(id);
 
         int occ = (format.get().length() - format.get().replace("%s", "").length()) / 2;
         if (objects.length != occ)
@@ -88,7 +87,19 @@ public class Strings
      */
     public static void set(String id, String value)
     {
-        if (map.containsKey(id)) map.get(id).set(value);
-        else map.put(id, new SimpleStringProperty(value));
+        map.setValue(id, value);
+    }
+
+    public static void loadLocale(Locale locale)
+    {
+        try
+        {
+            ResourceBundle bundle = ResourceBundle.getBundle("lang", locale);
+            bundle.keySet().forEach(k -> set(k, bundle.getString(k)));
+        }
+        catch (MissingResourceException e)
+        {
+            Main.logger.log(Level.SEVERE, "While loading lang bundle", e);
+        }
     }
 }
