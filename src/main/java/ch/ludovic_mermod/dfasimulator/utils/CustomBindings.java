@@ -101,7 +101,7 @@ public class CustomBindings
         return new DoubleBinding()
         {
             {
-                super.bind(observables);
+                bind(observables);
             }
 
             @Override

@@ -1,4 +1,4 @@
-package ch.ludovic_mermod.dfasimulator.gui.components;
+package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
@@ -15,18 +15,18 @@ import javafx.scene.text.Text;
 
 import java.util.Comparator;
 
-public class TransitionTable extends ScrollPane
+public class TransitionTablePane extends ScrollPane
 {
     private static final int              ADDITIONAL_COLUMNS = 4;
     private final        TableView<State> tableView;
 
-    public TransitionTable()
+    public TransitionTablePane()
     {
         tableView = new TableView<>();
         setContent(tableView);
     }
 
-    public TransitionTable(FiniteAutomaton finiteAutomaton)
+    public TransitionTablePane(FiniteAutomaton finiteAutomaton)
     {
         this();
         loadFiniteAutomaton(finiteAutomaton);

@@ -3,7 +3,6 @@ package ch.ludovic_mermod.dfasimulator.gui;
 import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import ch.ludovic_mermod.dfasimulator.constants.Controls;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
-import ch.ludovic_mermod.dfasimulator.gui.components.TransitionTable;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -94,7 +93,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem transitionTableItem = new MenuItem();
             Strings.bind("menu.dfa.transition_table", transitionTableItem.textProperty());
-            transitionTableItem.setOnAction(event -> Utils.openNewStage(new TransitionTable(mainPane.getFiniteAutomaton())));
+            transitionTableItem.setOnAction(event -> Utils.openNewStage(new TransitionTablePane(mainPane.getFiniteAutomaton())));
             dfaMenu.getItems().add(transitionTableItem);
 
             MenuItem testItem = new MenuItem();

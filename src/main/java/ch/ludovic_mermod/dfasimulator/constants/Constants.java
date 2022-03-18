@@ -24,7 +24,7 @@ public class Constants
 
     public static final ObservableIntegerValue       EDGE_LINE_WIDTH      = new SimpleIntegerProperty(10);
     public static final ObservableObjectValue<Color> EDGE_LINE_COLOR      = new SimpleObjectProperty<>(BLACK);
-    public static final ObservableDoubleValue        EDGE_SIDELINE_LENGTH = new SimpleDoubleProperty(20);
+    public static final ObservableDoubleValue        EDGE_SIDELINE_LENGTH = new SimpleDoubleProperty(35);
 
     public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_LINE          = new SimpleDoubleProperty(25);
     public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR   = new SimpleDoubleProperty(0.25);
