@@ -16,18 +16,18 @@ import javafx.scene.text.Text;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class TransitionTablePane extends ScrollPane
+public class TablePane extends ScrollPane
 {
     private static final int              ADDITIONAL_COLUMNS = 4;
     private final        TableView<State> tableView;
 
-    public TransitionTablePane()
+    public TablePane()
     {
         tableView = new TableView<>();
         setContent(tableView);
     }
 
-    public TransitionTablePane(FiniteAutomaton finiteAutomaton)
+    public TablePane(FiniteAutomaton finiteAutomaton)
     {
         this();
         loadFiniteAutomaton(finiteAutomaton);
