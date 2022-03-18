@@ -26,7 +26,7 @@ public class FiniteAutomaton
 
     private final ObjectProperty<State>  initialState;
     private final ListProperty<State>    states;
-    private final SetProperty<Character> alphabet;
+    private final ObservableSet<Character> alphabet;
     private       MainPane               mainPane;
 
     public FiniteAutomaton()
@@ -61,7 +61,7 @@ public class FiniteAutomaton
 
         jsonObject = new JSONObject();
         jsonObject.add("states", JSONArray.fromObservableList(states, State::getJSONObject));
-        jsonObject.add(JSON_ALPHABET, JSONArray.fromObservableSet(alphabet.get(), c -> new JSONPrimitive(c.toString())));
+        jsonObject.add(JSON_ALPHABET, JSONArray.fromObservableSet(alphabet, c -> new JSONPrimitive(c.toString())));
         jsonObject.addProperty(JSON_INITIAL, new StringBinding()
         {
             {
@@ -103,10 +103,6 @@ public class FiniteAutomaton
         return states;
     }
     public ObservableSet<Character> alphabet()
-    {
-        return alphabet.get();
-    }
-    public SetProperty<Character> alphabetProperty()
     {
         return alphabet;
     }

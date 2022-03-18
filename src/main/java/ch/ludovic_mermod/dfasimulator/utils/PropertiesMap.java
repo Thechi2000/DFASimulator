@@ -15,7 +15,8 @@ import java.util.Set;
 public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
 {
     private final ObservableMap<K, ObjectProperty<V>> map;
-    private final Set<PropertyChangeListener<K, V>>   listeners;
+    private final Set<PropertyChangeListener<K, V>> propertyChangeListeners;
+    private final Set<PropertyRemoveListener<K, V>> propertyRemoveListeners;
 
     public PropertiesMap()
     {
@@ -24,12 +25,13 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
     public PropertiesMap(ObservableMap<K, ObjectProperty<V>> map)
     {
         this.map = map;
-        listeners = new HashSet<>();
+        propertyChangeListeners = new HashSet<>();
+        propertyRemoveListeners = new HashSet<>();
 
         map.addListener((MapChangeListener<K, ObjectProperty<V>>) change ->
         {
             if (change.wasAdded())
-                listeners.forEach(l -> l.onValueChange(map.get(change.getKey()), change.getKey(), null, map.get(change.getKey()).getValue()));
+                propertyChangeListeners.forEach(l -> l.onValueChange(map.get(change.getKey()), change.getKey(), null, map.get(change.getKey()).getValue()));
         });
     }
 
@@ -50,7 +52,7 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
         {
             V oldValue = map.get(key).getValue();
             map.get(key).set(value);
-            listeners.forEach(l -> l.onValueChange(map.get(key), key, oldValue, value));
+            propertyChangeListeners.forEach(l -> l.onValueChange(map.get(key), key, oldValue, value));
         }
         else put(key, new SimpleObjectProperty<>(value));
         return map.get(key);
@@ -62,11 +64,19 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
 
     public void addListener(PropertyChangeListener<K, V> listener)
     {
-        listeners.add(listener);
+        propertyChangeListeners.add(listener);
     }
     public void removeListener(PropertyChangeListener<K, V> listener)
     {
-        listeners.remove(listener);
+        propertyChangeListeners.remove(listener);
+    }
+    public void addListener(PropertyRemoveListener<K, V> listener)
+    {
+        propertyRemoveListeners.add(listener);
+    }
+    public void removeListener(PropertyRemoveListener<K, V> listener)
+    {
+        propertyRemoveListeners.remove(listener);
     }
 
     @Override
@@ -107,13 +117,19 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
     @Override
     public ObjectProperty<V> put(K key, ObjectProperty<V> value)
     {
-        value.addListener((o, ov, nv) -> listeners.forEach(l -> l.onValueChange(value, key, ov, nv)));
+        value.addListener((o, ov, nv) -> propertyChangeListeners.forEach(l -> l.onValueChange(value, key, ov, nv)));
         return map.put(key, value);
     }
     @Override
     public ObjectProperty<V> remove(Object key)
     {
-        return map.remove(key);
+        if (!map.containsKey(key)) return null;
+        final ObjectProperty<V> value = map.get(key);
+        var ret = map.remove(key);
+
+        propertyRemoveListeners.forEach(l -> l.onPropertyRemove((K) key, value));
+
+        return ret;
     }
     @Override
     public void putAll(Map<? extends K, ? extends ObjectProperty<V>> m)
@@ -155,5 +171,11 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
     public interface PropertyChangeListener<K, V>
     {
         void onValueChange(ObjectProperty<V> property, K key, V oldValue, V newValue);
+    }
+
+    @FunctionalInterface
+    public interface PropertyRemoveListener<K, V>
+    {
+        void onPropertyRemove(K key, ObjectProperty<V> value);
     }
 }

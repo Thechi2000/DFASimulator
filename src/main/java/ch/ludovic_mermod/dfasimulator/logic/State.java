@@ -1,13 +1,15 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
-import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import ch.ludovic_mermod.dfasimulator.gui.components.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONNull;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.*;
-import javafx.collections.MapChangeListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.Map;
 import java.util.Objects;
@@ -68,11 +70,7 @@ public class State
                 jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).addProperty(k.toString(), n.nameProperty());
             else jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).add(k.toString(), JSONNull.INSTANCE);
         });
-        transitionMapProperty.addListener((MapChangeListener<? super Character, ? super ObjectProperty<State>>) change ->
-        {
-            if (change.wasRemoved())
-                jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).remove(change.getKey().toString());
-        });
+        transitionMapProperty.addListener((k, p) -> jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).remove(String.valueOf(k)));
     }
 
     public static State fromJSONObject(JSONObject jsonObject, FiniteAutomaton finiteAutomaton) throws IOManager.CorruptedFileException

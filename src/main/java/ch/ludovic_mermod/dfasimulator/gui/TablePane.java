@@ -215,11 +215,17 @@ public class TablePane extends ScrollPane
 
     private void addColumn(Character character, FiniteAutomaton finiteAutomaton, DoubleBinding columnWidthBinding)
     {
-        TableColumn<State, ChoiceBox<State>> column = new TableColumn<>(character.toString());
+        TableColumn<State, javafx.scene.Node> column = new TableColumn<>(character.toString());
 
         column.setCellValueFactory(cellFeatures ->
         {
-            if (cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
+            if (cellFeatures.getValue() == null)
+            {
+                Button button = new Button();
+                Strings.bind("table_pane.remove_alphabet", button.textProperty());
+                button.setOnAction(event -> finiteAutomaton.alphabet().remove(character));
+                return new SimpleObjectProperty<>(button);
+            }
 
             ChoiceBox<State> choiceBox = new ChoiceBox<>();
             choiceBox.setItems(finiteAutomaton.states());

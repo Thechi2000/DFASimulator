@@ -46,9 +46,9 @@ public class Edge extends Group
         alphabetDisplay = new Text();
         updateAlphabetDisplay();
         source.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
+        source.transitionMap().addListener((k, p) -> updateAlphabetDisplay());
 
         Path path = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
-        path.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
         arrow = new Arrow(path);
         arrow.fillProperty().bind(Constants.EDGE_LINE_COLOR);
@@ -56,6 +56,7 @@ public class Edge extends Group
         arrow.sidelineLengthProperty().bind(Constants.EDGE_SIDELINE_LENGTH);
         arrow.endXProperty().bind(curve.xProperty());
         arrow.endYProperty().bind(curve.yProperty());
+        arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
         /*leftLine = new Line();
         leftLine.fillProperty().bind(Constants.EDGE_LINE_COLOR);
