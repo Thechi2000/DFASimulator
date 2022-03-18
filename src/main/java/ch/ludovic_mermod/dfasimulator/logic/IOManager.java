@@ -34,7 +34,7 @@ public class IOManager
         filepathProperty = new SimpleStringProperty();
         isSavedProperty = new SimpleBooleanProperty();
 
-        filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(new File(filepathProperty.get()).getName()));
+        filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(nv == null ? "new" :new File(filepathProperty.get()).getName()));
 
         mainPane.getFiniteAutomaton().getJSONObject().getAsJSONObject().addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
         finiteAutomaton = mainPane.getFiniteAutomaton();
@@ -133,7 +133,12 @@ public class IOManager
 
     public boolean isSaved()
     {
-        return savedFile == null || savedFile.equals(finiteAutomaton.getJSONObject());
+        if(savedFile == null) return true;
+
+        final String s = savedFile.toString();
+        final String s2 = finiteAutomaton.getJSONObject().toString();
+        final boolean b = savedFile == null || s.equals(s2);
+        return b;
     }
     public ReadOnlyBooleanProperty isSavedProperty()
     {

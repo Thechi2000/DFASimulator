@@ -37,7 +37,7 @@ public class FiniteAutomaton
 
         initialState.addListener((o, ov, nv) ->
         {
-            if (!states.contains(nv))
+            if (!states.contains(nv) && !states.isEmpty())
                 Platform.runLater(() -> initialState.set(ov));
         });
 
@@ -158,6 +158,7 @@ public class FiniteAutomaton
         alphabet.clear();
         states.clear();
         mainPane.getGraphPane().children().clear();
+        mainPane.getGraphPane().edges().clear();
     }
 
     public MainPane getMainPane()

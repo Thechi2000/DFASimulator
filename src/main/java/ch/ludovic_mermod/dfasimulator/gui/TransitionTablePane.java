@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 public class TransitionTablePane extends ScrollPane
 {
@@ -146,13 +147,13 @@ public class TransitionTablePane extends ScrollPane
             });
             toggleGroup.selectedToggleProperty().addListener((o, ov, nv) ->
             {
-                if (!nv.getUserData().equals(finiteAutomaton.initialState()))
+                if (nv != null && !Objects.equals(nv.getUserData(), finiteAutomaton.initialState()))
                     finiteAutomaton.initialStateProperty().set((State) nv.getUserData());
             });
             finiteAutomaton.initialStateProperty().addListener((o, ov, nv) ->
             {
-                if (!toggleGroup.getSelectedToggle().getUserData().equals(nv))
-                    toggleGroup.selectToggle(toggleGroup.getToggles().stream().filter(t -> t.getUserData().equals(nv)).findAny().orElse(null));
+                if (toggleGroup.getSelectedToggle() != null && !Objects.equals(nv, toggleGroup.getSelectedToggle().getUserData()))
+                    toggleGroup.selectToggle(toggleGroup.getToggles().stream().filter(t -> Objects.equals(t.getUserData(), nv)).findAny().orElse(null));
             });
 
             initialColumn.prefWidthProperty().bind(columnWidthBinding);
