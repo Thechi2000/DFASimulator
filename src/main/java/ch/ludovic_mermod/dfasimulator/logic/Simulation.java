@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
-import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
+import ch.ludovic_mermod.dfasimulator.gui.MainPane;
 import javafx.beans.property.*;
 
 import java.util.*;

@@ -1,7 +1,7 @@
-package ch.ludovic_mermod.dfasimulator.gui.scene.components;
+package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
-import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
+import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.BezierQuadCurve;

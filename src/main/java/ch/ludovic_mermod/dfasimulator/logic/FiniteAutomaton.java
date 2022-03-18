@@ -1,7 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
-import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
-import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
+import ch.ludovic_mermod.dfasimulator.gui.MainPane;
+import ch.ludovic_mermod.dfasimulator.gui.components.Edge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;

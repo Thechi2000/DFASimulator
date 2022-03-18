@@ -1,8 +1,8 @@
-package ch.ludovic_mermod.dfasimulator.gui.scene.components;
+package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
-import ch.ludovic_mermod.dfasimulator.gui.scene.GraphPane;
+import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;

@@ -1,8 +1,8 @@
-package ch.ludovic_mermod.dfasimulator.gui.scene;
+package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
-import ch.ludovic_mermod.dfasimulator.gui.scene.components.Edge;
+import ch.ludovic_mermod.dfasimulator.gui.components.Edge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;

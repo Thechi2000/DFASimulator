@@ -1,7 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
-import ch.ludovic_mermod.dfasimulator.gui.scene.components.Node;
+import ch.ludovic_mermod.dfasimulator.gui.components.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONNull;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;

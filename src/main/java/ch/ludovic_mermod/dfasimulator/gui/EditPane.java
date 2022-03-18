@@ -1,4 +1,4 @@
-package ch.ludovic_mermod.dfasimulator.gui.scene;
+package ch.ludovic_mermod.dfasimulator.gui;
 
 import javafx.scene.layout.VBox;
 

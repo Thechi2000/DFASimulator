@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator;
 
-import ch.ludovic_mermod.dfasimulator.gui.scene.MainPane;
+import ch.ludovic_mermod.dfasimulator.gui.MainPane;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
