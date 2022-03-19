@@ -10,6 +10,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
@@ -101,16 +102,20 @@ public class TablePane extends ScrollPane
 
         // Alphabet columns
         {
-            finiteAutomaton.alphabet().stream().sorted().forEach(character -> addColumn(character, finiteAutomaton, columnWidthBinding));
+            TableColumn<State, Node> alphabetColumn = new TableColumn<>();
+
+            finiteAutomaton.alphabet().stream().sorted().forEach(character -> alphabetColumn.getColumns().add(createAlphabetColumn(character, finiteAutomaton, columnWidthBinding)));
 
             finiteAutomaton.alphabet().addListener((SetChangeListener<? super Character>) change ->
             {
                 if (change.wasAdded())
-                    addColumn(change.getElementAdded(), finiteAutomaton, columnWidthBinding);
+                    alphabetColumn.getColumns().add(createAlphabetColumn(change.getElementAdded(), finiteAutomaton, columnWidthBinding));
 
                 if (change.wasRemoved())
-                    tableView.getColumns().removeIf(c -> c.getText().equals(change.getElementRemoved().toString()));
+                    alphabetColumn.getColumns().removeIf(c -> c.getText().equals(change.getElementRemoved().toString()));
             });
+
+            tableView.getColumns().add(alphabetColumn);
         }
 
         // Accepting column
@@ -213,9 +218,9 @@ public class TablePane extends ScrollPane
         }
     }
 
-    private void addColumn(Character character, FiniteAutomaton finiteAutomaton, DoubleBinding columnWidthBinding)
+    private TableColumn<State, Node> createAlphabetColumn(Character character, FiniteAutomaton finiteAutomaton, DoubleBinding columnWidthBinding)
     {
-        TableColumn<State, javafx.scene.Node> column = new TableColumn<>(character.toString());
+        TableColumn<State, Node> column = new TableColumn<>(character.toString());
 
         column.setCellValueFactory(cellFeatures ->
         {
@@ -238,6 +243,6 @@ public class TablePane extends ScrollPane
         });
 
         column.prefWidthProperty().bind(columnWidthBinding);
-        tableView.getColumns().add(column);
+        return column;
     }
 }
