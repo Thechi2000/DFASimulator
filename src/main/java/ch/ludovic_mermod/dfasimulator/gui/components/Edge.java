@@ -58,16 +58,6 @@ public class Edge extends Group
         arrow.endYProperty().bind(curve.yProperty());
         arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
-        /*leftLine = new Line();
-        leftLine.fillProperty().bind(Constants.EDGE_LINE_COLOR);
-        leftLine.strokeWidthProperty().bind(Constants.EDGE_LINE_WIDTH);
-        leftLine.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
-
-        rightLine = new Line();
-        rightLine.fillProperty().bind(Constants.EDGE_LINE_COLOR);
-        rightLine.strokeWidthProperty().bind(Constants.EDGE_LINE_WIDTH);
-        rightLine.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());*/
-
         addEventHandlers();
         bindPositions();
 
@@ -85,8 +75,7 @@ public class Edge extends Group
                 curve.controlXProperty(),
                 curve.controlYProperty(),
                 curve.xProperty(),
-                curve.yProperty()
-        );
+                curve.yProperty());
     }
 
     public State source()
@@ -165,16 +154,6 @@ public class Edge extends Group
 
         CustomBindings.bindDouble(arrow.directionXProperty(), () -> curve.getX() - curve.getControlX(), curve.xProperty(), curve.controlXProperty());
         CustomBindings.bindDouble(arrow.directionYProperty(), () -> curve.getY() - curve.getControlY(), curve.yProperty(), curve.controlYProperty());
-
-      /*  CustomBindings.bindDouble(leftLine.startXProperty(), () -> computePoints().leftLineStart.getX(), observables);
-        CustomBindings.bindDouble(leftLine.startYProperty(), () -> computePoints().leftLineStart.getY(), observables);
-        CustomBindings.bindDouble(leftLine.endXProperty(), () -> computePoints().end.getX(), observables);
-        CustomBindings.bindDouble(leftLine.endYProperty(), () -> computePoints().end.getY(), observables);
-
-        CustomBindings.bindDouble(rightLine.startXProperty(), () -> computePoints().rightLineStart.getX(), observables);
-        CustomBindings.bindDouble(rightLine.startYProperty(), () -> computePoints().rightLineStart.getY(), observables);
-        CustomBindings.bindDouble(rightLine.endXProperty(), () -> computePoints().end.getX(), observables);
-        CustomBindings.bindDouble(rightLine.endYProperty(), () -> computePoints().end.getY(), observables);*/
 
         CustomBindings.bindDouble(alphabetDisplay.xProperty(), () -> computePoints().textPos.getX(), observables);
         CustomBindings.bindDouble(alphabetDisplay.yProperty(), () -> computePoints().textPos.getY(), observables);
