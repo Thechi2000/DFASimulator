@@ -19,8 +19,9 @@ import java.util.Objects;
 
 public class TablePane extends ScrollPane
 {
-    private static final int              ADDITIONAL_COLUMNS = 4;
-    private final        TableView<State> tableView;
+    private static final int ADDITIONAL_COLUMNS = 4;
+
+    private final TableView<State> tableView;
 
     public TablePane()
     {
@@ -42,13 +43,13 @@ public class TablePane extends ScrollPane
         DoubleBinding columnWidthBinding = new DoubleBinding()
         {
             {
-                super.bind(widthProperty(), finiteAutomaton.alphabet());
+                super.bind(widthProperty(), finiteAutomaton.alphabet(), tableView.getColumns());
             }
 
             @Override
             protected double computeValue()
             {
-                return widthProperty().get() / (finiteAutomaton.alphabet().size() + ADDITIONAL_COLUMNS);
+                return widthProperty().get() / (finiteAutomaton.alphabet().size() + tableView.getColumns().size() - 1);
             }
         };
 
@@ -103,13 +104,14 @@ public class TablePane extends ScrollPane
         // Alphabet columns
         {
             TableColumn<State, Node> alphabetColumn = new TableColumn<>();
+            Strings.bind("table_pane.alphabet_column", alphabetColumn.textProperty());
 
             finiteAutomaton.alphabet().stream().sorted().forEach(character -> alphabetColumn.getColumns().add(createAlphabetColumn(character, finiteAutomaton, columnWidthBinding)));
 
             finiteAutomaton.alphabet().addListener((SetChangeListener<? super Character>) change ->
             {
                 if (change.wasAdded())
-                    alphabetColumn.getColumns().add(createAlphabetColumn(change.getElementAdded(), finiteAutomaton, columnWidthBinding));
+                    alphabetColumn.getColumns().add(finiteAutomaton.alphabet().size() - 1, createAlphabetColumn(change.getElementAdded(), finiteAutomaton, columnWidthBinding));
 
                 if (change.wasRemoved())
                     alphabetColumn.getColumns().removeIf(c -> c.getText().equals(change.getElementRemoved().toString()));
@@ -167,15 +169,50 @@ public class TablePane extends ScrollPane
 
         // Delete column
         {
-            TableColumn<State, Button> deleteColumn = new TableColumn<>();
+            TableColumn<State, Node> deleteColumn = new TableColumn<>();
             deleteColumn.setCellValueFactory(cellFeatures ->
             {
-                if (cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
+                if (cellFeatures.getValue() == null)
+                {
+                    Group cell = new Group();
 
-                Button button = new Button();
-                Strings.bind("transition_pane.delete_button", button.textProperty());
-                button.setOnAction(event -> finiteAutomaton.removeState(cellFeatures.getValue()));
-                return new SimpleObjectProperty<>(button);
+                    TextField addAlphabetField = new TextField();
+                    cell.getChildren().add(addAlphabetField);
+                    addAlphabetField.setVisible(false);
+
+                    Button addAlphabetButton = new Button();
+                    Strings.bind("transition_table.add_alphabet", addAlphabetButton.textProperty());
+                    cell.getChildren().add(addAlphabetButton);
+
+                    addAlphabetField.focusedProperty().addListener((o, ov, nv) ->
+                    {
+                        if (!nv)
+                        {
+                            addAlphabetField.setVisible(false);
+                            addAlphabetButton.setVisible(true);
+                        }
+                    });
+                    addAlphabetField.setOnAction(event -> {
+                        if (addAlphabetField.getText().length() == 1)
+                            finiteAutomaton.alphabet().add(addAlphabetField.getText().charAt(0));
+                    });
+
+                    addAlphabetButton.setOnAction(event ->
+                    {
+                        addAlphabetField.setVisible(true);
+                        addAlphabetButton.setVisible(false);
+                        addAlphabetField.requestFocus();
+                    });
+
+                    return new SimpleObjectProperty<>(cell);
+                }
+                else
+                {
+                    Button button = new Button();
+                    Strings.bind("transition_pane.delete_button", button.textProperty());
+                    button.setOnAction(event -> finiteAutomaton.removeState(cellFeatures.getValue()));
+                    return new SimpleObjectProperty<>(button);
+                }
             });
             deleteColumn.prefWidthProperty().bind(columnWidthBinding);
             tableView.getColumns().add(deleteColumn);
