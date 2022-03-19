@@ -152,13 +152,9 @@ public class MainPane extends BorderPane
         ioManager.saveAs("default.json");
     }
 
-    /*public void bindEditPane(Link link)
-    {
-        bindEditPane(new EdgeEditPane(simulation, link));
-    }*/
     public void bindEditPane(State state)
     {
-        bindEditPane(new NodeEditPane(finiteAutomaton, state));
+        bindEditPane(new EditPane(finiteAutomaton, state));
     }
     private void bindEditPane(EditPane pane)
     {
