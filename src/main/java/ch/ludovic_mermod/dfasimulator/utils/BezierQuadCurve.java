@@ -33,7 +33,10 @@ public class BezierQuadCurve
 
     public Point2D apply(double t)
     {
-        return new Point2D(p0x.get(), p0y.get()).multiply((1 - t) * (1 - t)).add(new Point2D(p1x.get(), p1y.get())).multiply(2 * (1 - t) * t).add(new Point2D(p2x.get(), p2y.get()).multiply(t * t));
+        final Point2D p0 = new Point2D(p0x.get(), p0y.get());
+        final Point2D p1 = new Point2D(p1x.get(), p1y.get());
+        final Point2D p2 = new Point2D(p2x.get(), p2y.get());
+        return p0.multiply((1 - t) * (1 - t)).add(p1.multiply(2 * (1 - t) * t)).add(p2.multiply(t * t));
     }
 
     public double distance(double t, Point2D point2D)
