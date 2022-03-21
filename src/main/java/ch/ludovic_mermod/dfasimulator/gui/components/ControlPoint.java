@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -11,7 +12,7 @@ public class ControlPoint extends Group
 {
     private Point2D pos;
 
-    public ControlPoint(DoubleProperty xProperty, DoubleProperty yProperty)
+    public ControlPoint()
     {
         Circle circle = new Circle();
         circle.radiusProperty().bind(Constants.CONTROL_POINT_RADIUS);
@@ -19,33 +20,29 @@ public class ControlPoint extends Group
         getChildren().add(circle);
 
         addHandlers();
-        xProperty.bindBidirectional(layoutXProperty());
-        yProperty.bindBidirectional(layoutYProperty());
+    }
+    public ControlPoint(DoubleProperty xProperty, DoubleProperty yProperty, ObservableBooleanValue visibleProperty)
+    {
+        this();
+
+        layoutXProperty().bindBidirectional(xProperty);
+        layoutYProperty().bindBidirectional(yProperty);
+        visibleProperty().bind(visibleProperty);
     }
 
     private void addHandlers()
     {
-        setOnMouseEntered(event -> {
-            setCursor(Cursor.HAND);
-            System.out.println("enter");
-        });
-        setOnMouseExited(event -> {
-            setCursor(Cursor.DEFAULT);
-            System.out.println("exit");
-        });
+        setOnMouseEntered(event -> setCursor(Cursor.HAND));
+        setOnMouseExited(event -> setCursor(Cursor.DEFAULT));
 
         setOnMousePressed(event -> {
-            System.out.println("pressed");
             if (event.isPrimaryButtonDown())
             {
                 setCursor(Cursor.CLOSED_HAND);
                 pos = new Point2D(event.getX(), event.getY());
             }
         });
-        setOnMouseReleased(event -> {
-            setCursor(Cursor.DEFAULT);
-            System.out.println("released");
-        });
+        setOnMouseReleased(event -> setCursor(Cursor.DEFAULT));
 
         setOnMouseDragged(event ->
         {
@@ -59,7 +56,6 @@ public class ControlPoint extends Group
 
                 relocate(x, y);
             }
-            System.out.println("dragged");
         });
     }
 }
