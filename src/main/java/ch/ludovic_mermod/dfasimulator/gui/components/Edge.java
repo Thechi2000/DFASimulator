@@ -129,7 +129,10 @@ public class Edge extends GraphItem
 
     private void addEventHandlers()
     {
-        setOnMousePressed(event -> requestGraphFocus());
+        setOnMousePressed(event -> {
+            requestGraphFocus();
+            event.consume();
+        });
 
         path.setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)

@@ -52,7 +52,10 @@ public class GraphPane extends Region
         simulation = mainPane.getSimulation();
         menu = createContextMenu();
 
-        setOnMousePressed(event -> menu.hide());
+        setOnMousePressed(event -> {
+            menu.hide();
+            focusedItem.set(null);
+        });
         setOnContextMenuRequested(event ->
         {
             menuPosition = new Point2D(event.getX(), event.getY());
