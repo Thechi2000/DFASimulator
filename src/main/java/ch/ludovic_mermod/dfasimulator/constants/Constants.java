@@ -13,7 +13,7 @@ import static javafx.scene.paint.Color.*;
 
 public class Constants
 {
-    public static final ObservableObjectValue<Font> FONT           = new SimpleObjectProperty<>(Font.font("Courier", 20));
+    public static final ObservableObjectValue<Font> GRAPH_FONT     = new SimpleObjectProperty<>(Font.font("Courier", 20));
     public static final ObservableObjectValue<Font> NODE_NAME_FONT = new SimpleObjectProperty<>(Font.font("Courier", 20));
 
     public static final ObservableIntegerValue       NODE_INNER_CIRCLE_RADIUS = new SimpleIntegerProperty(50);
@@ -35,4 +35,7 @@ public class Constants
     public static final ObservableBooleanValue TEST_PANE_GRID_LINES    = new SimpleBooleanProperty(true);
     public static final ObservableValue<Paint> TEST_PANE_SUCCESS       = new SimpleObjectProperty<>(GREEN);
     public static final ObservableValue<Paint> TEST_PANE_FAILURE       = new SimpleObjectProperty<>(RED);
+
+    public static final ObservableDoubleValue  CONTROL_POINT_RADIUS = new SimpleDoubleProperty(5);
+    public static final ObservableValue<Paint> CONTROL_POINT_FILL   = new SimpleObjectProperty<>(RED);
 }

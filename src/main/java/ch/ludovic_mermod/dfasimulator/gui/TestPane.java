@@ -79,7 +79,7 @@ public class TestPane extends VBox
                 for (int i = 0; i < maxValue; ++i)
                 {
                     Text text = new Text();
-                    text.fontProperty().bind(Constants.FONT);
+                    text.fontProperty().bind(Constants.GRAPH_FONT);
                     text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Constants.TEST_PANE_SUCCESS : Constants.TEST_PANE_FAILURE);
 
                     int finalI = i;
@@ -101,7 +101,7 @@ public class TestPane extends VBox
                 for (int i = 0; i < entries.size(); ++i)
                 {
                     Text text = new Text(String.format(" %" + (int) Math.ceil(Math.log(maxValue) / Math.log(alphabet.size())) + "s ", entries.get(i)));
-                    text.fontProperty().bind(Constants.FONT);
+                    text.fontProperty().bind(Constants.GRAPH_FONT);
                     text.fillProperty().bind(mainPane.getSimulation().test(entries.get(i)) ? Constants.TEST_PANE_SUCCESS : Constants.TEST_PANE_FAILURE);
                     gridPane.add(text, i / 16, i % 16);
                 }
