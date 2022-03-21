@@ -158,6 +158,11 @@ public class GraphPane extends Region
         }
     }
 
+    public void grantFocus(GraphItem item)
+    {
+        focusedItem.set(item);
+    }
+
     private ContextMenu createContextMenu()
     {
         ContextMenu menu = new ContextMenu();

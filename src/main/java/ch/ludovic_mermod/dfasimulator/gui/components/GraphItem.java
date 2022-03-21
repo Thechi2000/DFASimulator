@@ -14,4 +14,6 @@ public class GraphItem extends Group
     {
         return graphPane.focusedItemProperty().isEqualTo(this);
     }
+    public boolean hasFocus() {return graphPane.focusedItemProperty().get().equals(this);}
+    public void requestGraphFocus() {graphPane.grantFocus(this);}
 }
