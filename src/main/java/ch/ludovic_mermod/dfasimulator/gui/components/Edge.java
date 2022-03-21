@@ -7,14 +7,17 @@ import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.BezierQuadCurve;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.Observable;
+import javafx.beans.binding.Binding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
 import javafx.scene.text.Text;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class Edge extends GraphItem
@@ -24,16 +27,19 @@ public class Edge extends GraphItem
     private final State source;
     private final State target;
 
-    private final DoubleProperty targetT;
+    private final DoubleProperty targetPointX;
+    private final DoubleProperty targetPointY;
 
     private final MoveTo          moveTo;
     private final QuadCurveTo     curve;
     private final BezierQuadCurve bezier;
 
-    //    private final Line leftLine, rightLine;
     private final Arrow arrow;
     private final Text  alphabetDisplay;
     private final Path  path;
+
+    private final AtomicBoolean updatingControlFromTarget, updatingTargetFromControl;
+    private Binding<Point2D> targetBinding;
 
     public Edge(State source, State target, GraphPane graphPane)
     {
@@ -41,7 +47,11 @@ public class Edge extends GraphItem
 
         this.source = source;
         this.target = target;
-        targetT = new SimpleDoubleProperty(0.5);
+
+        targetPointX = new SimpleDoubleProperty();
+        targetPointY = new SimpleDoubleProperty();
+        updatingControlFromTarget = new AtomicBoolean(false);
+        updatingTargetFromControl = new AtomicBoolean(false);
 
         alphabetDisplay = new Text();
         alphabetDisplay.fontProperty().bind(Constants.GRAPH_FONT);
@@ -70,7 +80,8 @@ public class Edge extends GraphItem
         addEventHandlers();
         bindPositions();
 
-        getChildren().addAll(arrow, alphabetDisplay, new ControlPoint(curve.controlXProperty(), curve.controlYProperty()));
+        getChildren().addAll(arrow, alphabetDisplay);
+        addControlComponents();
 
         jsonObject = new JSONObject();
         jsonObject.addProperty("source", source.nameProperty());
@@ -118,11 +129,13 @@ public class Edge extends GraphItem
 
     private void addEventHandlers()
     {
+        setOnMousePressed(event -> requestGraphFocus());
+
         path.setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
             {
-                curve.setControlX(reverseBezierForControl(moveTo.getX(), curve.getX(), targetT.get(), event.getX()));
-                curve.setControlY(reverseBezierForControl(moveTo.getY(), curve.getY(), targetT.get(), event.getY()));
+                targetPointX.set(event.getX());
+                targetPointY.set(event.getY());
             }
         });
     }
@@ -153,6 +166,27 @@ public class Edge extends GraphItem
 
         CustomBindings.bindDouble(alphabetDisplay.xProperty(), () -> new Point2D(curve.getX(), curve.getY()).subtract(bezier.apply(0.5)).normalize().multiply(20).add(bezier.apply(0.5)).getX(), observables);
         CustomBindings.bindDouble(alphabetDisplay.yProperty(), () -> new Point2D(curve.getX(), curve.getY()).subtract(bezier.apply(0.5)).normalize().multiply(20).add(bezier.apply(0.5)).getY(), observables);
+
+        ChangeListener<Number> updateControl = (o, ov, nv) -> {
+            if (updatingTargetFromControl.get()) return;
+
+            updatingControlFromTarget.set(true);
+            curve.setControlX(Edge.this.reverseBezierForControl(moveTo.getX(), curve.getX(), 0.5, targetPointX.get()));
+            curve.setControlY(Edge.this.reverseBezierForControl(moveTo.getY(), curve.getY(), 0.5, targetPointY.get()));
+            updatingControlFromTarget.set(false);
+        };
+        targetPointX.addListener(updateControl);
+        targetPointY.addListener(updateControl);
+
+        targetBinding = CustomBindings.binding(() -> bezier.apply(0.5), moveTo.xProperty(), moveTo.yProperty(), curve.controlXProperty(), curve.controlYProperty(), curve.xProperty(), curve.yProperty());
+        targetBinding.addListener((o, ov, nv) -> {
+            if (updatingControlFromTarget.get()) return;
+
+            updatingTargetFromControl.set(true);
+            targetPointX.set(nv.getX());
+            targetPointY.set(nv.getY());
+            updatingTargetFromControl.set(false);
+        });
     }
 
     private void updateAlphabetDisplay()
@@ -188,6 +222,28 @@ public class Edge extends GraphItem
                 start.add(end.subtract(start).multiply(0.5)),
                 projectionPoint.add(projectionDistance),
                 projectionPoint.subtract(projectionDistance));
+    }
+
+    private void addControlComponents()
+    {
+        ControlPoint controlPoint = new ControlPoint(curve.controlXProperty(), curve.controlYProperty(), focusProperty());
+        ControlPoint onCurvePoint = new ControlPoint(targetPointX, targetPointY, focusProperty());
+
+        ControlLine startControlLine = new ControlLine(
+                curve.controlXProperty(),
+                curve.controlYProperty(),
+                moveTo.xProperty(),
+                moveTo.yProperty(),
+                focusProperty());
+
+        ControlLine endControlLine = new ControlLine(
+                curve.controlXProperty(),
+                curve.controlYProperty(),
+                curve.xProperty(),
+                curve.yProperty(),
+                focusProperty());
+
+        getChildren().addAll(startControlLine, endControlLine, onCurvePoint, controlPoint);
     }
 
     private double reverseBezierForControl(double p0, double p2, double t, double target)
