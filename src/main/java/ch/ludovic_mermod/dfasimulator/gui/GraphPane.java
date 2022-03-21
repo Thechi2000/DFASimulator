@@ -3,6 +3,7 @@ package ch.ludovic_mermod.dfasimulator.gui;
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.components.Edge;
+import ch.ludovic_mermod.dfasimulator.gui.components.GraphItem;
 import ch.ludovic_mermod.dfasimulator.gui.components.SelfEdge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
@@ -10,9 +11,7 @@ import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -27,15 +26,17 @@ import java.util.logging.Level;
 
 public class GraphPane extends Region
 {
-    private final ObservableSet<Edge> edges;
+    private final ObservableSet<Edge>            edges;
     private final ObservableMap<State, SelfEdge> selfEdges;
+    private final ObjectProperty<GraphItem>      focusedItem;
 
-    private Tool    tool;
-    private Point2D menuPosition;
+    private final MainPane   mainPane;
+    private       Simulation simulation;
+    private       Tool       tool;
 
-    private final MainPane    mainPane;
-    private       ContextMenu menu;
-    private       Simulation  simulation;
+    private Point2D     menuPosition;
+    private ContextMenu menu;
+
 
     public GraphPane(MainPane mainPane)
     {
@@ -43,6 +44,7 @@ public class GraphPane extends Region
         edges = FXCollections.observableSet(new HashSet<>());
         selfEdges = FXCollections.observableHashMap();
         tool = Tool.EDIT;
+        focusedItem = new SimpleObjectProperty<>();
     }
 
     public void create(MainPane mainPane)
@@ -113,7 +115,7 @@ public class GraphPane extends Region
                     getChildren().add(e2);
                 });
 
-        SelfEdge selfEdge = new SelfEdge(state);
+        SelfEdge selfEdge = new SelfEdge(state, this);
         selfEdges.put(state, selfEdge);
         getChildren().add(selfEdge);
         getChildren().add(state.getNode());
@@ -180,6 +182,10 @@ public class GraphPane extends Region
     public ObservableSet<Edge> edges()
     {
         return edges;
+    }
+    public ReadOnlyObjectProperty<GraphItem> focusedItemProperty()
+    {
+        return focusedItem;
     }
 
     public enum Tool

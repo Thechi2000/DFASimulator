@@ -10,7 +10,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
@@ -18,13 +17,12 @@ import javafx.scene.text.Text;
 
 import java.util.stream.Collectors;
 
-public class Edge extends Group
+public class Edge extends GraphItem
 {
     private final JSONObject jsonObject;
 
-    private final State     source;
-    private final State     target;
-    private final GraphPane graphPane;
+    private final State source;
+    private final State target;
 
     private final DoubleProperty targetT;
 
@@ -35,20 +33,23 @@ public class Edge extends Group
     //    private final Line leftLine, rightLine;
     private final Arrow arrow;
     private final Text  alphabetDisplay;
+    private final Path  path;
 
     public Edge(State source, State target, GraphPane graphPane)
     {
+        super(graphPane);
+
         this.source = source;
         this.target = target;
-        this.graphPane = graphPane;
         targetT = new SimpleDoubleProperty(0.5);
 
         alphabetDisplay = new Text();
+        alphabetDisplay.fontProperty().bind(Constants.GRAPH_FONT);
         updateAlphabetDisplay();
         source.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
         source.transitionMap().addListener((k, p) -> updateAlphabetDisplay());
 
-        Path path = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
+        path = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
 
         arrow = new Arrow(path);
         arrow.fillProperty().bind(Constants.EDGE_LINE_COLOR);
@@ -58,17 +59,6 @@ public class Edge extends Group
         arrow.endYProperty().bind(curve.yProperty());
         arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
-        addEventHandlers();
-        bindPositions();
-
-        getChildren().addAll(arrow, alphabetDisplay);
-
-        jsonObject = new JSONObject();
-        jsonObject.addProperty("source", source.nameProperty());
-        jsonObject.addProperty("target", target.nameProperty());
-        jsonObject.addProperty("control_x", curve.controlXProperty());
-        jsonObject.addProperty("control_y", curve.controlYProperty());
-
         bezier = new BezierQuadCurve(
                 moveTo.xProperty(),
                 moveTo.yProperty(),
@@ -76,6 +66,17 @@ public class Edge extends Group
                 curve.controlYProperty(),
                 curve.xProperty(),
                 curve.yProperty());
+
+        addEventHandlers();
+        bindPositions();
+
+        getChildren().addAll(arrow, alphabetDisplay, new ControlPoint(curve.controlXProperty(), curve.controlYProperty()));
+
+        jsonObject = new JSONObject();
+        jsonObject.addProperty("source", source.nameProperty());
+        jsonObject.addProperty("target", target.nameProperty());
+        jsonObject.addProperty("control_x", curve.controlXProperty());
+        jsonObject.addProperty("control_y", curve.controlYProperty());
     }
 
     public State source()
@@ -117,12 +118,7 @@ public class Edge extends Group
 
     private void addEventHandlers()
     {
-        /*setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
-                targetT.set(bezier.findClosest(new Point2D(event.getX(), event.getY())));
-        });*/
-
-        setOnMouseDragged(event -> {
+        path.setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
             {
                 curve.setControlX(reverseBezierForControl(moveTo.getX(), curve.getX(), targetT.get(), event.getX()));
@@ -137,8 +133,8 @@ public class Edge extends Group
         final Node tn = target.getNode();
 
         Observable[] observables = new Observable[]{
-                sn.layoutXProperty(), sn.layoutYProperty(), sn.widthProperty(), sn.heightProperty(),
-                tn.layoutXProperty(), tn.layoutYProperty(), tn.widthProperty(), tn.heightProperty(),
+                sn.layoutXProperty(), sn.layoutYProperty(), sn.widthBinding(), sn.heightBinding(),
+                tn.layoutXProperty(), tn.layoutYProperty(), tn.widthBinding(), tn.heightBinding(),
                 curve.controlXProperty(), curve.controlYProperty(),
                 Constants.NODE_INNER_CIRCLE_RADIUS,
                 Constants.EDGE_SIDELINE_LENGTH,
@@ -155,8 +151,8 @@ public class Edge extends Group
         CustomBindings.bindDouble(arrow.directionXProperty(), () -> curve.getX() - curve.getControlX(), curve.xProperty(), curve.controlXProperty());
         CustomBindings.bindDouble(arrow.directionYProperty(), () -> curve.getY() - curve.getControlY(), curve.yProperty(), curve.controlYProperty());
 
-        CustomBindings.bindDouble(alphabetDisplay.xProperty(), () -> computePoints().textPos.getX(), observables);
-        CustomBindings.bindDouble(alphabetDisplay.yProperty(), () -> computePoints().textPos.getY(), observables);
+        CustomBindings.bindDouble(alphabetDisplay.xProperty(), () -> new Point2D(curve.getX(), curve.getY()).subtract(bezier.apply(0.5)).normalize().multiply(20).add(bezier.apply(0.5)).getX(), observables);
+        CustomBindings.bindDouble(alphabetDisplay.yProperty(), () -> new Point2D(curve.getX(), curve.getY()).subtract(bezier.apply(0.5)).normalize().multiply(20).add(bezier.apply(0.5)).getY(), observables);
     }
 
     private void updateAlphabetDisplay()
@@ -176,25 +172,22 @@ public class Edge extends Group
         Node tn = target.getNode();
 
         Point2D controlPoint = new Point2D(curve.getControlX(), curve.getControlY()),
-                startCenter = new Point2D(sn.getLayoutX() + sn.getWidth() / 2, sn.getLayoutY() + sn.getHeight() / 2),
-                endCenter = new Point2D(tn.getLayoutX() + tn.getWidth() / 2, tn.getLayoutY() + tn.getHeight() / 2),
+                startCenter = new Point2D(sn.getLayoutX(), sn.getLayoutY()),
+                endCenter = new Point2D(tn.getLayoutX(), tn.getLayoutY()),
                 directorStart = controlPoint.subtract(startCenter).normalize(),
                 directorEnd = endCenter.subtract(controlPoint).normalize(),
                 normalEnd = new Point2D(directorEnd.getY(), -directorEnd.getX()),
                 start = startCenter.add(directorStart.multiply(Constants.NODE_INNER_CIRCLE_RADIUS.get())),
                 end = endCenter.subtract(directorEnd.multiply(Constants.NODE_INNER_CIRCLE_RADIUS.get())),
                 projectionPoint = end.subtract(directorEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get())),
-                projectionDistance = normalEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get()),
-                projectionRelative = start.add(end.subtract(start).multiply(Constants.EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR.get())),
-                projectionAbsolute = start.add(directorStart.multiply(Constants.EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE.get()));
+                projectionDistance = normalEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get());
 
         return new Points(
                 start,
                 end,
                 start.add(end.subtract(start).multiply(0.5)),
                 projectionPoint.add(projectionDistance),
-                projectionPoint.subtract(projectionDistance),
-                (Constants.EDGE_TEXT_USE_ABSOLUTE_DISTANCE.get() && (projectionRelative.subtract(start).magnitude() > Constants.EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE.get()) ? projectionAbsolute : projectionRelative).add(normalEnd.multiply(Constants.EDGE_TEXT_DISTANCE_FROM_LINE.get())));
+                projectionPoint.subtract(projectionDistance));
     }
 
     private double reverseBezierForControl(double p0, double p2, double t, double target)
@@ -202,5 +195,5 @@ public class Edge extends Group
         return (target - t * t * p2 - (1 - t) * (1 - t) * p0) / (2 * (1 - t) * t);
     }
 
-    private record Points(Point2D start, Point2D end, Point2D center, Point2D leftLineStart, Point2D rightLineStart, Point2D textPos) {}
+    private record Points(Point2D start, Point2D end, Point2D center, Point2D leftLineStart, Point2D rightLineStart) {}
 }

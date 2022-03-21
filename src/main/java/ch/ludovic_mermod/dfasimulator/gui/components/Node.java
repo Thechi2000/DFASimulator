@@ -4,42 +4,39 @@ import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.logic.State;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-public class Node extends StackPane
+public class Node extends GraphItem
 {
     private final Position pos;
     private final State    state;
 
-    private final ContextMenu menu;
-    private       MenuItem    deleteMenuItem;
-
-    private final GraphPane graphPane;
-
     private final Circle innerCircle;
     private final Circle outerCircle;
+
+    private ContextMenu menu;
+    private MenuItem    deleteMenuItem;
 
 
     public Node(State state, GraphPane graphPane)
     {
-        this.state = state;
-        this.graphPane = graphPane;
+        super(graphPane);
 
-        setAlignment(Pos.CENTER);
+        this.state = state;
 
         menu = createContextMenu();
         pos = new Position();
@@ -95,8 +92,8 @@ public class Node extends StackPane
         return state;
     }
 
-    public DoubleBinding centerXProperty() {return layoutXProperty().add(widthProperty().divide(2));}
-    public DoubleBinding centerYProperty() {return layoutYProperty().add(heightProperty().divide(2));}
+    public DoubleProperty centerXProperty() {return layoutXProperty();}
+    public DoubleProperty centerYProperty() {return layoutYProperty();}
     public ReadOnlyDoubleProperty radiusProperty() {return innerCircle.radiusProperty();}
 
     protected void bindSimulationPane(GraphPane graphPane)
@@ -123,8 +120,7 @@ public class Node extends StackPane
                         }));
         setOnMouseExited(event -> setCursor(Cursor.DEFAULT));
 
-        setOnMousePressed(event ->
-        {
+        setOnMousePressed(event -> {
             menu.hide();
             if (event.isPrimaryButtonDown())
                 switch (graphPane.getTool())
@@ -140,15 +136,14 @@ public class Node extends StackPane
                         setCursor(Cursor.CLOSED_HAND);
 
                         //When a press event occurs, the location coordinates of the event are cached
-                        pos.x = event.getX();
-                        pos.y = event.getY();
+                        pos.x = event.getX() + getWidth() / 2;
+                        pos.y = event.getY() + getHeight() / 2;
                         break;
                 }
         });
         setOnMouseReleased(event -> setCursor(Cursor.DEFAULT));
 
-        setOnMouseDragged(event ->
-        {
+        setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
             {
                 double distanceX = event.getX() - pos.x;
@@ -160,31 +155,24 @@ public class Node extends StackPane
                 relocate(x, y);
             }
         });
+    }
 
+    public double getWidth()
+    {
+        return getBoundsInParent().getWidth();
+    }
+    public double getHeight()
+    {
+        return getBoundsInParent().getHeight();
+    }
 
-      /*  setOnDragDetected(event ->
-        {
-            if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.LINK)
-            {
-                Dragboard db = startDragAndDrop(TransferMode.ANY);
-                ClipboardContent content = new ClipboardContent();
-                content.putString(state.nameProperty().get());
-                db.setContent(content);
-            }
-
-            event.consume();
-        });
-        setOnDragOver(event ->
-        {
-            if (event.getGestureSource() != this && event.getDragboard().hasString())
-                event.acceptTransferModes(TransferMode.ANY);
-            event.consume();
-        });
-        setOnDragDropped(event ->
-        {
-            if (getParent() instanceof GraphPane && event.getGestureSource() instanceof Node)
-                graphPane.getMainPane().getSimulation().createLink(event.getDragboard().getString(), state.nameProperty().get());
-        });*/
+    public DoubleBinding widthBinding()
+    {
+        return CustomBindings.doubleBinding(this::getWidth, boundsInParentProperty());
+    }
+    public DoubleBinding heightBinding()
+    {
+        return CustomBindings.doubleBinding(this::getHeight, boundsInParentProperty());
     }
 
     private ContextMenu createContextMenu()

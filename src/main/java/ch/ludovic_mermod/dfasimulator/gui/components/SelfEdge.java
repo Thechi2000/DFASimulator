@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.utils.Maths;
@@ -8,17 +9,14 @@ import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import java.util.stream.Collectors;
 
-public class SelfEdge extends Group
+public class SelfEdge extends GraphItem
 {
     private final State state;
 
@@ -32,8 +30,10 @@ public class SelfEdge extends Group
     private final MoveTo startingPoint;
     private final ArcTo  arc;
 
-    public SelfEdge(State state)
+    public SelfEdge(State state, GraphPane graphPane)
     {
+        super(graphPane);
+
         this.state = state;
 
         centerX = new SimpleDoubleProperty();
@@ -78,7 +78,7 @@ public class SelfEdge extends Group
 
         alphabetDisplay = new Text();
         alphabetDisplay.xProperty().bind(centerX);
-        alphabetDisplay.yProperty().bind(centerY. subtract(radius).subtract(20));
+        alphabetDisplay.yProperty().bind(centerY.subtract(radius).subtract(20));
         updateAlphabetDisplay();
         state.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
         state.transitionMap().addListener((k, p) -> updateAlphabetDisplay());
