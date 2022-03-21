@@ -5,8 +5,10 @@ import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -20,12 +22,17 @@ import javafx.scene.text.TextAlignment;
 
 public class Node extends StackPane
 {
-    private final Position    pos;
+    private final Position pos;
+    private final State    state;
+
     private final ContextMenu menu;
-    private final GraphPane   graphPane;
-    private final State       state;
-    private final Circle outerCircle;
     private       MenuItem    deleteMenuItem;
+
+    private final GraphPane graphPane;
+
+    private final Circle innerCircle;
+    private final Circle outerCircle;
+
 
     public Node(State state, GraphPane graphPane)
     {
@@ -37,7 +44,7 @@ public class Node extends StackPane
         menu = createContextMenu();
         pos = new Position();
 
-        Circle innerCircle = new Circle();
+        innerCircle = new Circle();
         innerCircle.radiusProperty().bind(Constants.NODE_INNER_CIRCLE_RADIUS);
         initialBinding().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.NODE_CURRENT_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
@@ -87,6 +94,10 @@ public class Node extends StackPane
     {
         return state;
     }
+
+    public DoubleBinding centerXProperty() {return layoutXProperty().add(widthProperty().divide(2));}
+    public DoubleBinding centerYProperty() {return layoutYProperty().add(heightProperty().divide(2));}
+    public ReadOnlyDoubleProperty radiusProperty() {return innerCircle.radiusProperty();}
 
     protected void bindSimulationPane(GraphPane graphPane)
     {
