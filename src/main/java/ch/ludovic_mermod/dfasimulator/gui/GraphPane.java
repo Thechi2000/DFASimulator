@@ -3,6 +3,7 @@ package ch.ludovic_mermod.dfasimulator.gui;
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.components.Edge;
+import ch.ludovic_mermod.dfasimulator.gui.components.SelfEdge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
@@ -14,6 +15,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -26,16 +28,20 @@ import java.util.logging.Level;
 public class GraphPane extends Region
 {
     private final ObservableSet<Edge> edges;
-    private final MainPane            mainPane;
-    private       ContextMenu         menu;
-    private       Point2D             menuPosition;
-    private       Tool                tool;
-    private       Simulation          simulation;
+    private final ObservableMap<State, SelfEdge> selfEdges;
+
+    private Tool    tool;
+    private Point2D menuPosition;
+
+    private final MainPane    mainPane;
+    private       ContextMenu menu;
+    private       Simulation  simulation;
 
     public GraphPane(MainPane mainPane)
     {
         this.mainPane = mainPane;
         edges = FXCollections.observableSet(new HashSet<>());
+        selfEdges = FXCollections.observableHashMap();
         tool = Tool.EDIT;
     }
 
@@ -106,6 +112,10 @@ public class GraphPane extends Region
                     edges.add(e2);
                     getChildren().add(e2);
                 });
+
+        SelfEdge selfEdge = new SelfEdge(state);
+        selfEdges.put(state, selfEdge);
+        getChildren().add(selfEdge);
         getChildren().add(state.getNode());
     }
     public void removeState(State state)
@@ -113,6 +123,9 @@ public class GraphPane extends Region
         var l = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).toList();
         getChildren().removeAll(l);
         l.forEach(edges::remove);
+
+        getChildren().remove(selfEdges.get(state));
+        selfEdges.remove(state);
 
         getChildren().remove(state.getNode());
     }
