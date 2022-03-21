@@ -4,7 +4,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.*;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableDoubleValue;
+import javafx.beans.value.ObservableIntegerValue;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
@@ -31,11 +34,14 @@ public class Constants
     public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE = new SimpleDoubleProperty(20);
     public static final ObservableBooleanValue EDGE_TEXT_USE_ABSOLUTE_DISTANCE       = new SimpleBooleanProperty(true);
 
-    public static final ObservableDoubleValue  TEST_PANE_INPUT_SPACING = new SimpleDoubleProperty(20);
-    public static final ObservableBooleanValue TEST_PANE_GRID_LINES    = new SimpleBooleanProperty(true);
-    public static final ObservableValue<Paint> TEST_PANE_SUCCESS       = new SimpleObjectProperty<>(GREEN);
-    public static final ObservableValue<Paint> TEST_PANE_FAILURE       = new SimpleObjectProperty<>(RED);
+    public static final ObservableDoubleValue        TEST_PANE_INPUT_SPACING = new SimpleDoubleProperty(20);
+    public static final ObservableBooleanValue       TEST_PANE_GRID_LINES    = new SimpleBooleanProperty(true);
+    public static final ObservableObjectValue<Paint> TEST_PANE_SUCCESS       = new SimpleObjectProperty<>(GREEN);
+    public static final ObservableObjectValue<Paint> TEST_PANE_FAILURE       = new SimpleObjectProperty<>(RED);
 
-    public static final ObservableDoubleValue  CONTROL_POINT_RADIUS = new SimpleDoubleProperty(5);
-    public static final ObservableValue<Paint> CONTROL_POINT_FILL   = new SimpleObjectProperty<>(RED);
+    public static final ObservableDoubleValue        CONTROL_POINT_RADIUS = new SimpleDoubleProperty(5);
+    public static final ObservableObjectValue<Paint> CONTROL_POINT_FILL   = new SimpleObjectProperty<>(RED);
+
+    public static final ObservableDoubleValue        CONTROL_LINE_WIDTH = new SimpleDoubleProperty(3);
+    public static final ObservableObjectValue<Paint> CONTROL_LINE_FILL  = new SimpleObjectProperty<>(RED);
 }
