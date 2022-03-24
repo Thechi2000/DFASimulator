@@ -90,7 +90,7 @@ public class IOManager
             finiteAutomaton.loadJSON(object.getAsJSONObject("automaton"));
             mainPane.getGraphPane().loadJSON(object.getAsJSONObject("graph"));
 
-            savedFile = finiteAutomaton.getJSONObject().deepCopy();
+            savedFile = currentFile.deepCopy();
         }
         catch (FileNotFoundException | CorruptedFileException | JsonParseException e)
         {
@@ -104,7 +104,7 @@ public class IOManager
     {
         finiteAutomaton.clear();
         filepathProperty.set(null);
-        savedFile = finiteAutomaton.getJSONObject().deepCopy();
+        savedFile = currentFile.deepCopy();
 
         updateSavedProperty();
     }
