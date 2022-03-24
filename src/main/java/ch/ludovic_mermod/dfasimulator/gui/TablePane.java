@@ -56,7 +56,7 @@ public class TablePane extends ScrollPane
         // Name column
         {
             TableColumn<State, Group> nameColumn = new TableColumn<>();
-            Strings.bind("transition_table.label_column", nameColumn.textProperty());
+            Strings.bind("table_pane.label_column", nameColumn.textProperty());
             nameColumn.setCellValueFactory(cellFeatures ->
             {
                 SimpleObjectProperty<Group> cell = new SimpleObjectProperty<>(new Group());
@@ -68,7 +68,7 @@ public class TablePane extends ScrollPane
                     addStateField.setVisible(false);
 
                     Button addStateButton = new Button();
-                    Strings.bind("transition_table.add_state", addStateButton.textProperty());
+                    Strings.bind("table_pane.add_state", addStateButton.textProperty());
                     cell.get().getChildren().add(addStateButton);
 
                     addStateField.focusedProperty().addListener((o, ov, nv) ->
@@ -123,7 +123,7 @@ public class TablePane extends ScrollPane
         // Accepting column
         {
             TableColumn<State, CheckBox> acceptingColumn = new TableColumn<>();
-            Strings.bind("transition_table.accepting_column", acceptingColumn.textProperty());
+            Strings.bind("table_pane.accepting_column", acceptingColumn.textProperty());
             acceptingColumn.setCellValueFactory(cellFeatures ->
             {
                 if (cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
@@ -139,7 +139,7 @@ public class TablePane extends ScrollPane
         // Initial column
         {
             TableColumn<State, Toggle> initialColumn = new TableColumn<>();
-            Strings.bind("transition_table.initial_column", initialColumn.textProperty());
+            Strings.bind("table_pane.initial_column", initialColumn.textProperty());
             ToggleGroup toggleGroup = new ToggleGroup();
 
             initialColumn.setCellValueFactory(cellFeatures ->
@@ -181,7 +181,7 @@ public class TablePane extends ScrollPane
                     addAlphabetField.setVisible(false);
 
                     Button addAlphabetButton = new Button();
-                    Strings.bind("transition_table.add_alphabet", addAlphabetButton.textProperty());
+                    Strings.bind("table_pane.add_alphabet", addAlphabetButton.textProperty());
                     cell.getChildren().add(addAlphabetButton);
 
                     addAlphabetField.focusedProperty().addListener((o, ov, nv) ->
@@ -209,7 +209,7 @@ public class TablePane extends ScrollPane
                 else
                 {
                     Button button = new Button();
-                    Strings.bind("transition_pane.delete_button", button.textProperty());
+                    Strings.bind("table_pane.delete_button", button.textProperty());
                     button.setOnAction(event -> finiteAutomaton.removeState(cellFeatures.getValue()));
                     return new SimpleObjectProperty<>(button);
                 }
