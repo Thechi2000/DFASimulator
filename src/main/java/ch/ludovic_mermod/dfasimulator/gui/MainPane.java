@@ -31,16 +31,16 @@ public class MainPane extends BorderPane
 
     public MainPane()
     {
-        finiteAutomaton = new FiniteAutomaton();
-        ioManager = new IOManager(this);
-        graphPane = new GraphPane(this);
-        simulation = new Simulation(this);
-
         editPaneProperty = new SimpleObjectProperty<>(null);
         menuBar = new MenuBar();
         consolePane = new ConsolePane();
         simulationPane = new SimulationPane();
         rightSplitPane = new SplitPane();
+
+        finiteAutomaton = new FiniteAutomaton();
+        graphPane = new GraphPane(this);
+        ioManager = new IOManager(this);
+        simulation = new Simulation(this);
     }
 
     public void create(Stage primaryStage)

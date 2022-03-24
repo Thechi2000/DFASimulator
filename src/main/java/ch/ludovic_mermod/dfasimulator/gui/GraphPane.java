@@ -14,7 +14,6 @@ import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -22,13 +21,18 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Region;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 
 public class GraphPane extends Region
 {
-    private final ObservableSet<Edge>            edges;
-    private final ObservableMap<State, SelfEdge> selfEdges;
-    private final ObjectProperty<GraphItem>      focusedItem;
+    protected static final String     JSON_SELF_EDGES = "self_edges";
+    protected static final String     JSON_EDGES      = "edges";
+    private final          JSONObject object;
+
+    private final ObservableSet<Edge>       edges;
+    private final ObservableSet<SelfEdge>   selfEdges;
+    private final ObjectProperty<GraphItem> focusedItem;
 
     private final MainPane   mainPane;
     private       Simulation simulation;
@@ -42,9 +46,13 @@ public class GraphPane extends Region
     {
         this.mainPane = mainPane;
         edges = FXCollections.observableSet(new HashSet<>());
-        selfEdges = FXCollections.observableHashMap();
+        selfEdges = FXCollections.observableSet(new HashSet<>());
         tool = Tool.EDIT;
         focusedItem = new SimpleObjectProperty<>();
+
+        object = new JSONObject();
+        object.add(JSON_EDGES, JSONArray.fromObservableSet(edges, Edge::getJSONObject));
+        object.add(JSON_SELF_EDGES, JSONArray.fromObservableSet(selfEdges, SelfEdge::getJSONObject));
     }
 
     public void create(MainPane mainPane)
@@ -125,45 +133,65 @@ public class GraphPane extends Region
                 });
 
         SelfEdge selfEdge = new SelfEdge(state, this);
-        selfEdges.put(state, selfEdge);
+        selfEdges.add(selfEdge);
         getChildren().add(selfEdge);
         getChildren().add(state.getNode());
     }
     public void removeState(State state)
     {
-        var l = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).toList();
-        getChildren().removeAll(l);
-        l.forEach(edges::remove);
+        var edgesToRemove = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).toList();
+        getChildren().removeAll(edgesToRemove);
+        edgesToRemove.forEach(edges::remove);
 
-        getChildren().remove(selfEdges.get(state));
-        selfEdges.remove(state);
+        final List<SelfEdge> selfEdgesToRemove = this.selfEdges.stream().filter(s -> s.state().equals(state)).toList();
+        getChildren().removeAll(selfEdgesToRemove);
+        selfEdgesToRemove.forEach(this.selfEdges::remove);
 
         getChildren().remove(state.getNode());
     }
 
-    public void loadEdges(JSONArray array) throws IOManager.CorruptedFileException
+    public JSONObject getJSONObject()
     {
-        for (JSONElement element : array)
+        return object;
+    }
+    public void loadJSON(JSONObject object) throws IOManager.CorruptedFileException
+    {
+        object.checkHasArray(JSON_EDGES);
+        object.checkHasArray(JSON_SELF_EDGES);
+
+        for (JSONElement element : object.getAsJSONArray(JSON_EDGES))
         {
-            JSONObject o;
+            JSONObject obj;
             if (!element.isJSONObject()) throw new IOManager.CorruptedFileException("Could not parse \"%s\" into an edge", element);
+            obj = element.getAsJSONObject();
+            obj.checkHasString(Edge.JSON_SOURCE);
+            obj.checkHasString(Edge.JSON_TARGET);
 
-            o = element.getAsJSONObject();
-            o.checkHasString("source");
-            o.checkHasString("target");
-            o.checkHasNumber("control_x");
-            o.checkHasNumber("control_y");
-
-
-            Edge edge = edges.stream().filter(e -> e.getSourceName().equals(o.get("source").getAsString()) && e.getTargetName().equals(o.get("target").getAsString())).findAny().orElse(null);
-
+            Edge edge = edges.stream().filter(e -> e.getSourceName().equals(obj.get(Edge.JSON_SOURCE).getAsString()) && e.getTargetName().equals(obj.get(Edge.JSON_TARGET).getAsString())).findAny().orElse(null);
             if (edge == null)
             {
-                Main.log(Level.WARNING, "Tried to parse unknown edge between \"%s\" and \"%s\"", o.get("source"), o.get("target"));
+                Main.log(Level.WARNING, "Tried to parse unknown edge between \"%s\" and \"%s\"", obj.get(Edge.JSON_SOURCE), obj.get(Edge.JSON_TARGET));
                 return;
             }
 
-            edge.setControlPoint(o.get("control_x").getAsDouble(), o.get("control_y").getAsDouble());
+            edge.loadJSONObject(obj);
+        }
+
+        for (JSONElement element : object.getAsJSONArray(JSON_SELF_EDGES))
+        {
+            JSONObject obj;
+            if (!element.isJSONObject()) throw new IOManager.CorruptedFileException("Could not parse \"%s\" into an edge", element);
+            obj = element.getAsJSONObject();
+            obj.checkHasString(SelfEdge.JSON_STATE);
+
+            SelfEdge edge = selfEdges.stream().filter(e -> e.state().name().equals(obj.get(SelfEdge.JSON_STATE).getAsString())).findAny().orElse(null);
+            if (edge == null)
+            {
+                Main.log(Level.WARNING, "Tried to parse unknown edge at \"%s\"", obj.get(SelfEdge.JSON_STATE));
+                return;
+            }
+
+            edge.loadJSONObject(obj);
         }
     }
 
@@ -197,6 +225,10 @@ public class GraphPane extends Region
     {
         return edges;
     }
+    public ObservableSet<SelfEdge> selfEdges()
+    {
+        return selfEdges;
+    }
     public ReadOnlyObjectProperty<GraphItem> focusedItemProperty()
     {
         return focusedItem;
@@ -208,5 +240,4 @@ public class GraphPane extends Region
         DRAG,
         LINK
     }
-
 }

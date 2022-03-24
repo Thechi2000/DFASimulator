@@ -2,6 +2,8 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.utils.Maths;
@@ -21,6 +23,13 @@ import java.util.stream.Collectors;
 
 public class SelfEdge extends GraphItem
 {
+    public static final String JSON_RADIUS   = "radius";
+    public static final String JSON_CENTER_Y = "center_y";
+    public static final String JSON_CENTER_X = "center_x";
+    public static final String JSON_STATE    = "state";
+
+    private final JSONObject jsonObject;
+
     private final State state;
 
     private final Arrow arrow;
@@ -130,13 +139,36 @@ public class SelfEdge extends GraphItem
         recomputeControl();
         getChildren().addAll(arrow, alphabetDisplay);
         addControlComponents();
+
+        jsonObject = new JSONObject();
+        jsonObject.addProperty(JSON_STATE, state.nameProperty());
+        jsonObject.addProperty(JSON_CENTER_X, center.xProperty());
+        jsonObject.addProperty(JSON_CENTER_Y, center.yProperty());
+        jsonObject.addProperty(JSON_RADIUS, radius);
+    }
+
+    public JSONObject getJSONObject()
+    {
+        return jsonObject;
+    }
+    public void loadJSONObject(JSONObject object) throws IOManager.CorruptedFileException
+    {
+        object.checkHasNumber(JSON_CENTER_X);
+        object.checkHasNumber(JSON_CENTER_Y);
+        object.checkHasNumber(JSON_RADIUS);
+
+        center.set(object.get(JSON_CENTER_X).getAsDouble(), object.get(JSON_CENTER_Y).getAsDouble());
+        radius.set(object.get(JSON_RADIUS).getAsDouble());
+
+        recomputeControl();
     }
 
     private void addControlComponents()
     {
-        getChildren().addAll(new ControlPoint(center.xProperty(), center.yProperty(), focusProperty()),
-                new ControlPoint(radiusControlPoint.xProperty(), radiusControlPoint.yProperty(), focusProperty()),
-                new ControlLine(center, radiusControlPoint, focusProperty()));
+        getChildren().addAll(new ControlLine(center, radiusControlPoint, focusProperty()),
+                new ControlPoint(center.xProperty(), center.yProperty(), focusProperty()),
+                new ControlPoint(radiusControlPoint.xProperty(), radiusControlPoint.yProperty(), focusProperty(),
+                        p -> center.get().add(Maths.projection(p.subtract(center.get()), state.getNode().getCenter().subtract(center.get())))));
     }
 
     private void recomputeRadius()
@@ -190,5 +222,10 @@ public class SelfEdge extends GraphItem
     {
         Point2D rad = point.subtract(center.get());
         return new Point2D(-rad.getY(), rad.getX());
+    }
+
+    public State state()
+    {
+        return state;
     }
 }

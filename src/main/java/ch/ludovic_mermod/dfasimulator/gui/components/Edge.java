@@ -3,6 +3,7 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.BezierQuadCurve;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
@@ -23,6 +24,11 @@ import java.util.stream.Collectors;
 
 public class Edge extends GraphItem
 {
+    public static final String JSON_SOURCE    = "source";
+    public static final String JSON_TARGET    = "target";
+    public static final String JSON_CONTROL_X = "control_x";
+    public static final String JSON_CONTROL_Y = "control_y";
+
     private final JSONObject jsonObject;
 
     private final State source;
@@ -84,10 +90,10 @@ public class Edge extends GraphItem
         addControlComponents();
 
         jsonObject = new JSONObject();
-        jsonObject.addProperty("source", source.nameProperty());
-        jsonObject.addProperty("target", target.nameProperty());
-        jsonObject.addProperty("control_x", curve.controlXProperty());
-        jsonObject.addProperty("control_y", curve.controlYProperty());
+        jsonObject.addProperty(JSON_SOURCE, source.nameProperty());
+        jsonObject.addProperty(JSON_TARGET, target.nameProperty());
+        jsonObject.addProperty(JSON_CONTROL_X, curve.controlXProperty());
+        jsonObject.addProperty(JSON_CONTROL_Y, curve.controlYProperty());
     }
 
     public State source()
@@ -110,6 +116,12 @@ public class Edge extends GraphItem
     public JSONObject getJSONObject()
     {
         return jsonObject;
+    }
+    public void loadJSONObject(JSONObject object) throws IOManager.CorruptedFileException
+    {
+        object.checkHasNumber(JSON_CONTROL_X);
+        object.checkHasNumber(JSON_CONTROL_Y);
+        setControlPoint(object.get(JSON_CONTROL_X).getAsDouble(), object.get(JSON_CONTROL_Y).getAsDouble());
     }
 
     public void setControlPoint(double x, double y)

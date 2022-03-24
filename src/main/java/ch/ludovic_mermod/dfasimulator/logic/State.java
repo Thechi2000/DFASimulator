@@ -6,7 +6,10 @@ import ch.ludovic_mermod.dfasimulator.json.JSONNull;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.Map;
 import java.util.Objects;
@@ -14,8 +17,8 @@ import java.util.Objects;
 public class State
 {
     protected static final String JSON_TRANSITION_MAP = "transition_map";
-    protected static final String JSON_X_COORD        = "y_coord";
-    protected static final String JSON_Y_COORD        = "x_coord";
+    protected static final String JSON_X_COORD        = "x_coord";
+    protected static final String JSON_Y_COORD        = "y_coord";
     protected static final String JSON_IS_ACCEPTING   = "is_accepting";
     protected static final String JSON_NAME           = "name";
 
@@ -74,14 +77,14 @@ public class State
     {
         jsonObject.checkHasString(JSON_NAME);
         jsonObject.checkHasBoolean(JSON_IS_ACCEPTING);
-        jsonObject.checkHasNumber(JSON_Y_COORD);
         jsonObject.checkHasNumber(JSON_X_COORD);
+        jsonObject.checkHasNumber(JSON_Y_COORD);
         jsonObject.checkHasObject(JSON_TRANSITION_MAP);
 
         State state = new State(finiteAutomaton);
         state.name.set(jsonObject.get(JSON_NAME).getAsString());
         state.isAcceptingProperty.set(jsonObject.get(JSON_IS_ACCEPTING).getAsBoolean());
-        state.node.relocate(jsonObject.get(State.JSON_X_COORD).getAsDouble(), jsonObject.get(JSON_Y_COORD).getAsDouble());
+        state.node.relocate(jsonObject.get(State.JSON_X_COORD).getAsDouble() + state.node.getLayoutBounds().getMinX(), jsonObject.get(JSON_Y_COORD).getAsDouble() + state.node.getLayoutBounds().getMinY());
         return state;
     }
     public void loadTransitionMap(JSONObject jsonObject) throws IOManager.CorruptedFileException

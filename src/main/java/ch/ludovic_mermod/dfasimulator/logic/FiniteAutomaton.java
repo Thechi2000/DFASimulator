@@ -24,10 +24,10 @@ public class FiniteAutomaton
 
     private final JSONObject jsonObject;
 
-    private final ObjectProperty<State>  initialState;
-    private final ListProperty<State>    states;
+    private final ObjectProperty<State>    initialState;
+    private final ListProperty<State>      states;
     private final ObservableSet<Character> alphabet;
-    private       MainPane               mainPane;
+    private       MainPane                 mainPane;
 
     public FiniteAutomaton()
     {
@@ -174,5 +174,30 @@ public class FiniteAutomaton
     public boolean hasState(String name)
     {
         return states.stream().anyMatch(s -> s.name().equals(name));
+    }
+
+    public void loadJSON(JSONObject object) throws IOManager.CorruptedFileException
+    {
+        object.checkHasArray(JSON_STATES);
+        object.checkHasString(JSON_INITIAL);
+        object.checkHasArray(JSON_ALPHABET);
+
+        var nodesArray = object.get(JSON_STATES).getAsJSONArray();
+
+        clear();
+
+        for (JSONElement e : object.getAsJSONArray(JSON_ALPHABET))
+        {
+            if (!e.isJSONPrimitive() || !e.getAsJSONPrimitive().isString() || e.getAsJSONPrimitive().getAsString().length() != 1)
+                throw new IOManager.CorruptedFileException("Could not convert \"%s\" to a character", e);
+            alphabet().add(e.getAsString().charAt(0));
+        }
+
+        for (JSONElement jsonElement : nodesArray)
+            addState(State.fromJSONObject(jsonElement.getAsJSONObject(), this));
+        initialStateProperty().set(getState(object.get(JSON_INITIAL).getAsString()));
+
+        for (JSONElement e : nodesArray)
+            getState(e.getAsJSONObject().get(State.JSON_NAME).getAsString()).loadTransitionMap(e.getAsJSONObject().get(State.JSON_TRANSITION_MAP).getAsJSONObject());
     }
 }

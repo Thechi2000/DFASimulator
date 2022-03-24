@@ -24,8 +24,8 @@ public class IOManager
     private final StringProperty filenameProperty, filepathProperty;
     private final BooleanProperty isSavedProperty;
 
-    private JSONElement savedFile;
-
+    private final JSONObject  currentFile;
+    private       JSONElement savedFile;
 
     public IOManager(MainPane mainPane)
     {
@@ -34,10 +34,13 @@ public class IOManager
         filepathProperty = new SimpleStringProperty();
         isSavedProperty = new SimpleBooleanProperty();
 
-        filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(nv == null ? "new" :new File(filepathProperty.get()).getName()));
-
-        mainPane.getFiniteAutomaton().getJSONObject().getAsJSONObject().addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
+        filepathProperty.addListener((o, ov, nv) -> filenameProperty.set(nv == null ? "new" : new File(filepathProperty.get()).getName()));
         finiteAutomaton = mainPane.getFiniteAutomaton();
+
+        currentFile = new JSONObject();
+        currentFile.add("graph", mainPane.getGraphPane().getJSONObject());
+        currentFile.add("automaton", mainPane.getFiniteAutomaton().getJSONObject());
+        currentFile.addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
     }
 
     public void save()
@@ -55,9 +58,8 @@ public class IOManager
             if (file.exists() || file.createNewFile())
                 try (FileOutputStream o = new FileOutputStream(file))
                 {
-                    final JSONElement copy = finiteAutomaton.getJSONObject().deepCopy();
-                    savedFile = copy;
-                    o.write((copy).toString().getBytes(StandardCharsets.UTF_8));
+                    savedFile = currentFile.deepCopy();
+                    o.write((savedFile).toString().getBytes(StandardCharsets.UTF_8));
                 }
             else
                 Main.log(Level.SEVERE, "Could not create file " + file.getAbsolutePath());
@@ -82,30 +84,11 @@ public class IOManager
         {
             JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
 
-            object.checkHasArray(FiniteAutomaton.JSON_STATES);
-            object.checkHasString(FiniteAutomaton.JSON_INITIAL);
-            object.checkHasArray(FiniteAutomaton.JSON_ALPHABET);
+            object.checkHasObject("graph");
+            object.checkHasObject("automaton");
 
-            var nodesArray = object.get(FiniteAutomaton.JSON_STATES).getAsJSONArray();
-
-            finiteAutomaton.clear();
-
-            for (JSONElement e : object.getAsJSONArray(FiniteAutomaton.JSON_ALPHABET))
-            {
-                if(!e.isJSONPrimitive() || ! e.getAsJSONPrimitive().isString() || e.getAsJSONPrimitive().getAsString().length() != 1)
-                    throw new CorruptedFileException("Could not convert \"%s\" to a character", e);
-                finiteAutomaton.alphabet().add(e.getAsString().charAt(0));
-            }
-
-            for (JSONElement jsonElement : nodesArray)
-                finiteAutomaton.addState(State.fromJSONObject(jsonElement.getAsJSONObject(), finiteAutomaton));
-            finiteAutomaton.initialStateProperty().set(finiteAutomaton.getState(object.get(FiniteAutomaton.JSON_INITIAL).getAsString()));
-
-            for (JSONElement e : nodesArray)
-                finiteAutomaton.getState(e.getAsJSONObject().get(State.JSON_NAME).getAsString()).loadTransitionMap(e.getAsJSONObject().get(State.JSON_TRANSITION_MAP).getAsJSONObject());
-
-            if (object.hasArray("edges"))
-                mainPane.getGraphPane().loadEdges(object.getAsJSONArray("edges"));
+            finiteAutomaton.loadJSON(object.getAsJSONObject("automaton"));
+            mainPane.getGraphPane().loadJSON(object.getAsJSONObject("graph"));
 
             savedFile = finiteAutomaton.getJSONObject().deepCopy();
         }
@@ -133,12 +116,7 @@ public class IOManager
 
     public boolean isSaved()
     {
-        if(savedFile == null) return true;
-
-        final String s = savedFile.toString();
-        final String s2 = finiteAutomaton.getJSONObject().toString();
-        final boolean b = savedFile == null || s.equals(s2);
-        return b;
+        return savedFile == null || savedFile.toString().equals(currentFile.toString());
     }
     public ReadOnlyBooleanProperty isSavedProperty()
     {
