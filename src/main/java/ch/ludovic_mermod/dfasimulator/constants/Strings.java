@@ -1,17 +1,23 @@
 package ch.ludovic_mermod.dfasimulator.constants;
 
 import ch.ludovic_mermod.dfasimulator.Main;
-import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
-import javafx.beans.property.ObjectProperty;
+import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.StringProperty;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 public class Strings
 {
-    private static final PropertiesMap<String, String> map;
+    protected static final Pattern                       DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
+    private static final   PropertiesMap<String, String> map;
 
     static
     {
@@ -25,7 +31,7 @@ public class Strings
      * @param id the StringProperty queried
      * @return the StringProperty associated with the given id
      */
-    public static ObjectProperty<String> get(String id)
+    public static StringBinding get(String id)
     {
         if (!map.containsKey(id))
         {
@@ -33,7 +39,23 @@ public class Strings
             set(id, id);
         }
 
-        return map.get(id);
+        List<StringBinding> dependencies = DEPENDENCY_PATTERN.matcher(id).results().map(r -> get(r.group(1))).toList();
+
+        //return CustomBindings.format(CustomBindings.create(() -> map.get(id).get().replaceAll("\\$\\(([a-z_.]+)\\)", "%s"), map.get(id)), false, dependencies.toArray());
+        return new StringBinding()
+        {
+            {
+                bind(dependencies.toArray(new StringBinding[0]));
+            }
+
+            @Override
+            protected String computeValue()
+            {
+                AtomicReference<String> result = new AtomicReference<>(map.getValue(id));
+                DEPENDENCY_PATTERN.matcher(map.getValue(id)).results().forEach(r -> result.set(result.get().replace(r.group(0), Strings.get(r.group(1)).get())));
+                return result.get();
+            }
+        };
     }
 
     /**
