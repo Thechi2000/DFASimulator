@@ -109,7 +109,7 @@ public class FiniteAutomaton
 
     public Binding<Boolean> hasBinaryAlphabet()
     {
-        return CustomBindings.binding(() -> alphabet.size() == 2 && alphabet.contains('0') && alphabet.contains('1'), alphabet);
+        return CustomBindings.create(() -> alphabet.size() == 2 && alphabet.contains('0') && alphabet.contains('1'), alphabet);
     }
 
     private void validateNameChange(State state, String oldName)

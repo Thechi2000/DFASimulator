@@ -81,7 +81,7 @@ public class CustomBindings
         };
     }
 
-    public static <T> Binding<T> binding(Supplier<T> computeValue, Observable... observables)
+    public static <T> Binding<T> create(Supplier<T> computeValue, Observable... observables)
     {
         return new ObjectBinding<T>() {
             {
@@ -96,7 +96,7 @@ public class CustomBindings
         };
     }
 
-    public static DoubleBinding doubleBinding(Supplier<Double> computeValue, Observable... observables)
+    public static DoubleBinding createDouble(Supplier<Double> computeValue, Observable... observables)
     {
         return new DoubleBinding()
         {
@@ -113,7 +113,7 @@ public class CustomBindings
     }
     public static void bindDouble(DoubleProperty property, Supplier<Double> computeValue, Observable... observables)
     {
-        property.bind(doubleBinding(computeValue, observables));
+        property.bind(createDouble(computeValue, observables));
     }
 
     public static StringBinding format(ObservableValue<String> format, Object... objects)

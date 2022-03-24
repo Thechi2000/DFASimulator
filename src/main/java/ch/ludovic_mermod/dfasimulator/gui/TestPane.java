@@ -83,7 +83,7 @@ public class TestPane extends VBox
                     text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Constants.TEST_PANE_SUCCESS : Constants.TEST_PANE_FAILURE);
 
                     int finalI = i;
-                    text.textProperty().bind(CustomBindings.binding(() ->
+                    text.textProperty().bind(CustomBindings.create(() ->
                             switch (radixChoiceBox.valueProperty().get())
                                     {
                                         case HEX -> String.format(" %" + maxHexLen + "x ", finalI);

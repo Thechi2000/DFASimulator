@@ -184,7 +184,7 @@ public class Edge extends GraphItem
         targetPointX.addListener(updateControl);
         targetPointY.addListener(updateControl);
 
-        targetBinding = CustomBindings.binding(() -> bezier.apply(0.5), moveTo.xProperty(), moveTo.yProperty(), curve.controlXProperty(), curve.controlYProperty(), curve.xProperty(), curve.yProperty());
+        targetBinding = CustomBindings.create(() -> bezier.apply(0.5), moveTo.xProperty(), moveTo.yProperty(), curve.controlXProperty(), curve.controlYProperty(), curve.xProperty(), curve.yProperty());
         targetBinding.addListener((o, ov, nv) -> {
             if (updatingControlFromTarget.get()) return;
 

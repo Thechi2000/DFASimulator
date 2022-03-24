@@ -173,11 +173,11 @@ public class Node extends GraphItem
 
     public DoubleBinding widthBinding()
     {
-        return CustomBindings.doubleBinding(this::getWidth, boundsInParentProperty());
+        return CustomBindings.createDouble(this::getWidth, boundsInParentProperty());
     }
     public DoubleBinding heightBinding()
     {
-        return CustomBindings.doubleBinding(this::getHeight, boundsInParentProperty());
+        return CustomBindings.createDouble(this::getHeight, boundsInParentProperty());
     }
 
     private ContextMenu createContextMenu()
