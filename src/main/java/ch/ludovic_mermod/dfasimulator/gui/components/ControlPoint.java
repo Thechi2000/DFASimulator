@@ -8,9 +8,13 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 
+import java.util.function.Function;
+
 public class ControlPoint extends Group
 {
     private Point2D pos;
+
+    private Function<Point2D, Point2D> constraint;
 
     public ControlPoint()
     {
@@ -21,6 +25,11 @@ public class ControlPoint extends Group
 
         addHandlers();
     }
+    public ControlPoint(Function<Point2D, Point2D> constraint)
+    {
+        this();
+        this.constraint = constraint;
+    }
     public ControlPoint(DoubleProperty xProperty, DoubleProperty yProperty, ObservableBooleanValue visibleProperty)
     {
         this();
@@ -28,6 +37,11 @@ public class ControlPoint extends Group
         layoutXProperty().bindBidirectional(xProperty);
         layoutYProperty().bindBidirectional(yProperty);
         visibleProperty().bind(visibleProperty);
+    }
+    public ControlPoint(DoubleProperty xProperty, DoubleProperty yProperty, ObservableBooleanValue visibleProperty, Function<Point2D, Point2D> constraint)
+    {
+        this(xProperty, yProperty, visibleProperty);
+        this.constraint = constraint;
     }
 
     private void addHandlers()
@@ -54,7 +68,10 @@ public class ControlPoint extends Group
                 double x = getLayoutX() + distanceX;
                 double y = getLayoutY() + distanceY;
 
-                relocate(x, y);
+                Point2D target = new Point2D(x, y);
+                if(constraint != null) target = constraint.apply(target);
+
+                relocate(target.getX(), target.getY());
             }
         });
     }
