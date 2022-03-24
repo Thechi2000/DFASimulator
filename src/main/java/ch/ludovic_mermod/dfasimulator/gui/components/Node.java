@@ -12,6 +12,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -92,6 +93,10 @@ public class Node extends GraphItem
         return state;
     }
 
+    public Point2D getCenter()
+    {
+        return new Point2D(centerXProperty().get(), centerYProperty().get());
+    }
     public DoubleProperty centerXProperty() {return layoutXProperty();}
     public DoubleProperty centerYProperty() {return layoutYProperty();}
     public ReadOnlyDoubleProperty radiusProperty() {return innerCircle.radiusProperty();}
