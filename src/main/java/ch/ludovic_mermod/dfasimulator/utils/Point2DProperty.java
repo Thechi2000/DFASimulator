@@ -71,8 +71,12 @@ public class Point2DProperty extends ObjectProperty<Point2D>
     @Override
     public void set(Point2D point2D)
     {
-        x.set(point2D.getX());
-        y.set(point2D.getY());
+        set(point2D.getX(), point2D.getY());
+    }
+    public void set(double x, double y)
+    {
+        this.x.set(x);
+        this.y.set(y);
     }
     @Override
     public void addListener(ChangeListener<? super Point2D> changeListener)
