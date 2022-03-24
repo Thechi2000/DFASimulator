@@ -11,7 +11,7 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Path;
+import javafx.scene.shape.Shape;
 
 public class Arrow extends Group
 {
@@ -28,11 +28,11 @@ public class Arrow extends Group
     private final Line leftLine;
     private final Line rightLine;
 
-    public Arrow(Path path)
+    public Arrow(Shape shape)
     {
         leftLine = new Line();
         rightLine = new Line();
-        path.setFill(Color.TRANSPARENT);
+        shape.setFill(Color.TRANSPARENT);
 
         endX = new SimpleDoubleProperty();
         endY = new SimpleDoubleProperty();
@@ -43,12 +43,12 @@ public class Arrow extends Group
         width = new SimpleDoubleProperty();
         leftLine.strokeWidthProperty().bind(width);
         rightLine.strokeWidthProperty().bind(width);
-        path.strokeWidthProperty().bind(width);
+        shape.strokeWidthProperty().bind(width);
 
         fill = new SimpleObjectProperty<>(Color.BLACK);
         leftLine.fillProperty().bind(fill);
         rightLine.fillProperty().bind(fill);
-        path.strokeProperty().bind(fill);
+        shape.strokeProperty().bind(fill);
 
         Observable[] observables = new Observable[]{endX, endY, directionX, directionY, sidelineLength};
 
@@ -62,7 +62,7 @@ public class Arrow extends Group
         rightLine.endXProperty().bind(endX);
         rightLine.endYProperty().bind(endY);
 
-        getChildren().addAll(path, leftLine, rightLine);
+        getChildren().addAll(shape, leftLine, rightLine);
     }
 
     private Point2D computeProjection()
