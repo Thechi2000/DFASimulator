@@ -16,8 +16,9 @@ import java.util.regex.Pattern;
 
 public class Strings
 {
-    protected static final Pattern                       DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
-    private static final   PropertiesMap<String, String> map;
+    protected static final Pattern DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
+
+    private static final PropertiesMap<String, String> map;
 
     static
     {

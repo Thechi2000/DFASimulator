@@ -1,11 +1,11 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
-import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
@@ -26,8 +26,8 @@ public class MainPane extends BorderPane
     private final MenuBar                  menuBar;
     private final ConsolePane              consolePane;
     private final SimulationPane           simulationPane;
-    private final SplitPane  rightSplitPane;
-    private final Simulation simulation;
+    private final SplitPane                rightSplitPane;
+    private final Simulation               simulation;
 
     public MainPane()
     {

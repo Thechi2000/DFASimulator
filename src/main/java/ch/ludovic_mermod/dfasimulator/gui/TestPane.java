@@ -158,7 +158,7 @@ public class TestPane extends VBox
             sb.append(alphabet.get(i));
         });
 
-        if(sb.isEmpty()) sb.append(discarded);
+        if (sb.isEmpty()) sb.append(discarded);
 
         return sb.toString();
     }

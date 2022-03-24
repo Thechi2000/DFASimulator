@@ -69,7 +69,7 @@ public class ControlPoint extends Group
                 double y = getLayoutY() + distanceY;
 
                 Point2D target = new Point2D(x, y);
-                if(constraint != null) target = constraint.apply(target);
+                if (constraint != null) target = constraint.apply(target);
 
                 relocate(target.getX(), target.getY());
             }

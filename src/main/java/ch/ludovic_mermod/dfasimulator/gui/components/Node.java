@@ -29,8 +29,8 @@ public class Node extends GraphItem
     private final Circle innerCircle;
     private final Circle outerCircle;
 
-    private ContextMenu menu;
-    private MenuItem    deleteMenuItem;
+    private final ContextMenu menu;
+    private       MenuItem    deleteMenuItem;
 
 
     public Node(State state, GraphPane graphPane)

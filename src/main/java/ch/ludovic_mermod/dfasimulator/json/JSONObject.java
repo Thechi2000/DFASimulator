@@ -160,7 +160,7 @@ public class JSONObject extends JSONElement implements Observable
     }
     private void missingProperty(String name, String type) throws IOManager.CorruptedFileException
     {
-        throw new IOManager.CorruptedFileException(String.format("Could not find %s(%s) in \"%s\"", name, type, toString()));
+        throw new IOManager.CorruptedFileException(String.format("Could not find %s(%s) in \"%s\"", name, type, this));
     }
 
     public void addProperty(String property, String value)
