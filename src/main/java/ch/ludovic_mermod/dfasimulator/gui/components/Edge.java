@@ -12,6 +12,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
@@ -77,7 +78,6 @@ public class Edge extends GraphItem
                 curve.xProperty(),
                 curve.yProperty());
 
-        addEventHandlers();
         bindPositions();
 
         getChildren().addAll(arrow, alphabetDisplay);
@@ -127,20 +127,11 @@ public class Edge extends GraphItem
                '}';
     }
 
-    private void addEventHandlers()
+    @Override
+    public void onMousePressed(MouseEvent event)
     {
-        setOnMousePressed(event -> {
-            requestGraphFocus();
-            event.consume();
-        });
-
-        path.setOnMouseDragged(event -> {
-            if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
-            {
-                targetPointX.set(event.getX());
-                targetPointY.set(event.getY());
-            }
-        });
+        final Point2D mousePosition = new Point2D(event.getX(), event.getY());
+        if (bezier.distance(bezier.findClosest(mousePosition), mousePosition) < 10 || new Point2D(curve.getControlX(), curve.getControlY()).distance(mousePosition) < Constants.CONTROL_POINT_RADIUS.get()) super.onMousePressed(event);
     }
 
     private void bindPositions()

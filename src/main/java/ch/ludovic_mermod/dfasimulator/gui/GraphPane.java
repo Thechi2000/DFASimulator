@@ -53,6 +53,12 @@ public class GraphPane extends Region
         menu = createContextMenu();
 
         setOnMousePressed(event -> {
+            for (var g : getChildren().stream().filter(n -> n instanceof GraphItem).map(n -> ((GraphItem) n)).toList())
+            {
+                g.onMousePressed(event);
+                if (event.isConsumed()) return;
+            }
+
             menu.hide();
             focusedItem.set(null);
         });
