@@ -2,10 +2,7 @@ package ch.ludovic_mermod.dfasimulator.utils;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import javafx.beans.Observable;
-import javafx.beans.binding.Binding;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.binding.StringBinding;
+import javafx.beans.binding.*;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
@@ -111,16 +108,34 @@ public class CustomBindings
             }
         };
     }
+    private static StringBinding createString(Supplier<String> computeValue, ObservableValue<String> observables)
+    {
+        return new StringBinding()
+        {
+            {
+                bind(observables);
+            }
+
+            @Override
+            protected String computeValue()
+            {
+                return computeValue.get();
+            }
+        };
+    }
     public static void bindDouble(DoubleProperty property, Supplier<Double> computeValue, Observable... observables)
     {
         property.bind(createDouble(computeValue, observables));
     }
 
     public static StringBinding format(ObservableValue<String> format, Object... objects)
+    {return format(format, true, objects);}
+    public static StringBinding format(ObservableValue<String> format, boolean checkCount, Object... objects)
     {
         int occ = (format.getValue().length() - format.getValue().replace("%s", "").length()) / 2;
-        if (objects.length != occ)
+        if (checkCount&& objects.length != occ)
             Main.log(Level.WARNING, "Invalid parameters count in \"%s\", expected: %d actual: %d", format.getValue(), objects.length, occ);
+        if(objects.length == 0) return  CustomBindings.createString(format::getValue, format);
 
         Set<ObservableValue<?>> properties = Arrays.stream(objects)
                 .filter(o -> o instanceof ObservableValue<?>)
