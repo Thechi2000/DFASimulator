@@ -7,7 +7,6 @@ import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -18,11 +17,19 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class Node extends GraphItem
 {
+    public static final String INNER_CIRCLE_RADIUS = "node.inner_circle_radius";
+    public static final String DEFAULT_COLOR       = "node.default_color";
+    public static final String INITIAL_COLOR       = "node.initial_color";
+    public static final String CURRENT_COLOR       = "node.current_color";
+    public static final String OUTER_CIRCLE_RADIUS = "node.outer_circle_radius";
+    public static final String NAME_FONT_SIZE      = "node.name_font_size";
+
     private final Position pos;
     private final State    state;
 
@@ -43,23 +50,23 @@ public class Node extends GraphItem
         pos = new Position();
 
         innerCircle = new Circle();
-        innerCircle.radiusProperty().bind(Constants.NODE_INNER_CIRCLE_RADIUS);
+        innerCircle.radiusProperty().bind(Constants.getDouble(INNER_CIRCLE_RADIUS));
         initialBinding().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.NODE_CURRENT_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.NODE_INITIAL_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.NODE_BASE_COLOR.addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Constants.getColor(DEFAULT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Constants.getColor(INITIAL_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Constants.getColor(CURRENT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         graphPane.currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         updateCircleColor(innerCircle);
 
         outerCircle = new Circle();
-        outerCircle.radiusProperty().bind(IntegerBinding.integerExpression(Constants.NODE_OUTER_CIRCLE_RADIUS));
+        outerCircle.radiusProperty().bind(Constants.getDouble(OUTER_CIRCLE_RADIUS));
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
         outerCircle.setFill(Color.TRANSPARENT);
         outerCircle.visibleProperty().bind(state.isAcceptingProperty());
 
         Text text = new Text();
-        text.fontProperty().bind(Constants.NODE_NAME_FONT);
+        Constants.getDouble(NAME_FONT_SIZE).addListener((o, ov, nv) -> text.setFont(new Font(text.getFont().getName(), nv)));
         text.textProperty().bind(state.nameProperty());
         text.setTextAlignment(TextAlignment.CENTER);
 
@@ -109,10 +116,10 @@ public class Node extends GraphItem
     private void updateCircleColor(Circle c)
     {
         c.setFill(graphPane.currentStateProperty().get() == state
-                  ? Constants.NODE_CURRENT_COLOR.get()
+                  ? Constants.getColorValue(CURRENT_COLOR)
                   : state.isInitialBinding().get()
-                    ? Constants.NODE_INITIAL_COLOR.get()
-                    : Constants.NODE_BASE_COLOR.get());
+                    ? Constants.getColorValue(INITIAL_COLOR)
+                    : Constants.getColorValue(DEFAULT_COLOR));
     }
 
     private void addEventHandlers()

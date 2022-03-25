@@ -12,6 +12,9 @@ import java.util.function.Function;
 
 public class ControlPoint extends Group
 {
+    public static final String RADIUS = "control_point.radius";
+    public static final String FILL   = "control_point.fill";
+
     private Point2D pos;
 
     private Function<Point2D, Point2D> constraint;
@@ -19,8 +22,8 @@ public class ControlPoint extends Group
     public ControlPoint()
     {
         Circle circle = new Circle();
-        circle.radiusProperty().bind(Constants.CONTROL_POINT_RADIUS);
-        circle.fillProperty().bind(Constants.CONTROL_POINT_FILL);
+        circle.radiusProperty().bind(Constants.getDouble(RADIUS));
+        circle.fillProperty().bind(Constants.getColor(FILL));
         getChildren().add(circle);
 
         addHandlers();

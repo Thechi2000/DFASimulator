@@ -84,9 +84,9 @@ public class SelfEdge extends GraphItem
             arrow = new Arrow(new Path(startingPoint, arc));
             arrow.endXProperty().bind(arc.xProperty());
             arrow.endYProperty().bind(arc.yProperty());
-            arrow.widthProperty().bind(Constants.EDGE_LINE_WIDTH);
-            arrow.sidelineLengthProperty().bind(Constants.EDGE_SIDELINE_LENGTH);
-            arrow.fillProperty().bind(Constants.EDGE_LINE_COLOR);
+            arrow.widthProperty().bind(Constants.getDouble(Edge.WIDTH));
+            arrow.sidelineLengthProperty().bind(Constants.getDouble(Edge.SIDELINE_LENGTH));
+            arrow.fillProperty().bind(Constants.getColor(Edge.COLOR));
         }
 
         // Add endpoints bindings

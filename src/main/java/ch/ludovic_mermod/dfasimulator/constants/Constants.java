@@ -1,47 +1,139 @@
 package ch.ludovic_mermod.dfasimulator.constants;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import ch.ludovic_mermod.dfasimulator.Main;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
+import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
+import javafx.beans.binding.Binding;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableDoubleValue;
-import javafx.beans.value.ObservableIntegerValue;
-import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
-import static javafx.scene.paint.Color.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
+import static javafx.scene.paint.Color.BLACK;
 
 public class Constants
 {
-    public static final ObservableObjectValue<Font> GRAPH_FONT     = new SimpleObjectProperty<>(Font.font("Courier", 20));
-    public static final ObservableObjectValue<Font> NODE_NAME_FONT = new SimpleObjectProperty<>(Font.font("Courier", 20));
+    public static final Font FONT = new Font(Font.getDefault().getName(), 20);
 
-    public static final ObservableIntegerValue       NODE_INNER_CIRCLE_RADIUS = new SimpleIntegerProperty(50);
-    public static final ObservableIntegerValue       NODE_OUTER_CIRCLE_RADIUS = new SimpleIntegerProperty(60);
-    public static final ObservableObjectValue<Color> NODE_BASE_COLOR          = new SimpleObjectProperty<>(GREEN);
-    public static final ObservableObjectValue<Color> NODE_CURRENT_COLOR       = new SimpleObjectProperty<>(RED);
-    public static final ObservableObjectValue<Color> NODE_INITIAL_COLOR       = new SimpleObjectProperty<>(BLUE);
+    private static final PropertiesMap<String, Object> values;
+    private static final Properties                    properties;
 
-    public static final ObservableIntegerValue       EDGE_LINE_WIDTH      = new SimpleIntegerProperty(10);
-    public static final ObservableObjectValue<Color> EDGE_LINE_COLOR      = new SimpleObjectProperty<>(BLACK);
-    public static final ObservableDoubleValue        EDGE_SIDELINE_LENGTH = new SimpleDoubleProperty(35);
+    private static final Pattern BOOL_PATTERN   = Pattern.compile("(true|false)");
+    private static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+\\.?\\d*|\\d*\\.\\d+)d?");
+    private static final Pattern COLOR_PATTERN  = Pattern.compile("0x[\\da-fA-F]{8}");
 
-    public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_LINE          = new SimpleDoubleProperty(25);
-    public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR   = new SimpleDoubleProperty(0.25);
-    public static final ObservableDoubleValue  EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE = new SimpleDoubleProperty(20);
-    public static final ObservableBooleanValue EDGE_TEXT_USE_ABSOLUTE_DISTANCE       = new SimpleBooleanProperty(true);
+    static
+    {
+        values = new PropertiesMap<>();
+        properties = new Properties();
+        loadFromFile("settings.json");
+        values.addListener((p, k, o, n) -> properties.put(k, n.toString()));
+    }
 
-    public static final ObservableDoubleValue        TEST_PANE_INPUT_SPACING = new SimpleDoubleProperty(20);
-    public static final ObservableBooleanValue       TEST_PANE_GRID_LINES    = new SimpleBooleanProperty(true);
-    public static final ObservableObjectValue<Paint> TEST_PANE_SUCCESS       = new SimpleObjectProperty<>(GREEN);
-    public static final ObservableObjectValue<Paint> TEST_PANE_FAILURE       = new SimpleObjectProperty<>(RED);
+    public static void loadFromFile(String filename)
+    {
+        try (FileReader fileReader = new FileReader(filename))
+        {
+            properties.load(fileReader);
+        }
+        catch (IOException e)
+        {
+            Main.logger.log(Level.WARNING, "Could not load settings from file \"%s\"", filename);
+        }
 
-    public static final ObservableDoubleValue        CONTROL_POINT_RADIUS = new SimpleDoubleProperty(5);
-    public static final ObservableObjectValue<Paint> CONTROL_POINT_FILL   = new SimpleObjectProperty<>(RED);
+        properties.keySet().stream().map(Object::toString).forEach(k -> {
+            String value = properties.getProperty(k);
+            ObjectProperty<Object> obs = null;
 
-    public static final ObservableDoubleValue        CONTROL_LINE_WIDTH = new SimpleDoubleProperty(3);
-    public static final ObservableObjectValue<Paint> CONTROL_LINE_FILL  = new SimpleObjectProperty<>(RED);
+            if (value.matches(BOOL_PATTERN.pattern()))
+                obs = new SimpleObjectProperty<>(Boolean.valueOf(value));
+            else if (value.matches(COLOR_PATTERN.pattern()))
+                obs = new SimpleObjectProperty<>(Color.valueOf(value));
+            else if (value.matches(DOUBLE_PATTERN.pattern()))
+                obs = new SimpleObjectProperty<>(Double.parseDouble(value));
+            else
+                Main.log(Level.WARNING, "Could not parse property \"%s:%s\" in \"%s\"", k, value, filename);
+
+            if (obs != null)
+            {
+                obs.addListener((o, ov, nv) -> properties.put(k, nv.toString()));
+                values.put(k, obs);
+            }
+        });
+    }
+    public static void saveToFile(String filename)
+    {
+        try (FileWriter fileWriter = new FileWriter(filename))
+        {
+            properties.store(fileWriter, LocalDateTime.now().toString());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static Binding<Boolean> getBoolean(String key)
+    {
+        return get(key, false);
+    }
+    public static Binding<Double> getDouble(String key)
+    {
+        return get(key, 0d);
+    }
+    public static Binding<Color> getColor(String key)
+    {
+        return get(key, BLACK);
+    }
+
+    public static <T> Binding<T> get(String key, T defaultValue)
+    {
+        if (!values.containsKey(key))
+        {
+            Main.log(Level.WARNING, "Could not find property \"%s\" of type %s", key, defaultValue.getClass().getName());
+            values.setValue(key, defaultValue);
+        }
+
+        var value = values.get(key);
+        if (defaultValue.getClass().isAssignableFrom(value.get().getClass())) return CustomBindings.create(() -> (T) value.get(), value);
+        else throw new IllegalArgumentException("Property \"%s\" is not of type \"%s\"");
+    }
+
+    public static Boolean getBooleanValue(String key)
+    {
+        return getValue(key, false);
+    }
+    public static Double getDoubleValue(String key)
+    {
+        return getValue(key, 0d);
+    }
+    public static Color getColorValue(String key)
+    {
+        return getValue(key, BLACK);
+    }
+
+    public static <T> T getValue(String key, T defaultValue)
+    {
+        if (!values.containsKey(key))
+        {
+            Main.log(Level.WARNING, "Could not find property \"%s\" of type %s", key, defaultValue.getClass().getName());
+            values.setValue(key, defaultValue);
+        }
+
+        var value = values.get(key);
+
+        if (defaultValue instanceof Double && value.get() instanceof Double)
+            return (T) value.get();
+
+        if (defaultValue.getClass().isAssignableFrom(value.get().getClass())) return (T) value.get();
+        else throw new IllegalArgumentException(String.format("Property \"%s\" is not of type \"%s\"", defaultValue.getClass().getName(), value.get().getClass().getName()));
+    }
 }

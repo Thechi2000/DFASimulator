@@ -22,8 +22,10 @@ import java.util.Set;
 
 public class TestPane extends VBox
 {
-    private final MainPane  mainPane;
-    private final TextField discardedCharacterField;
+    public static final String    FAILURE_COLOR = "test_pane.failure_color";
+    public static final String    SUCCESS_COLOR = "test_pane.success_color";
+    private final       MainPane  mainPane;
+    private final       TextField discardedCharacterField;
 
     public TestPane(MainPane mainPane)
     {
@@ -45,11 +47,11 @@ public class TestPane extends VBox
 
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
-        gridPane.gridLinesVisibleProperty().bind(Constants.TEST_PANE_GRID_LINES);
+        gridPane.gridLinesVisibleProperty().bind(Constants.getBoolean("test_pane.grid_lines"));
 
         HBox inputBox = new HBox(maxValueField, mainPane.getFiniteAutomaton().hasBinaryAlphabet().getValue() ? radixChoiceBox : discardedCharacterField, runButton);
         inputBox.setAlignment(Pos.CENTER);
-        inputBox.spacingProperty().bind(Constants.TEST_PANE_INPUT_SPACING);
+        inputBox.spacingProperty().bind(Constants.getDouble("test_pane.input_spacing"));
         getChildren().add(inputBox);
         getChildren().add(gridPane);
 
@@ -79,8 +81,8 @@ public class TestPane extends VBox
                 for (int i = 0; i < maxValue; ++i)
                 {
                     Text text = new Text();
-                    text.fontProperty().bind(Constants.GRAPH_FONT);
-                    text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Constants.TEST_PANE_SUCCESS : Constants.TEST_PANE_FAILURE);
+                    text.fontProperty().set(Constants.FONT);
+                    text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Constants.getColor(SUCCESS_COLOR) : Constants.getColor(FAILURE_COLOR));
 
                     int finalI = i;
                     text.textProperty().bind(CustomBindings.create(() ->
@@ -101,8 +103,8 @@ public class TestPane extends VBox
                 for (int i = 0; i < entries.size(); ++i)
                 {
                     Text text = new Text(String.format(" %" + (int) Math.ceil(Math.log(maxValue) / Math.log(alphabet.size())) + "s ", entries.get(i)));
-                    text.fontProperty().bind(Constants.GRAPH_FONT);
-                    text.fillProperty().bind(mainPane.getSimulation().test(entries.get(i)) ? Constants.TEST_PANE_SUCCESS : Constants.TEST_PANE_FAILURE);
+                    text.fontProperty().set(Constants.FONT);
+                    text.fillProperty().bind(mainPane.getSimulation().test(entries.get(i)) ? Constants.getColor(SUCCESS_COLOR) : Constants.getColor(FAILURE_COLOR));
                     gridPane.add(text, i / 16, i % 16);
                 }
             }

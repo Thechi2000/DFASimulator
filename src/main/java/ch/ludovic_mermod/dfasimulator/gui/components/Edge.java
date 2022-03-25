@@ -17,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,6 +29,10 @@ public class Edge extends GraphItem
     public static final String JSON_TARGET    = "target";
     public static final String JSON_CONTROL_X = "control_x";
     public static final String JSON_CONTROL_Y = "control_y";
+
+    public static final String COLOR           = "edge.arrow.color";
+    public static final String WIDTH           = "edge.arrow.width";
+    public static final String SIDELINE_LENGTH = "edge.arrow.sideline_length";
 
     private final JSONObject jsonObject;
 
@@ -61,7 +66,7 @@ public class Edge extends GraphItem
         updatingTargetFromControl = new AtomicBoolean(false);
 
         alphabetDisplay = new Text();
-        alphabetDisplay.fontProperty().bind(Constants.GRAPH_FONT);
+        Constants.getDouble(GraphPane.FONT_SIZE).addListener((o, ov, nv) -> alphabetDisplay.setFont(new Font(alphabetDisplay.getFont().getName(), nv)));
         updateAlphabetDisplay();
         source.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
         source.transitionMap().addListener((k, p) -> updateAlphabetDisplay());
@@ -69,9 +74,9 @@ public class Edge extends GraphItem
         path = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
 
         arrow = new Arrow(path);
-        arrow.fillProperty().bind(Constants.EDGE_LINE_COLOR);
-        arrow.widthProperty().bind(Constants.EDGE_LINE_WIDTH);
-        arrow.sidelineLengthProperty().bind(Constants.EDGE_SIDELINE_LENGTH);
+        arrow.fillProperty().bind(Constants.getColor(COLOR));
+        arrow.widthProperty().bind(Constants.getDouble(WIDTH));
+        arrow.sidelineLengthProperty().bind(Constants.getDouble(SIDELINE_LENGTH));
         arrow.endXProperty().bind(curve.xProperty());
         arrow.endYProperty().bind(curve.yProperty());
         arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
@@ -143,7 +148,8 @@ public class Edge extends GraphItem
     public void onMousePressed(MouseEvent event)
     {
         final Point2D mousePosition = new Point2D(event.getX(), event.getY());
-        if (bezier.distance(bezier.findClosest(mousePosition), mousePosition) < 10 || new Point2D(curve.getControlX(), curve.getControlY()).distance(mousePosition) < Constants.CONTROL_POINT_RADIUS.get()) super.onMousePressed(event);
+        if (bezier.distance(bezier.findClosest(mousePosition), mousePosition) < 10 || new Point2D(curve.getControlX(), curve.getControlY()).distance(mousePosition) < Constants.getDoubleValue(ControlPoint.RADIUS))
+            super.onMousePressed(event);
     }
 
     private void bindPositions()
@@ -155,11 +161,8 @@ public class Edge extends GraphItem
                 sn.layoutXProperty(), sn.layoutYProperty(), sn.widthBinding(), sn.heightBinding(),
                 tn.layoutXProperty(), tn.layoutYProperty(), tn.widthBinding(), tn.heightBinding(),
                 curve.controlXProperty(), curve.controlYProperty(),
-                Constants.NODE_INNER_CIRCLE_RADIUS,
-                Constants.EDGE_SIDELINE_LENGTH,
-                Constants.EDGE_TEXT_DISTANCE_FROM_NODE_FACTOR,
-                Constants.EDGE_TEXT_DISTANCE_FROM_NODE_ABSOLUTE,
-                Constants.EDGE_TEXT_USE_ABSOLUTE_DISTANCE
+                Constants.getDouble(Node.INNER_CIRCLE_RADIUS),
+                Constants.getDouble(SIDELINE_LENGTH)
         };
 
         CustomBindings.bindDouble(moveTo.xProperty(), () -> computePoints().start.getX(), observables);
@@ -217,10 +220,10 @@ public class Edge extends GraphItem
                 directorStart = controlPoint.subtract(startCenter).normalize(),
                 directorEnd = endCenter.subtract(controlPoint).normalize(),
                 normalEnd = new Point2D(directorEnd.getY(), -directorEnd.getX()),
-                start = startCenter.add(directorStart.multiply(Constants.NODE_INNER_CIRCLE_RADIUS.get())),
-                end = endCenter.subtract(directorEnd.multiply(Constants.NODE_INNER_CIRCLE_RADIUS.get())),
-                projectionPoint = end.subtract(directorEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get())),
-                projectionDistance = normalEnd.multiply(Constants.EDGE_SIDELINE_LENGTH.get());
+                start = startCenter.add(directorStart.multiply(Constants.getDoubleValue(Node.INNER_CIRCLE_RADIUS))),
+                end = endCenter.subtract(directorEnd.multiply(Constants.getDoubleValue(Node.INNER_CIRCLE_RADIUS))),
+                projectionPoint = end.subtract(directorEnd.multiply(Constants.getDoubleValue(SIDELINE_LENGTH))),
+                projectionDistance = normalEnd.multiply(Constants.getDoubleValue(SIDELINE_LENGTH));
 
         return new Points(
                 start,

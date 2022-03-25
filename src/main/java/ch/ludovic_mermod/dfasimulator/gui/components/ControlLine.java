@@ -9,13 +9,16 @@ import javafx.scene.shape.Line;
 
 public class ControlLine extends Group
 {
+    public static final String WIDTH = "control_line.width";
+    public static final String COLOR = "control_line.color";
+
     private final Line line;
 
     public ControlLine()
     {
         line = new Line();
-        line.strokeWidthProperty().bind(Constants.CONTROL_LINE_WIDTH);
-        line.strokeProperty().bind(Constants.CONTROL_LINE_FILL);
+        line.strokeWidthProperty().bind(Constants.getDouble(WIDTH));
+        line.strokeProperty().bind(Constants.getColor(COLOR));
         line.getStrokeDashArray().addAll(5d, 5d);
 
         getChildren().add(line);
