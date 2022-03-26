@@ -4,9 +4,7 @@ import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
-import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
-import javafx.beans.binding.Binding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
@@ -14,6 +12,7 @@ import javafx.scene.text.Font;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -23,11 +22,11 @@ public class Constants
 {
     public static final Font FONT = new Font(Font.getDefault().getName(), 20);
 
-    private static final PropertiesMap<String, Object> values;
+    public static final Pattern BOOL_PATTERN   = Pattern.compile("(true|false)");
+    public static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+\\.?\\d*|\\d*\\.\\d+)d?");
+    public static final Pattern COLOR_PATTERN  = Pattern.compile("0x[\\da-fA-F]{8}");
 
-    private static final Pattern BOOL_PATTERN   = Pattern.compile("(true|false)");
-    private static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+\\.?\\d*|\\d*\\.\\d+)d?");
-    private static final Pattern COLOR_PATTERN  = Pattern.compile("0x[\\da-fA-F]{8}");
+    private static final PropertiesMap<String, Object> values;
 
     private static JSONObject json;
 
@@ -106,19 +105,19 @@ public class Constants
         }
     }
 
-    public static Binding<Boolean> getBoolean(String key)
+    public static ObjectProperty<Boolean> getBoolean(String key)
     {
         return get(key, false);
     }
-    public static Binding<Double> getDouble(String key)
+    public static ObjectProperty<Double> getDouble(String key)
     {
         return get(key, 0d);
     }
-    public static Binding<Color> getColor(String key)
+    public static ObjectProperty<Color> getColor(String key)
     {
         return get(key, BLACK);
     }
-    public static <T> Binding<T> get(String key, T defaultValue)
+    public static <T> ObjectProperty<T> get(String key, T defaultValue)
     {
         if (!values.containsKey(key))
         {
@@ -139,7 +138,7 @@ public class Constants
         }
 
         var value = values.get(key);
-        if (defaultValue.getClass().isAssignableFrom(value.get().getClass())) return CustomBindings.create(() -> (T) value.get(), value);
+        if (defaultValue.getClass().isAssignableFrom(value.get().getClass())) return (ObjectProperty<T>) value;
         else throw new IllegalArgumentException("Property \"%s\" is not of type \"%s\"");
     }
 
@@ -158,5 +157,15 @@ public class Constants
     public static <T> T getValue(String key, T defaultValue)
     {
         return get(key, defaultValue).getValue();
+    }
+
+    public static <T> void setValue(String key, T value)
+    {
+        values.get(key).set(value);
+    }
+
+    public static Set<String> keySet()
+    {
+        return values.keySet();
     }
 }
