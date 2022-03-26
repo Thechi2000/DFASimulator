@@ -26,6 +26,8 @@ public class MenuBar extends javafx.scene.control.MenuBar
         this.mainPane = mainPane;
         var graphPane = mainPane.getGraphPane();
 
+        SeparatorMenuItem separator = new SeparatorMenuItem();
+
         // File
         {
             Menu fileMenu = new Menu();
@@ -44,7 +46,6 @@ public class MenuBar extends javafx.scene.control.MenuBar
             open.acceleratorProperty().bind(Controls.open);
             fileMenu.getItems().add(open);
 
-            SeparatorMenuItem separator = new SeparatorMenuItem();
             fileMenu.getItems().add(separator);
 
             MenuItem save = new MenuItem();
@@ -58,6 +59,19 @@ public class MenuBar extends javafx.scene.control.MenuBar
             saveAs.setOnAction(event -> saveAs());
             saveAs.acceleratorProperty().bind(Controls.saveAs);
             fileMenu.getItems().add(saveAs);
+        }
+
+        // Window
+        {
+            Menu windowMenu = new Menu();
+            Strings.bind("menu.window", windowMenu.textProperty());
+            getMenus().add(windowMenu);
+
+            MenuItem settings = new MenuItem();
+            Strings.bind("menu.window.settings", settings.textProperty());
+            settings.setOnAction(event -> Utils.openNewStage(new SettingsPane()));
+            settings.acceleratorProperty().bind(Controls.settings);
+            windowMenu.getItems().add(settings);
         }
 
         // Tools
