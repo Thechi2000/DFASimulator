@@ -2,10 +2,7 @@ package ch.ludovic_mermod.dfasimulator.utils;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import javafx.beans.Observable;
-import javafx.beans.binding.Binding;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.binding.StringBinding;
+import javafx.beans.binding.*;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
@@ -112,7 +109,7 @@ public class CustomBindings
             }
         };
     }
-    private static StringBinding createString(Supplier<String> computeValue, ObservableValue<String> observables)
+    public static StringBinding createString(Supplier<String> computeValue, Observable... observables)
     {
         return new StringBinding()
         {
@@ -127,6 +124,20 @@ public class CustomBindings
             }
         };
     }
+    public static BooleanBinding createBoolean(Supplier<Boolean> computeValue, Observable... observables)
+    {
+        return new BooleanBinding()
+        {
+            {super.bind(observables);}
+
+            @Override
+            protected boolean computeValue()
+            {
+                return computeValue.get();
+            }
+        };
+    }
+
     public static void bindDouble(DoubleProperty property, Supplier<Double> computeValue, Observable... observables)
     {
         property.bind(createDouble(computeValue, observables));
