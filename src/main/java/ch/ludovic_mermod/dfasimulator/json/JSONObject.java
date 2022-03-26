@@ -1,12 +1,14 @@
 package ch.ludovic_mermod.dfasimulator.json;
 
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import com.google.gson.JsonObject;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableNumberValue;
 import javafx.beans.value.ObservableStringValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
 
@@ -190,6 +192,13 @@ public class JSONObject extends JSONElement implements Observable
         addProperty(property, value.getValue());
         value.addListener((o, ov, nv) -> addProperty(property, nv));
     }
+    public void addProperty(String property, ObservableValue<Object> value)
+    {
+        if (value.getValue() instanceof Double) addProperty(property, CustomBindings.createDouble(() -> (Double) value.getValue(), value));
+        else if (value.getValue() instanceof Boolean) addProperty(property, CustomBindings.createBoolean(() -> (Boolean) value.getValue(), value));
+        else addProperty(property, CustomBindings.createString(value.getValue()::toString, value));
+    }
+
     public Set<Map.Entry<String, JSONElement>> entrySet()
     {
         return members.entrySet();
