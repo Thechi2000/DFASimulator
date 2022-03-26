@@ -1,15 +1,20 @@
 package ch.ludovic_mermod.dfasimulator.json;
 
+import ch.ludovic_mermod.dfasimulator.Main;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public abstract class JSONElement
 {
@@ -60,8 +65,39 @@ public abstract class JSONElement
         return null;
     }
 
-    public abstract JSONElement deepCopy();
+    public static JSONElement readFromFile(String filename)
+    {
+        try (BufferedReader in = new BufferedReader(new FileReader(filename)))
+        {
+            final String collect = in.lines().collect(Collectors.joining("\n"));
+            return JSONElement.parse(collect);
+        }
+        catch (IOException e)
+        {
+            Main.logger.log(Level.SEVERE, "Could not parse JSON from file \"%s\"", filename);
+            return new JSONObject();
+        }
+    }
+    public void saveToFile(String filename)
+    {
+        File file = new File(filename);
+        try
+        {
+            if (file.exists() || file.createNewFile())
+                try (FileOutputStream o = new FileOutputStream(file))
+                {
+                    o.write(toString().getBytes(StandardCharsets.UTF_8));
+                }
+            else
+                Main.log(Level.SEVERE, "Could not create file " + file.getAbsolutePath());
+        }
+        catch (IOException e)
+        {
+            Main.log(Level.SEVERE, "Could not save DFA", e);
+        }
+    }
 
+    public abstract JSONElement deepCopy();
     public JSONObject getAsJSONObject()
     {
         if (this.isJSONObject())
@@ -106,7 +142,6 @@ public abstract class JSONElement
             throw new IllegalStateException("Not a JSON Null: " + this);
         }
     }
-
     public boolean isJSONArray()
     {
         return this instanceof JSONArray;

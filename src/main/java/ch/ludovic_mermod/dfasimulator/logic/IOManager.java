@@ -1,7 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.Main;
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.MainPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
@@ -11,11 +10,9 @@ import javafx.beans.property.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class IOManager
 {
@@ -53,22 +50,8 @@ public class IOManager
             filepathProperty.set(str);
         }
 
-        File file = new File(filepathProperty.get());
-        try
-        {
-            if (file.exists() || file.createNewFile())
-                try (FileOutputStream o = new FileOutputStream(file))
-                {
-                    savedFile = currentFile.deepCopy();
-                    o.write((savedFile).toString().getBytes(StandardCharsets.UTF_8));
-                }
-            else
-                Main.log(Level.SEVERE, "Could not create file " + file.getAbsolutePath());
-        }
-        catch (IOException e)
-        {
-            Main.log(Level.SEVERE, "Could not save DFA", e);
-        }
+        currentFile.saveToFile(filepathProperty.get());
+        savedFile = currentFile.deepCopy();
 
         updateSavedProperty();
     }
@@ -83,7 +66,8 @@ public class IOManager
 
         try
         {
-            JSONObject object = JSONElement.parse(new BufferedReader(new FileReader(filepathProperty.get())).lines().collect(Collectors.joining("\n"))).getAsJSONObject();
+            var readJSON = JSONElement.readFromFile(filename);
+            JSONObject object = readJSON.isJSONObject() ? readJSON.getAsJSONObject() : new JSONObject();
 
             object.checkHasObject("graph");
             object.checkHasObject("automaton");
@@ -93,7 +77,7 @@ public class IOManager
 
             savedFile = currentFile.deepCopy();
         }
-        catch (FileNotFoundException | CorruptedFileException | JsonParseException e)
+        catch (CorruptedFileException | JsonParseException e)
         {
             Main.logger.log(Level.SEVERE, "While reading " + filename, e);
             finiteAutomaton.clear();
