@@ -10,16 +10,19 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 public class Setting extends HBox
 {
-    private final JSONObject             settingJson;
     private final ObjectProperty<Object> value;
+
+    private final String     id;
+    private final JSONObject jsonSetting;
 
     public Setting(String id)
     {
-        settingJson = Constants.getSetting(id);
+        this.id = id;
         setAlignment(Pos.CENTER_LEFT);
         setPrefHeight(30);
 
@@ -30,7 +33,8 @@ public class Setting extends HBox
         Strings.bind("settings." + path[path.length - 1], nameText.textProperty());
         getChildren().add(nameText);
 
-        switch (settingJson.get(".type").getAsString())
+        jsonSetting = Constants.getSetting(id);
+        switch (jsonSetting.get(".type").getAsString())
         {
             case "double" -> {
                 TextField input = new TextField();
@@ -57,7 +61,17 @@ public class Setting extends HBox
                 getChildren().add(picker);
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + settingJson.get(".type"));
+            default -> throw new IllegalStateException("Unexpected value: " + Constants.getSetting(id).get(".type"));
+        }
+    }
+
+    public void saveChanges()
+    {
+        switch (jsonSetting.get(".type").getAsString())
+        {
+            case "double" -> Constants.getDouble(id).set((Double) value.get());
+            case "boolean" -> Constants.getBoolean(id).set((Boolean) value.get());
+            case "color" -> Constants.getColor(id).set((Color) value.get());
         }
     }
 }

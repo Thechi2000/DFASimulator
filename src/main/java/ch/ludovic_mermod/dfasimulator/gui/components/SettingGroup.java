@@ -3,7 +3,6 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,6 +15,9 @@ import java.util.TreeMap;
 
 public class SettingGroup extends VBox
 {
+    private final Map<String, SettingGroup> childrenGroups;
+    private final Map<String, Setting>      childrenSettings;
+
     public SettingGroup(String id)
     {
         var childrenKeys = Constants.keySet().stream().filter(k -> k.startsWith(id)).toList();
@@ -34,9 +36,9 @@ public class SettingGroup extends VBox
             ToggleButton toggleButton = new ToggleButton();
             toggleButton.setSelected(true);
             toggleButton.selectedProperty().addListener((o, ov, nv) -> {
-                if(nv && getChildren().size() == 1)
+                if (nv && getChildren().size() == 1)
                     getChildren().add(childrenBox);
-                else if(!nv)
+                else if (!nv)
                     getChildren().remove(childrenBox);
             });
             hBox.getChildren().add(toggleButton);
@@ -45,8 +47,8 @@ public class SettingGroup extends VBox
             childrenBox.setPadding(new Insets(0, 0, 0, 20));
         }
 
-        Map<String, SettingGroup> childrenGroups = new TreeMap<>();
-        Map<String, Setting> childrenSettings = new TreeMap<>();
+        childrenGroups = new TreeMap<>();
+        childrenSettings = new TreeMap<>();
 
         childrenKeys.forEach(k -> {
             var keyPath = Arrays.asList(k.split("\\."));
@@ -65,5 +67,11 @@ public class SettingGroup extends VBox
         childrenSettings.values().forEach(childrenBox.getChildren()::add);
 
         getChildren().addAll(childrenBox);
+    }
+
+    public void saveChanges()
+    {
+        childrenGroups.values().forEach(SettingGroup::saveChanges);
+        childrenSettings.values().forEach(Setting::saveChanges);
     }
 }
