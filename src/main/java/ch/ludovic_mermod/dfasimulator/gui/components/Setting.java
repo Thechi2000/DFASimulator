@@ -24,41 +24,40 @@ public class Setting extends HBox
         setPrefHeight(30);
 
         value = new SimpleObjectProperty<>();
+        String[] path = id.split("\\.");
 
         Text nameText = new Text();
-        Strings.bind("settings." + id, nameText.textProperty());
+        Strings.bind("settings." + path[path.length - 1], nameText.textProperty());
         getChildren().add(nameText);
 
         switch (settingJson.get(".type").getAsString())
         {
-            case "double":
+            case "double" -> {
                 TextField input = new TextField();
                 Strings.bind("settings_pane.double_input_prompt", input.promptTextProperty());
                 getChildren().add(input);
-
                 input.textProperty().addListener((o, ov, nv) -> {
                     if (nv.matches(Constants.DOUBLE_PATTERN.pattern()))
                         value.set(Double.valueOf(nv));
                 });
                 input.setText(Constants.getDoubleValue(id).toString());
-                break;
+            }
 
-            case "boolean":
+            case "boolean" -> {
                 CheckBox checkBox = new CheckBox();
                 checkBox.selectedProperty().addListener((o, ov, nv) -> value.set(ov));
                 checkBox.setSelected(Constants.getBooleanValue(id));
                 getChildren().add(checkBox);
-                break;
+            }
 
-            case "color":
+            case "color" -> {
                 ColorPicker picker = new ColorPicker();
                 picker.valueProperty().addListener((o, ov, nv) -> value.set(nv));
                 picker.setValue(Constants.getColorValue(id));
                 getChildren().add(picker);
-                break;
+            }
 
-            default:
-                throw new IllegalStateException("Unexpected value: " + settingJson.get(".type"));
+            default -> throw new IllegalStateException("Unexpected value: " + settingJson.get(".type"));
         }
     }
 }
