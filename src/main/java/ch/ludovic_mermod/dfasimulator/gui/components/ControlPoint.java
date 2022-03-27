@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 public class ControlPoint extends Group
 {
-    public static final String RADIUS = "control_point.radius";
-    public static final String FILL   = "control_point.fill";
+    public static final String RADIUS = "graph.control_point.radius";
+    public static final String FILL   = "graph.control_point.fill";
 
     private Point2D pos;
 

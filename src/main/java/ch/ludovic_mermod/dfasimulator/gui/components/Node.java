@@ -23,12 +23,12 @@ import javafx.scene.text.TextAlignment;
 
 public class Node extends GraphItem
 {
-    public static final String INNER_CIRCLE_RADIUS = "node.inner_circle_radius";
-    public static final String DEFAULT_COLOR       = "node.default_color";
-    public static final String INITIAL_COLOR       = "node.initial_color";
-    public static final String CURRENT_COLOR       = "node.current_color";
-    public static final String OUTER_CIRCLE_RADIUS = "node.outer_circle_radius";
-    public static final String NAME_FONT_SIZE      = "node.name_font_size";
+    public static final String INNER_CIRCLE_RADIUS = "graph.node.inner_circle_radius";
+    public static final String DEFAULT_COLOR       = "graph.node.default_color";
+    public static final String INITIAL_COLOR       = "graph.node.initial_color";
+    public static final String CURRENT_COLOR       = "graph.node.current_color";
+    public static final String OUTER_CIRCLE_RADIUS = "graph.node.outer_circle_radius";
+    public static final String NAME_FONT_SIZE      = "graph.node.name_font_size";
 
     private final Position pos;
     private final State    state;

@@ -30,9 +30,9 @@ public class Edge extends GraphItem
     public static final String JSON_CONTROL_X = "control_x";
     public static final String JSON_CONTROL_Y = "control_y";
 
-    public static final String COLOR           = "edge.arrow.color";
-    public static final String WIDTH           = "edge.arrow.width";
-    public static final String SIDELINE_LENGTH = "edge.arrow.sideline_length";
+    public static final String COLOR           = "graph.edge.color";
+    public static final String WIDTH           = "graph.edge.width";
+    public static final String SIDELINE_LENGTH = "graph.edge.sideline_length";
 
     private final JSONObject jsonObject;
 

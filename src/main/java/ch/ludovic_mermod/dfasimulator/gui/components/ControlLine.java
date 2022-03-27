@@ -9,8 +9,8 @@ import javafx.scene.shape.Line;
 
 public class ControlLine extends Group
 {
-    public static final String WIDTH = "control_line.width";
-    public static final String COLOR = "control_line.color";
+    public static final String WIDTH = "graph.control_line.width";
+    public static final String COLOR = "graph.control_line.color";
 
     private final Line line;
 
