@@ -69,9 +69,21 @@ public class Setting extends HBox
     {
         switch (jsonSetting.get(".type").getAsString())
         {
-            case "double" -> Constants.getDouble(id).set((Double) value.get());
-            case "boolean" -> Constants.getBoolean(id).set((Boolean) value.get());
-            case "color" -> Constants.getColor(id).set((Color) value.get());
+            case "double" -> {
+                Double val = (Double) value.get();
+                Constants.getDouble(id).set(val);
+                jsonSetting.addProperty(".value", val);
+            }
+            case "boolean" -> {
+                Boolean val = (Boolean) value.get();
+                Constants.getBoolean(id).set(val);
+                jsonSetting.addProperty(".value", val);
+            }
+            case "color" -> {
+                Color val = (Color) value.get();
+                Constants.getColor(id).set(val);
+                jsonSetting.addProperty(".value", val.toString());
+            }
         }
     }
 }
