@@ -5,12 +5,15 @@ import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class Setting extends HBox
@@ -49,8 +52,9 @@ public class Setting extends HBox
 
             case "boolean" -> {
                 CheckBox checkBox = new CheckBox();
-                checkBox.selectedProperty().addListener((o, ov, nv) -> value.set(ov));
+                checkBox.selectedProperty().addListener((o, ov, nv) -> value.set(nv));
                 checkBox.setSelected(Constants.getBooleanValue(id));
+                value.set(checkBox.isSelected());
                 getChildren().add(checkBox);
             }
 
@@ -59,6 +63,24 @@ public class Setting extends HBox
                 picker.valueProperty().addListener((o, ov, nv) -> value.set(nv));
                 picker.setValue(Constants.getColorValue(id));
                 getChildren().add(picker);
+            }
+
+            case "font" -> {
+                ChoiceBox<String> fontName = new ChoiceBox<>(FXCollections.observableList(Font.getFontNames()));
+                value.set(Constants.getFontValue(id));
+                fontName.valueProperty().addListener((o, ov, nv) -> value.set(new Font(nv, ((Font) value.get()).getSize())));
+                fontName.setValue(Constants.getFontValue(id).getName());
+
+                TextField size = new TextField();
+                Strings.bind("settings_pane.font_size", size.promptTextProperty());
+                size.textProperty().addListener((o, ov, nv) -> {
+                    if (nv.matches(Constants.DOUBLE_PATTERN.pattern()))
+                        value.set(new Font(((Font) value.get()).getName(), Double.parseDouble(nv)));
+                    System.out.println("f");
+                });
+                size.setText(String.valueOf(Constants.getFontValue(id).getSize()));
+
+                getChildren().addAll(fontName, size);
             }
 
             default -> throw new IllegalStateException("Unexpected value: " + Constants.getSetting(id).get(".type"));
@@ -83,6 +105,12 @@ public class Setting extends HBox
                 Color val = (Color) value.get();
                 Constants.getColor(id).set(val);
                 jsonSetting.addProperty(".value", val.toString());
+            }
+            case "font" -> {
+                Font val = (Font) value.get();
+                Constants.getFont(id).set(val);
+                jsonSetting.addProperty(".name", val.getName());
+                jsonSetting.addProperty(".size", val.getSize());
             }
         }
     }

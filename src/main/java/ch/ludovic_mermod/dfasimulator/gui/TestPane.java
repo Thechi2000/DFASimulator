@@ -81,7 +81,7 @@ public class TestPane extends VBox
                 for (int i = 0; i < maxValue; ++i)
                 {
                     Text text = new Text();
-                    text.fontProperty().set(Constants.FONT);
+                    text.fontProperty().bind(Constants.getFont("graph.font"));
                     text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Constants.getColor(SUCCESS_COLOR) : Constants.getColor(FAILURE_COLOR));
 
                     int finalI = i;
@@ -103,7 +103,7 @@ public class TestPane extends VBox
                 for (int i = 0; i < entries.size(); ++i)
                 {
                     Text text = new Text(String.format(" %" + (int) Math.ceil(Math.log(maxValue) / Math.log(alphabet.size())) + "s ", entries.get(i)));
-                    text.fontProperty().set(Constants.FONT);
+                    text.fontProperty().bind(Constants.getFont("font"));
                     text.fillProperty().bind(mainPane.getSimulation().test(entries.get(i)) ? Constants.getColor(SUCCESS_COLOR) : Constants.getColor(FAILURE_COLOR));
                     gridPane.add(text, i / 16, i % 16);
                 }

@@ -28,7 +28,7 @@ public class Node extends GraphItem
     public static final String INITIAL_COLOR       = "graph.node.initial_color";
     public static final String CURRENT_COLOR       = "graph.node.current_color";
     public static final String OUTER_CIRCLE_RADIUS = "graph.node.outer_circle_radius";
-    public static final String NAME_FONT_SIZE      = "graph.node.name_font_size";
+
 
     private final Position pos;
     private final State    state;
@@ -66,7 +66,7 @@ public class Node extends GraphItem
         outerCircle.visibleProperty().bind(state.isAcceptingProperty());
 
         Text text = new Text();
-        Constants.getDouble(NAME_FONT_SIZE).addListener((o, ov, nv) -> text.setFont(new Font(text.getFont().getName(), nv)));
+        text.fontProperty().bind(Constants.getFont("graph.font"));
         text.textProperty().bind(state.nameProperty());
         text.setTextAlignment(TextAlignment.CENTER);
 

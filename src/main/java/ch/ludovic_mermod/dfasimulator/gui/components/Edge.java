@@ -66,7 +66,7 @@ public class Edge extends GraphItem
         updatingTargetFromControl = new AtomicBoolean(false);
 
         alphabetDisplay = new Text();
-        Constants.getDouble(GraphPane.FONT_SIZE).addListener((o, ov, nv) -> alphabetDisplay.setFont(new Font(alphabetDisplay.getFont().getName(), nv)));
+        alphabetDisplay.fontProperty().bind(Constants.getFont("graph.font"));
         updateAlphabetDisplay();
         source.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
         source.transitionMap().addListener((k, p) -> updateAlphabetDisplay());

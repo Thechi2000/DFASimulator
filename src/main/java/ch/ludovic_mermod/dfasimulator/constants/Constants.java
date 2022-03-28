@@ -79,19 +79,17 @@ public class Constants
 
     private static void addEntries(JSONObject object, String objectPath) throws IOManager.CorruptedFileException
     {
-        if (object.has(".value") && object.has(".type"))
+        if (object.has(".type"))
         {
             String type = object.get(".type").getAsString();
-            JSONElement valueElement = object.get(".value");
             ObjectProperty<Object> obs = switch (type)
                     {
-                        case "double" -> new SimpleObjectProperty<>(valueElement.getAsDouble());
-                        case "boolean" -> new SimpleObjectProperty<>(valueElement.getAsBoolean());
-                        case "color" -> new SimpleObjectProperty<>(Color.valueOf(valueElement.getAsString()));
-                        default -> throw new IOManager.CorruptedFileException("Unknown type \"%s\" at \"%s\"", valueElement.getAsString(), object);
+                        case "double" -> new SimpleObjectProperty<>(object.get(".value").getAsDouble());
+                        case "boolean" -> new SimpleObjectProperty<>(object.get(".value").getAsJSONPrimitive().getAsBoolean());
+                        case "color" -> new SimpleObjectProperty<>(Color.valueOf(object.get(".value").getAsString()));
+                        case "font" -> new SimpleObjectProperty<>(new Font(object.get(".name").getAsString(), object.get(".size").getAsDouble()));
+                        default -> throw new IOManager.CorruptedFileException("Unknown type \"%s\" at \"%s\"", object.get(".value").getAsString(), object);
                     };
-
-            object.addProperty(".value", obs);
             values.put(objectPath, obs);
         }
         else
@@ -117,6 +115,10 @@ public class Constants
     {
         return get(key, BLACK);
     }
+    public static ObjectProperty<Font> getFont(String key)
+    {
+        return get(key, Font.getDefault());
+    }
     public static <T> ObjectProperty<T> get(String key, T defaultValue)
     {
         if (!values.containsKey(key))
@@ -127,19 +129,19 @@ public class Constants
             values.put(key, prop);
 
             var sett = getSetting(key);
-            sett.addProperty(".value", prop);
             sett.addProperty(".type", switch (defaultValue.getClass().getSimpleName())
                     {
                         case "Double" -> "double";
                         case "Boolean" -> "boolean";
                         case "Color" -> "color";
+                        case "Font" -> "font";
                         default -> "string";
                     });
         }
 
         var value = values.get(key);
         if (defaultValue.getClass().isAssignableFrom(value.get().getClass())) return (ObjectProperty<T>) value;
-        else throw new IllegalArgumentException("Property \"%s\" is not of type \"%s\"");
+        else throw new IllegalArgumentException(String.format("Property \"%s\" is not of type \"%s\"", key, defaultValue.getClass().getName()));
     }
 
     public static Boolean getBooleanValue(String key)
@@ -153,6 +155,10 @@ public class Constants
     public static Color getColorValue(String key)
     {
         return getValue(key, BLACK);
+    }
+    public static Font getFontValue(String key)
+    {
+        return getValue(key, Font.getDefault());
     }
     public static <T> T getValue(String key, T defaultValue)
     {

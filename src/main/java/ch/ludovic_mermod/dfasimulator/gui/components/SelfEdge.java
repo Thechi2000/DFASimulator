@@ -59,6 +59,7 @@ public class SelfEdge extends GraphItem
         // Create alphabet display
         {
             alphabetDisplay = new Text();
+            alphabetDisplay.fontProperty().bind(Constants.getFont("graph.font"));
             alphabetDisplay.xProperty().bind(center.xProperty());
             alphabetDisplay.yProperty().bind(center.yProperty().subtract(radius).subtract(20));
             updateAlphabetDisplay();
