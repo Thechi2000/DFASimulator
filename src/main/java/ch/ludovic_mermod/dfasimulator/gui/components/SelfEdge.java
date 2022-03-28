@@ -87,6 +87,7 @@ public class SelfEdge extends GraphItem
             arrow.widthProperty().bind(Constants.getDouble(Edge.WIDTH));
             arrow.sidelineLengthProperty().bind(Constants.getDouble(Edge.SIDELINE_LENGTH));
             arrow.fillProperty().bind(Constants.getColor(Edge.COLOR));
+            arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
         }
 
         // Add endpoints bindings
