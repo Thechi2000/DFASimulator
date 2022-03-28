@@ -1,0 +1,83 @@
+{
+  "graph": {
+    "control_line": {
+      "color": {
+        ".type": "color",
+        ".value": "0xff0000ff"
+      },
+      "width": {
+        ".type": "double",
+        ".value": 3.0
+      }
+    },
+    "control_point": {
+      "fill": {
+        ".type": "color",
+        ".value": "0xff0000ff"
+      },
+      "radius": {
+        ".type": "double",
+        ".value": 5.0
+      }
+    },
+    "edge": {
+      "color": {
+        ".type": "color",
+        ".value": "0x000000ff"
+      },
+      "sideline_length": {
+        ".type": "double",
+        ".value": 40.0
+      },
+      "width": {
+        ".type": "double",
+        ".value": 10.0
+      }
+    },
+    "font": {
+      ".name": "System Regular",
+      ".size": 12.0,
+      ".type": "font"
+    },
+    "font_size": {
+      ".type": "double",
+      ".value": 20.0
+    },
+    "node": {
+      "current_color": {
+        ".type": "color",
+        ".value": "0xff0000ff"
+      },
+      "default_color": {
+        ".type": "color",
+        ".value": "0x008000ff"
+      },
+      "initial_color": {
+        ".type": "color",
+        ".value": "0x0000ffff"
+      },
+      "inner_circle_radius": {
+        ".type": "double",
+        ".value": 50.0
+      },
+      "name_font_size": {
+        ".type": "double",
+        ".value": 20.0
+      },
+      "outer_circle_radius": {
+        ".type": "double",
+        ".value": 60.0
+      }
+    }
+  },
+  "test_pane": {
+    "grid_lines": {
+      ".type": "boolean",
+      ".value": false
+    },
+    "input_spacing": {
+      ".type": "double",
+      ".value": 5.0
+    }
+  }
+}
