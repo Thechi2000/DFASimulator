@@ -14,8 +14,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+/**
+ * Static grouping of all translatable Strings of the application.
+ * Each one is indexed with a unique String id.
+ */
 public class Strings
 {
+    private Strings(){}
+
     protected static final Pattern DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
 
     private static final PropertiesMap<String, String> map;
@@ -71,11 +77,26 @@ public class Strings
         target.bind(get(id));
     }
 
+    /**
+     * Bind a StringProperty to a String produced by formatting the value of id with the objects
+     * If an object is a property, its value is used in formatting (instead of the whole property) the target is updated when the property is
+     *
+     * @param id      (String) id of the String used as format
+     * @param target  (StringProperty) target to bind to the formatted String
+     * @param objects (Objects[]) objects to use for formatting
+     */
     public static void bindFormat(String id, StringProperty target, Object... objects)
     {
         target.bind(CustomBindings.format(get(id), objects));
     }
 
+    /**
+     * Format the value of id with the objects
+     *
+     * @param id      (String) id of the String used as format
+     * @param objects (Objects[]) objects to use for formatting
+     * @return the formatted String
+     */
     public static String format(String id, Object... objects)
     {
         String format = get(id).get();
@@ -98,6 +119,11 @@ public class Strings
         map.setValue(id, value);
     }
 
+    /**
+     * Load translations for a locale
+     *
+     * @param locale (Locale) locale to load
+     */
     public static void loadLocale(Locale locale)
     {
         try

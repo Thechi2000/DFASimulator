@@ -18,13 +18,15 @@ import java.util.regex.Pattern;
 
 import static javafx.scene.paint.Color.BLACK;
 
+/**
+ * Static grouping of all Constants for the application.
+ * Each one is indexed with a unique String id.
+ */
 public class Constants
 {
-    public static final Font FONT = new Font(Font.getDefault().getName(), 20);
+    private Constants() {}
 
-    public static final Pattern BOOL_PATTERN   = Pattern.compile("(true|false)");
     public static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+\\.?\\d*|\\d*\\.\\d+)d?");
-    public static final Pattern COLOR_PATTERN  = Pattern.compile("0x[\\da-fA-F]{8}");
 
     private static final PropertiesMap<String, Object> values;
 
@@ -37,6 +39,10 @@ public class Constants
         //values.addListener((p, k, o, n) -> getSetting (k).);
     }
 
+    /**
+     * @param id (String) id of the setting to get
+     * @return the JSONObject representing the queried setting
+     */
     public static JSONObject getSetting(String id)
     {
         List<String> path = Arrays.asList(id.split("\\."));
@@ -57,6 +63,11 @@ public class Constants
         return getSetting(object.getAsJSONObject(path.get(0)), path.subList(1, path.size()));
     }
 
+    /**
+     * Load all settings from a file
+     *
+     * @param filename (String) the file to load from
+     */
     public static void loadFromFile(String filename)
     {
         var readJSON = JSONElement.readFromFile(filename);
@@ -72,6 +83,12 @@ public class Constants
             Main.logger.log(Level.SEVERE, "Could not parse settings file", e);
         }
     }
+
+    /**
+     * Save all settings to a file
+     *
+     * @param filename (String) the file to save to
+     */
     public static void saveToFile(String filename)
     {
         json.saveToFile(filename);
@@ -103,32 +120,63 @@ public class Constants
         }
     }
 
-    public static ObjectProperty<Boolean> getBoolean(String key)
+    /**
+     * Get a setting as a Boolean setting
+     *
+     * @param id (String) id of the setting
+     * @return the ObjectProperty for the setting
+     */
+    public static ObjectProperty<Boolean> getBoolean(String id)
     {
-        return get(key, false);
+        return get(id, false);
     }
-    public static ObjectProperty<Double> getDouble(String key)
+    /**
+     * Get a setting as a Double setting
+     *
+     * @param id (String) id of the setting
+     * @return the ObjectProperty for the setting
+     */
+    public static ObjectProperty<Double> getDouble(String id)
     {
-        return get(key, 0d);
+        return get(id, 0d);
     }
-    public static ObjectProperty<Color> getColor(String key)
+    /**
+     * Get a setting as a Color setting
+     *
+     * @param id (String) id of the setting
+     * @return the ObjectProperty for the setting
+     */
+    public static ObjectProperty<Color> getColor(String id)
     {
-        return get(key, BLACK);
+        return get(id, BLACK);
     }
-    public static ObjectProperty<Font> getFont(String key)
+    /**
+     * Get a setting as a Font setting
+     *
+     * @param id (String) id of the setting
+     * @return the ObjectProperty for the setting
+     */
+    public static ObjectProperty<Font> getFont(String id)
     {
-        return get(key, Font.getDefault());
+        return get(id, Font.getDefault());
     }
-    public static <T> ObjectProperty<T> get(String key, T defaultValue)
+    /**
+     * Get a setting as a T setting
+     *
+     * @param <T> type of the setting value
+     * @param id  (String) id of the setting
+     * @return the ObjectProperty for the setting
+     */
+    public static <T> ObjectProperty<T> get(String id, T defaultValue)
     {
-        if (!values.containsKey(key))
+        if (!values.containsKey(id))
         {
-            Main.log(Level.WARNING, "Could not find property \"%s\" of type %s", key, defaultValue.getClass().getName());
+            Main.log(Level.WARNING, "Could not find property \"%s\" of type %s", id, defaultValue.getClass().getName());
 
             SimpleObjectProperty<Object> prop = new SimpleObjectProperty<>(defaultValue);
-            values.put(key, prop);
+            values.put(id, prop);
 
-            var sett = getSetting(key);
+            var sett = getSetting(id);
             sett.addProperty(".type", switch (defaultValue.getClass().getSimpleName())
                     {
                         case "Double" -> "double";
@@ -139,37 +187,78 @@ public class Constants
                     });
         }
 
-        var value = values.get(key);
+        var value = values.get(id);
         if (defaultValue.getClass().isAssignableFrom(value.get().getClass())) return (ObjectProperty<T>) value;
-        else throw new IllegalArgumentException(String.format("Property \"%s\" is not of type \"%s\"", key, defaultValue.getClass().getName()));
+        else throw new IllegalArgumentException(String.format("Property \"%s\" is not of type \"%s\"", id, defaultValue.getClass().getName()));
     }
 
-    public static Boolean getBooleanValue(String key)
+    /**
+     * Get a setting value as a Boolean
+     *
+     * @param id (String) id of the setting
+     * @return the value of the setting
+     */
+    public static Boolean getBooleanValue(String id)
     {
-        return getValue(key, false);
+        return getValue(id, false);
     }
-    public static Double getDoubleValue(String key)
+    /**
+     * Get a setting value as a Double
+     *
+     * @param id (String) id of the setting
+     * @return the value of the setting
+     */
+    public static Double getDoubleValue(String id)
     {
-        return getValue(key, 0d);
+        return getValue(id, 0d);
     }
-    public static Color getColorValue(String key)
+    /**
+     * Get a setting value as a Color
+     *
+     * @param id (String) id of the setting
+     * @return the value of the setting
+     */
+    public static Color getColorValue(String id)
     {
-        return getValue(key, BLACK);
+        return getValue(id, BLACK);
     }
-    public static Font getFontValue(String key)
+    /**
+     * Get a setting value as a Font
+     *
+     * @param id (String) id of the setting
+     * @return the value of the setting
+     */
+    public static Font getFontValue(String id)
     {
-        return getValue(key, Font.getDefault());
+        return getValue(id, Font.getDefault());
     }
-    public static <T> T getValue(String key, T defaultValue)
+    /**
+     * Get a setting value as a T
+     *
+     * @param <T> type of the setting value
+     * @param id  (String) id of the setting
+     * @return the value of the setting
+     */
+    public static <T> T getValue(String id, T defaultValue)
     {
-        return get(key, defaultValue).getValue();
+        return get(id, defaultValue).getValue();
     }
 
-    public static <T> void setValue(String key, T value)
+    /**
+     * Set the value of a setting to a given value
+     *
+     * @param id    (String) the id of the setting to set
+     * @param value (T) the value to give
+     * @param <T>   the type of the value
+     */
+    public static <T> void setValue(String id, T value)
     {
-        values.get(key).set(value);
+        values.get(id).set(value);
     }
 
+    /**
+     * @return (Set < String) a Set containing all available settings' ids
+     */
     public static Set<String> keySet()
     {
         return values.keySet();

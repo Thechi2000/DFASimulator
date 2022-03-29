@@ -8,6 +8,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 
+/**
+ * Represent a Point2D property
+ */
 public class Point2DProperty extends ObjectProperty<Point2D>
 {
     private final String         name;
@@ -15,18 +18,41 @@ public class Point2DProperty extends ObjectProperty<Point2D>
     private final DoubleProperty x;
     private final DoubleProperty y;
 
+    /**
+     * Constructs a Point2DProperty with value {0, 0}
+     */
     public Point2DProperty()
     {
         this(null, "");
     }
+    /**
+     * Constructs a Point2DProperty with value {x, y}
+     *
+     * @param x x coordinate of the point
+     * @param y y coordinate of the point
+     */
     public Point2DProperty(double x, double y)
     {
         this(null, "", x, y);
     }
+    /**
+     * Constructs a Point2DProperty with value {0, 0}
+     *
+     * @param bean bean of the property
+     * @param name name of the property
+     */
     public Point2DProperty(Object bean, String name)
     {
         this(bean, name, 0, 0);
     }
+    /**
+     * Constructs a Point2DProperty with value {x, y}
+     *
+     * @param bean bean of the property
+     * @param name name of the property
+     * @param x    x coordinate of the point
+     * @param y    y coordinate of the point
+     */
     public Point2DProperty(Object bean, String name, double x, double y)
     {
         this.bean = bean;

@@ -12,16 +12,32 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Represent an easy to manipulate map of properties
+ * When an entry is added, all MapChangeListeners and PropertyChangeListeners are called
+ * When an entry is updated, all PropertyChangeListeners are called
+ * When an entry is removed, all MapChangeListeners and PropertyRemoveListeners are called
+ *
+ * @param <K> type of the keys
+ * @param <V> type of the values
+ */
 public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
 {
     private final ObservableMap<K, ObjectProperty<V>> map;
     private final Set<PropertyChangeListener<K, V>>   propertyChangeListeners;
     private final Set<PropertyRemoveListener<K, V>>   propertyRemoveListeners;
 
+    /**
+     * Construct an empty map
+     */
     public PropertiesMap()
     {
         this(FXCollections.observableHashMap());
     }
+    /**
+     * Construct a map from an observable map
+     * The given map will be used and will not be copied
+     */
     public PropertiesMap(ObservableMap<K, ObjectProperty<V>> map)
     {
         this.map = map;
@@ -35,6 +51,14 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
         });
     }
 
+    /**
+     * Returns the object property at the given key
+     * If there is none, it is put and set to the given value
+     *
+     * @param key key of the queried property
+     * @param def default value to use if no property is found
+     * @return the object property at the given key
+     */
     public ObjectProperty<V> computeIfAbsent(Object key, V def)
     {
         if (map.containsKey(key)) return map.get(key);
@@ -46,6 +70,14 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
         }
     }
 
+    /**
+     * Set the property of a key to the given value
+     * If there is none, it is put and set to the given value
+     *
+     * @param key   key of the property to modify
+     * @param value value to give
+     * @return the modified property
+     */
     public ObjectProperty<V> setValue(K key, V value)
     {
         if (map.containsKey(key))
@@ -57,6 +89,12 @@ public class PropertiesMap<K, V> implements ObservableMap<K, ObjectProperty<V>>
         else put(key, new SimpleObjectProperty<>(value));
         return map.get(key);
     }
+    /**
+     * Returns the value of the property at the given key
+     *
+     * @param key key of the queried property
+     * @return value of the property at the given key
+     */
     public V getValue(K key)
     {
         return computeIfAbsent(key, (V) null).get();

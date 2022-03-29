@@ -16,8 +16,20 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+/**
+ * Static class grouping miscellaneous methods
+ */
 public class Utils
 {
+    private Utils() {}
+
+    /**
+     * Creates a collector for a HashMap
+     *
+     * @param <K> type of the keys
+     * @param <V> type of the values
+     * @return a collector for a HashMap
+     */
     public static <K, V> Collector<Map.Entry<K, V>, HashMap<K, V>, Map<K, V>> toMap()
     {
         return new Collector<>()
@@ -54,6 +66,13 @@ public class Utils
         };
     }
 
+    /**
+     * Creates a collector for a TreeMap
+     *
+     * @param <K> type of the keys
+     * @param <V> type of the values
+     * @return a collector for a TreeMap
+     */
     public static <K, V> Collector<Map.Entry<K, V>, TreeMap<K, V>, TreeMap<K, V>> toTreeMap()
     {
         return new Collector<>()
@@ -90,6 +109,15 @@ public class Utils
         };
     }
 
+    /**
+     * Creates a StringConverter
+     *
+     * @param toString   function to convert T to String
+     * @param fromString function to convert String to T
+     * @param nullString String to be considered as a null value
+     * @param <T>        type of the converted
+     * @return a StringConverter
+     */
     public static <T> StringConverter<T> stringConverter(Function<T, String> toString, Function<String, T> fromString, String nullString)
     {
         return new StringConverter<T>()
@@ -107,6 +135,14 @@ public class Utils
         };
     }
 
+    /**
+     * Create, open and return a new Stage
+     *
+     * @param content content of the Stage
+     * @param width   width of the Scene
+     * @param height  height of the Scene
+     * @return the newly created Stage
+     */
     public static Stage openNewStage(Parent content, double width, double height)
     {
         Stage s = new Stage();
@@ -114,6 +150,12 @@ public class Utils
         s.show();
         return s;
     }
+    /**
+     * Create, open and return a new Stage
+     *
+     * @param content content of the Stage
+     * @return the newly created Stage
+     */
     public static Stage openNewStage(Parent content)
     {
         Stage s = new Stage();
