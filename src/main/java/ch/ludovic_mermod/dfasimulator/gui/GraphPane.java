@@ -207,7 +207,7 @@ public class GraphPane extends Region
 
         MenuItem create = new MenuItem();
         Strings.bind("create", create.textProperty());
-        create.setOnAction(event -> mainPane.getFiniteAutomaton().createNode(menuPosition.getX(), menuPosition.getY()));
+        create.setOnAction(event -> mainPane.getFiniteAutomaton().addState(menuPosition.getX(), menuPosition.getY()));
         create.disableProperty().bind(simulation.isSimulatingProperty());
         menu.getItems().add(create);
 
