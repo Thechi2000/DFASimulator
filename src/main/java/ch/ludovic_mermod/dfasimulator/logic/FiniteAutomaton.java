@@ -16,6 +16,10 @@ import javafx.collections.*;
 import java.util.Objects;
 import java.util.TreeSet;
 
+/**
+ * Represent a deterministic FiniteAutomaton
+ * Will be improved to handle non-deterministic automatons
+ */
 public class FiniteAutomaton
 {
     public static final String JSON_ALPHABET = "alphabet";
@@ -29,6 +33,9 @@ public class FiniteAutomaton
     private final ObservableSet<Character> alphabet;
     private       MainPane                 mainPane;
 
+    /**
+     * Constructs a FiniteAutomaton
+     */
     public FiniteAutomaton()
     {
         initialState = new SimpleObjectProperty<>(this, "initialState", null);
@@ -80,6 +87,10 @@ public class FiniteAutomaton
         });
     }
 
+    /**
+     * Bind values to the MainPane
+     * @param mainPane the MainPane to bind to
+     */
     public void create(MainPane mainPane)
     {
         this.mainPane = mainPane;
@@ -118,17 +129,39 @@ public class FiniteAutomaton
             Platform.runLater(() -> state.nameProperty().set(oldName));
     }
 
+    /**
+     * Adds a State with a given name (if it is valid)
+     * The State position will be (0, 0)
+     * @param name the name of the new State
+     */
     public void addState(String name)
     {
         State state = new State(this);
         state.nameProperty().set(name);
         addState(state);
     }
+    /**
+     * Adds a State to the automaton
+     * @param state the State to add
+     */
     public void addState(State state)
     {
         states.add(state);
         mainPane.getGraphPane().addState(state);
     }
+    /**
+     * Add a State at the given position
+     */
+    public void addState(double x, double y)
+    {
+        State state = new State(this);
+        addState(state);
+        state.getNode().relocate(x, y);
+    }
+    /**
+     * Remove a State from the automaton
+     * @param state the state to remove
+     */
     public void removeState(State state)
     {
         states.stream()
@@ -142,12 +175,11 @@ public class FiniteAutomaton
         states.remove(state);
         mainPane.getGraphPane().removeState(state);
     }
-    public void createNode(double x, double y)
-    {
-        State state = new State(this);
-        addState(state);
-        state.getNode().relocate(x, y);
-    }
+
+    /**
+     * Clear the automaton
+     * Remove all states, edges, alphabet, and the initial state
+     */
     public void clear()
     {
         initialState.set(null);
@@ -155,6 +187,7 @@ public class FiniteAutomaton
         states.clear();
         mainPane.getGraphPane().children().clear();
         mainPane.getGraphPane().edges().clear();
+        mainPane.getGraphPane().selfEdges().clear();
     }
 
     public MainPane getMainPane()
@@ -167,15 +200,28 @@ public class FiniteAutomaton
         return jsonObject;
     }
 
+    /**
+     * @param name name of the queried state
+     * @return the State with the given name, or null if none is found
+     */
     public State getState(String name)
     {
         return states.stream().filter(s -> s.name().equals(name)).findAny().orElse(null);
     }
+    /**
+     * @param name name of the queried state
+     * @return whether there exists a State with the given name
+     */
     public boolean hasState(String name)
     {
         return states.stream().anyMatch(s -> s.name().equals(name));
     }
 
+    /**
+     * Load the automaton from a JSONObject
+     * @param object the object to load
+     * @throws IOManager.CorruptedFileException when the object is invalid
+     */
     public void loadJSON(JSONObject object) throws IOManager.CorruptedFileException
     {
         object.checkHasArray(JSON_STATES);

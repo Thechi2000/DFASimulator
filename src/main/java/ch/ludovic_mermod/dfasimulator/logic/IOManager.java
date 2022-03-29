@@ -14,6 +14,9 @@ import java.io.File;
 import java.util.Optional;
 import java.util.logging.Level;
 
+/**
+ * Manages the open/save actions for the current automaton
+ */
 public class IOManager
 {
     private final MainPane        mainPane;
@@ -25,6 +28,9 @@ public class IOManager
     private final JSONObject  currentFile;
     private       JSONElement savedFile;
 
+    /**
+     * Constructs an IOManager for the given MainPane
+     */
     public IOManager(MainPane mainPane)
     {
         this.mainPane = mainPane;
@@ -41,6 +47,9 @@ public class IOManager
         currentFile.addListener((JSONElement.ChildUpdateListener) update -> updateSavedProperty());
     }
 
+    /**
+     * Save the automaton to the current file
+     */
     public void save()
     {
         if (filepathProperty.isEmpty().get() || filepathProperty.get().isEmpty())
@@ -55,14 +64,23 @@ public class IOManager
 
         updateSavedProperty();
     }
+    /**
+     * Changes the current file and save the automaton to it
+     * @param filename the path of the file
+     */
     public void saveAs(String filename)
     {
         filepathProperty.set(filename);
         save();
     }
+    /**
+     * Open the given file
+     * @param filename the file to oepn
+     */
     public void open(String filename)
     {
         filepathProperty.set(filename);
+        if(!close()) return;
 
         try
         {
@@ -85,6 +103,9 @@ public class IOManager
 
         updateSavedProperty();
     }
+    /**
+     * Open a new file
+     */
     public void openNew()
     {
         finiteAutomaton.clear();
@@ -108,6 +129,11 @@ public class IOManager
         return isSavedProperty;
     }
 
+    /**
+     * Close the current file
+     * If the file is not saved, the user is prompted for saving the file
+     * @return whether the closure was successful (i.e. whether the file is saved)
+     */
     public boolean close()
     {
         if (isSaved()) return true;

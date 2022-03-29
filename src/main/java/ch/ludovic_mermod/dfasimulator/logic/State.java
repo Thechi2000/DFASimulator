@@ -32,6 +32,10 @@ public class State
     private final Node            node;
     private final FiniteAutomaton finiteAutomaton;
 
+    /**
+     * Construct a State for a finite automaton
+     * @param finiteAutomaton the parent automaton
+     */
     public State(FiniteAutomaton finiteAutomaton)
     {
         this.finiteAutomaton = finiteAutomaton;
@@ -73,6 +77,14 @@ public class State
         transitionMapProperty.addListener((k, p) -> jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).remove(String.valueOf(k)));
     }
 
+    /**
+     * Creates a State from a JSONObject
+     * The transition map is not loaded, it must be with the loadTransitionMap method
+     * @param jsonObject the jsonObject containing the information for the state
+     * @param finiteAutomaton the parent automaton
+     * @return the new State
+     * @throws IOManager.CorruptedFileException when the jsonObject does not hold the correct values
+     */
     public static State fromJSONObject(JSONObject jsonObject, FiniteAutomaton finiteAutomaton) throws IOManager.CorruptedFileException
     {
         jsonObject.checkHasString(JSON_NAME);
@@ -87,6 +99,12 @@ public class State
         state.node.relocate(jsonObject.get(State.JSON_X_COORD).getAsDouble() + state.node.getLayoutBounds().getMinX(), jsonObject.get(JSON_Y_COORD).getAsDouble() + state.node.getLayoutBounds().getMinY());
         return state;
     }
+
+    /**
+     * Load a transition map from a jsonObject
+     * @param jsonObject a jsonObject containing the transition map
+     * @throws IOManager.CorruptedFileException when the jsonObject is invalid
+     */
     public void loadTransitionMap(JSONObject jsonObject) throws IOManager.CorruptedFileException
     {
         for (Map.Entry<String, JSONElement> e : jsonObject.entrySet())

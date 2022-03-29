@@ -6,6 +6,9 @@ import javafx.beans.property.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Hold the information for simulating an automaton with an input
+ */
 public class Simulation
 {
     private final FiniteAutomaton finiteAutomaton;
@@ -19,6 +22,9 @@ public class Simulation
     private final BooleanProperty resultProperty;
     private final BooleanProperty simulationEndedProperty;
 
+    /**
+     * Construct a Simulation for a given MainPane
+     */
     public Simulation(MainPane mainPane)
     {
         finiteAutomaton = mainPane.getFiniteAutomaton();
@@ -68,6 +74,11 @@ public class Simulation
         return simulationEndedProperty;
     }
 
+    /**
+     * Check whether the automaton is a valid DFA
+     *
+     * @return a list containing all design errors (if empty, the DFA is valid)
+     */
     public List<Error> checkDFA()
     {
         List<Error> errors = new ArrayList<>();
@@ -94,6 +105,12 @@ public class Simulation
         return errors;
     }
 
+    /**
+     * Check whether the automaton is a valid DFA and the input matches the alphabet
+     *
+     * @param input the input for the simulation
+     * @return a list containing all design errors (if empty, the DFA is valid)
+     */
     public List<Error> checkDFA(String input)
     {
         Set<Character> alphabet = finiteAutomaton.alphabet();
@@ -105,6 +122,11 @@ public class Simulation
         return errors;
     }
 
+    /**
+     * Lists all design errors and prints them to the ConsolePane
+     *
+     * @return whether the DFA is valid
+     */
     @SuppressWarnings("unchecked")
     public boolean compileDFA()
     {
@@ -139,7 +161,11 @@ public class Simulation
         return errors.size() == 0;
     }
 
-
+    /**
+     * Start a simulation
+     *
+     * @param input the input of the simulation
+     */
     public void startSimulation(String input)
     {
         if (!compileDFA()) return;
@@ -151,6 +177,9 @@ public class Simulation
         initialInputProperty.set(input);
     }
 
+    /**
+     * Analyse next character in the input String
+     */
     public void nextSimulationStep()
     {
         if (remainingInputProperty.get().length() == 0)
@@ -170,6 +199,9 @@ public class Simulation
             simulationEndedProperty.set(true);
     }
 
+    /**
+     * Analyse all remaining characters one by one
+     */
     public void finish()
     {
         if (!isSimulatingProperty.get()) return;
@@ -185,6 +217,12 @@ public class Simulation
         }, 1000);
     }
 
+    /**
+     * Test whether an input is accepted
+     *
+     * @param input the input to test
+     * @return whether the input is accepted
+     */
     public boolean test(String input)
     {
         if (!compileDFA()) return false;
@@ -203,6 +241,12 @@ public class Simulation
         STRING_DOES_NOT_MATCH_ALPHABET
     }
 
+    /**
+     * Store an error
+     *
+     * @param code the ErrorCode
+     * @param data data to explicit the error, depends on the ErrorCode
+     */
     public record Error(ErrorCode code, Object[] data)
     {
     }
