@@ -20,10 +20,7 @@ import java.util.regex.Pattern;
  */
 public class Strings
 {
-    private Strings(){}
-
     protected static final Pattern DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
-
     private static final PropertiesMap<String, String> map;
 
     static
@@ -32,6 +29,7 @@ public class Strings
         loadLocale(Locale.ENGLISH);
     }
 
+    private Strings() {}
     /**
      * The StringProperty representing the id
      *

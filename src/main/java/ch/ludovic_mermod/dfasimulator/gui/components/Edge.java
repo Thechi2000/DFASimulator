@@ -17,7 +17,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -26,9 +26,9 @@ import java.util.logging.Level;
 
 public class GraphPane extends Region
 {
+    public static final    String     FONT_SIZE       = "graph.font_size";
     protected static final String     JSON_SELF_EDGES = "self_edges";
     protected static final String     JSON_EDGES      = "edges";
-    public static final String FONT_SIZE = "graph.font_size";
     private final          JSONObject object;
 
     private final ObservableSet<Edge>       edges;
