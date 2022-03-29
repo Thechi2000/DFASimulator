@@ -37,13 +37,13 @@ public class MenuBar extends javafx.scene.control.MenuBar
             MenuItem newItem = new MenuItem();
             Strings.bind("menu.file.new", newItem.textProperty());
             newItem.setOnAction(event -> mainPane.getIoManager().openNew());
-            newItem.acceleratorProperty().bind(Controls.newFile);
+            newItem.acceleratorProperty().bind(Controls.NEW_FILE);
             fileMenu.getItems().add(newItem);
 
             MenuItem open = new MenuItem();
             Strings.bind("menu.file.open", open.textProperty());
             open.setOnAction(event -> open());
-            open.acceleratorProperty().bind(Controls.open);
+            open.acceleratorProperty().bind(Controls.OPEN);
             fileMenu.getItems().add(open);
 
             fileMenu.getItems().add(separator);
@@ -51,13 +51,13 @@ public class MenuBar extends javafx.scene.control.MenuBar
             MenuItem save = new MenuItem();
             Strings.bind("menu.file.save", save.textProperty());
             save.setOnAction(event -> mainPane.getIoManager().save());
-            save.acceleratorProperty().bind(Controls.save);
+            save.acceleratorProperty().bind(Controls.SAVE);
             fileMenu.getItems().add(save);
 
             MenuItem saveAs = new MenuItem();
             Strings.bind("menu.file.save_as", saveAs.textProperty());
             saveAs.setOnAction(event -> saveAs());
-            saveAs.acceleratorProperty().bind(Controls.saveAs);
+            saveAs.acceleratorProperty().bind(Controls.SAVE_AS);
             fileMenu.getItems().add(saveAs);
         }
 
@@ -70,7 +70,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
             MenuItem settings = new MenuItem();
             Strings.bind("menu.window.settings", settings.textProperty());
             settings.setOnAction(event -> Utils.openNewStage(new SettingsPane()));
-            settings.acceleratorProperty().bind(Controls.settings);
+            settings.acceleratorProperty().bind(Controls.SETTINGS);
             windowMenu.getItems().add(settings);
         }
 
@@ -83,19 +83,19 @@ public class MenuBar extends javafx.scene.control.MenuBar
             MenuItem edit = new MenuItem();
             Strings.bind("menu.tools.edit", edit.textProperty());
             edit.setOnAction(event -> graphPane.setTool(GraphPane.Tool.EDIT));
-            edit.acceleratorProperty().bind(Controls.editTool);
+            edit.acceleratorProperty().bind(Controls.EDIT_TOOL);
             toolsMenu.getItems().add(edit);
 
             MenuItem drag = new MenuItem();
             Strings.bind("menu.tools.drag", drag.textProperty());
             drag.setOnAction(event -> graphPane.setTool(GraphPane.Tool.DRAG));
-            drag.acceleratorProperty().bind(Controls.dragTool);
+            drag.acceleratorProperty().bind(Controls.DRAG_TOOL);
             toolsMenu.getItems().add(drag);
 
             MenuItem link = new MenuItem();
             Strings.bind("menu.tools.link", link.textProperty());
             link.setOnAction(event -> graphPane.setTool(GraphPane.Tool.LINK));
-            link.acceleratorProperty().bind(Controls.linkTool);
+            link.acceleratorProperty().bind(Controls.LINK_TOOL);
             toolsMenu.getItems().add(link);
         }
 
