@@ -13,11 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Represent a group of Setting and SettingGroup
+ */
 public class SettingGroup extends VBox
 {
     private final Map<String, SettingGroup> childrenGroups;
     private final Map<String, Setting>      childrenSettings;
 
+    /**
+     * Constructs a SettingGroup for the given id
+     *
+     * @param id root of the settings of the group
+     */
     public SettingGroup(String id)
     {
         var childrenKeys = Constants.keySet().stream().filter(k -> k.startsWith(id)).toList();
@@ -69,6 +77,9 @@ public class SettingGroup extends VBox
         getChildren().addAll(childrenBox);
     }
 
+    /**
+     * Save recursively the current values of all child Setting to Constants
+     */
     public void saveChanges()
     {
         childrenGroups.values().forEach(SettingGroup::saveChanges);

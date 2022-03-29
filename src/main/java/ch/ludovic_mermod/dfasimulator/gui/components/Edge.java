@@ -22,6 +22,9 @@ import javafx.scene.text.Text;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+/**
+ * Represent an Edge between two nodes
+ */
 public class Edge extends GraphItem
 {
     public static final String JSON_SOURCE    = "source";
@@ -52,6 +55,12 @@ public class Edge extends GraphItem
     private final AtomicBoolean updatingControlFromTarget, updatingTargetFromControl;
     private Binding<Point2D> targetBinding;
 
+    /**
+     * Constructs an Edge
+     * @param source the source node of the Edge
+     * @param target the target node of the Edge
+     * @param graphPane the parent GraphPane
+     */
     public Edge(State source, State target, GraphPane graphPane)
     {
         super(graphPane);
@@ -121,17 +130,17 @@ public class Edge extends GraphItem
     {
         return jsonObject;
     }
+
+    /**
+     * Load control points from a JSONObject
+     * @param object the values to load
+     * @throws IOManager.CorruptedFileException when one or more values are missing in object
+     */
     public void loadJSONObject(JSONObject object) throws IOManager.CorruptedFileException
     {
         object.checkHasNumber(JSON_CONTROL_X);
         object.checkHasNumber(JSON_CONTROL_Y);
         setControlPoint(object.get(JSON_CONTROL_X).getAsDouble(), object.get(JSON_CONTROL_Y).getAsDouble());
-    }
-
-    public void setControlPoint(double x, double y)
-    {
-        curve.setControlX(x);
-        curve.setControlY(y);
     }
 
     @Override
@@ -149,6 +158,12 @@ public class Edge extends GraphItem
         final Point2D mousePosition = new Point2D(event.getX(), event.getY());
         if (bezier.distance(bezier.findClosest(mousePosition), mousePosition) < 10 || new Point2D(curve.getControlX(), curve.getControlY()).distance(mousePosition) < Constants.getDoubleValue(ControlPoint.RADIUS))
             super.onMousePressed(event);
+    }
+
+    private void setControlPoint(double x, double y)
+    {
+        curve.setControlX(x);
+        curve.setControlY(y);
     }
 
     private void bindPositions()

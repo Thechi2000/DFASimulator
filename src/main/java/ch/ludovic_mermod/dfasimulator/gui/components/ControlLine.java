@@ -7,6 +7,9 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.Group;
 import javafx.scene.shape.Line;
 
+/**
+ * Represent a dashed line to be used with ControlPoint
+ */
 public class ControlLine extends Group
 {
     public static final String WIDTH = "graph.control_line.width";

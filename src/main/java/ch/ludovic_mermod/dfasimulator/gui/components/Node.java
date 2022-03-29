@@ -20,6 +20,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+/**
+ * Represents a State of a FiniteAutomaton
+ */
 public class Node extends GraphItem
 {
     public static final String INNER_CIRCLE_RADIUS = "graph.node.inner_circle_radius";
@@ -28,17 +31,18 @@ public class Node extends GraphItem
     public static final String CURRENT_COLOR       = "graph.node.current_color";
     public static final String OUTER_CIRCLE_RADIUS = "graph.node.outer_circle_radius";
 
-
-    private final Position pos;
-    private final State    state;
-
+    private final State   state;
     private final Circle innerCircle;
-    private final Circle outerCircle;
+    private       Point2D pos;
 
     private final ContextMenu menu;
     private       MenuItem    deleteMenuItem;
 
-
+    /**
+     * Constructs a Node
+     * @param state the State to represent
+     * @param graphPane the parent GraphPane
+     */
     public Node(State state, GraphPane graphPane)
     {
         super(graphPane);
@@ -46,7 +50,7 @@ public class Node extends GraphItem
         this.state = state;
 
         menu = createContextMenu();
-        pos = new Position();
+        pos = new Point2D(0, 0);
 
         innerCircle = new Circle();
         innerCircle.radiusProperty().bind(Constants.getDouble(INNER_CIRCLE_RADIUS));
@@ -57,7 +61,7 @@ public class Node extends GraphItem
         graphPane.currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         updateCircleColor(innerCircle);
 
-        outerCircle = new Circle();
+        Circle outerCircle = new Circle();
         outerCircle.radiusProperty().bind(Constants.getDouble(OUTER_CIRCLE_RADIUS));
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
@@ -147,8 +151,7 @@ public class Node extends GraphItem
                         setCursor(Cursor.CLOSED_HAND);
 
                         //When a press event occurs, the location coordinates of the event are cached
-                        pos.x = event.getX() + getWidth() / 2;
-                        pos.y = event.getY() + getHeight() / 2;
+                        pos = new Point2D( event.getX() + getWidth() / 2,  event.getY() + getHeight() / 2);
                         break;
                 }
         });
@@ -157,8 +160,8 @@ public class Node extends GraphItem
         setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && graphPane.getTool() == GraphPane.Tool.DRAG)
             {
-                double distanceX = event.getX() - pos.x;
-                double distanceY = event.getY() - pos.y;
+                double distanceX = event.getX() - pos.getX();
+                double distanceY = event.getY() - pos.getY();
 
                 double x = getLayoutX() + distanceX;
                 double y = getLayoutY() + distanceY;
@@ -197,11 +200,5 @@ public class Node extends GraphItem
         menu.getItems().add(deleteMenuItem);
 
         return menu;
-    }
-
-    private static class Position
-    {
-        double x;
-        double y;
     }
 }

@@ -10,6 +10,10 @@ import javafx.scene.shape.Circle;
 
 import java.util.function.Function;
 
+/**
+ * Represents a movable small point
+ * The position may be constraint (e.g. to force it to be on a given line)
+ */
 public class ControlPoint extends Group
 {
     public static final String RADIUS = "graph.control_point.radius";

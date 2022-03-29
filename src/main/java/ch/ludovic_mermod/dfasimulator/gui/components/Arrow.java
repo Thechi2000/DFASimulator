@@ -11,8 +11,15 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Shape;
 
+/**
+ * Arrow shaped component
+ * The body of the arrow is the line from its start to its end
+ * The direction of the arrow is the tangent of the body at the end
+ * The sidelines are the two smaller lines at the end of the arrow
+ */
 public class Arrow extends Group
 {
     private final DoubleProperty endX;
@@ -25,14 +32,15 @@ public class Arrow extends Group
 
     private final ObjectProperty<Paint> fill;
 
-    private final Line leftLine;
-    private final Line rightLine;
-
-    public Arrow(Shape shape)
+    /**
+     * Constructs an arrow
+     * @param path the path of the body of the arrow
+     */
+    public Arrow(Path path)
     {
-        leftLine = new Line();
-        rightLine = new Line();
-        shape.setFill(Color.TRANSPARENT);
+        Line leftLine = new Line();
+        Line rightLine = new Line();
+        path.setFill(Color.TRANSPARENT);
 
         endX = new SimpleDoubleProperty();
         endY = new SimpleDoubleProperty();
@@ -43,12 +51,12 @@ public class Arrow extends Group
         width = new SimpleDoubleProperty();
         leftLine.strokeWidthProperty().bind(width);
         rightLine.strokeWidthProperty().bind(width);
-        shape.strokeWidthProperty().bind(width);
+        path.strokeWidthProperty().bind(width);
 
         fill = new SimpleObjectProperty<>(Color.BLACK);
         leftLine.fillProperty().bind(fill);
         rightLine.fillProperty().bind(fill);
-        shape.strokeProperty().bind(fill);
+        path.strokeProperty().bind(fill);
 
         Observable[] observables = new Observable[]{endX, endY, directionX, directionY, sidelineLength};
 
@@ -62,7 +70,7 @@ public class Arrow extends Group
         rightLine.endXProperty().bind(endX);
         rightLine.endYProperty().bind(endY);
 
-        getChildren().addAll(shape, leftLine, rightLine);
+        getChildren().addAll(path, leftLine, rightLine);
     }
 
     private Point2D computeProjection()

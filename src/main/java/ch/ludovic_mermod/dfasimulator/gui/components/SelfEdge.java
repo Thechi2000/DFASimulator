@@ -21,6 +21,9 @@ import javafx.util.Pair;
 
 import java.util.stream.Collectors;
 
+/**
+ * Represent an Edge from a Node to itself
+ */
 public class SelfEdge extends GraphItem
 {
     public static final String JSON_RADIUS   = "radius";

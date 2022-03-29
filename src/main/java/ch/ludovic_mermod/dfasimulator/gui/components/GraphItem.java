@@ -5,6 +5,10 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * Super class for the main components of a Graph
+ * Has a special MouseEvent handling, to have a more flexible management of the focus
+ */
 public class GraphItem extends Group
 {
     protected final GraphPane graphPane;
@@ -14,6 +18,11 @@ public class GraphItem extends Group
         this.graphPane = graphPane;
     }
 
+    /**
+     * Called when a MousePressedEvent is registered on the GraphPane
+     * Must check if this item is concerned by the click and consume the event if it is
+     * @param event the MouseEvent
+     */
     public void onMousePressed(MouseEvent event)
     {
         if (contains(event.getX(), event.getY()))
@@ -23,9 +32,9 @@ public class GraphItem extends Group
         }
     }
 
-    public BooleanBinding focusProperty()
+    protected BooleanBinding focusProperty()
     {
         return graphPane.focusedItemProperty().isEqualTo(this);
     }
-    public boolean hasFocus() {return graphPane.focusedItemProperty().get().equals(this);}
+    protected boolean hasFocus() {return graphPane.focusedItemProperty().get().equals(this);}
 }

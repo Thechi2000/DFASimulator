@@ -16,6 +16,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+/**
+ * Components for modifying a single parameter
+ */
 public class Setting extends HBox
 {
     private final ObjectProperty<Object> value;
@@ -23,6 +26,10 @@ public class Setting extends HBox
     private final String     id;
     private final JSONObject jsonSetting;
 
+    /**
+     * Constructs a Setting component for the setting with the given id
+     * @param id id of the setting to represent
+     */
     public Setting(String id)
     {
         this.id = id;
@@ -87,6 +94,9 @@ public class Setting extends HBox
         }
     }
 
+    /**
+     * Save the current value to the Constants
+     */
     public void saveChanges()
     {
         switch (jsonSetting.get(".type").getAsString())
