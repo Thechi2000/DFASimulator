@@ -3,6 +3,8 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.binding.BooleanBinding;
@@ -30,17 +32,23 @@ public class Node extends GraphItem
     public static final String INITIAL_COLOR       = "graph.node.initial_color";
     public static final String CURRENT_COLOR       = "graph.node.current_color";
     public static final String OUTER_CIRCLE_RADIUS = "graph.node.outer_circle_radius";
+    public static final String JSON_Y              = "y";
+    public static final String JSON_X              = "x";
+    public static final String JSON_STATE          = "state";
 
     private final State   state;
-    private final Circle innerCircle;
+    private final Circle  innerCircle;
     private       Point2D pos;
 
     private final ContextMenu menu;
     private       MenuItem    deleteMenuItem;
 
+    private final JSONObject object;
+
     /**
      * Constructs a Node
-     * @param state the State to represent
+     *
+     * @param state     the State to represent
      * @param graphPane the parent GraphPane
      */
     public Node(State state, GraphPane graphPane)
@@ -80,6 +88,11 @@ public class Node extends GraphItem
             menu.show(this, event.getScreenX(), event.getScreenY());
             event.consume();
         });
+
+        object = new JSONObject();
+        object.addProperty(JSON_STATE, state.nameProperty());
+        object.addProperty(JSON_X, layoutXProperty());
+        object.addProperty(JSON_Y, layoutYProperty());
     }
 
     protected StringProperty nameProperty()
@@ -110,6 +123,36 @@ public class Node extends GraphItem
     public DoubleProperty centerXProperty() {return layoutXProperty();}
     public DoubleProperty centerYProperty() {return layoutYProperty();}
     public ReadOnlyDoubleProperty radiusProperty() {return innerCircle.radiusProperty();}
+
+    public double getWidth()
+    {
+        return getBoundsInParent().getWidth();
+    }
+    public double getHeight()
+    {
+        return getBoundsInParent().getHeight();
+    }
+
+    public DoubleBinding widthBinding()
+    {
+        return CustomBindings.createDouble(this::getWidth, boundsInParentProperty());
+    }
+    public DoubleBinding heightBinding()
+    {
+        return CustomBindings.createDouble(this::getHeight, boundsInParentProperty());
+    }
+
+    public JSONObject getJSONObject()
+    {
+        return object;
+    }
+    public void loadFromJSONObject(JSONObject object) throws IOManager.CorruptedFileException
+    {
+        object.checkHasNumber(JSON_X);
+        object.checkHasNumber(JSON_Y);
+
+        relocate(object.get(JSON_X).getAsDouble() - getWidth() / 2, object.get(JSON_Y).getAsDouble()- getHeight() / 2);
+    }
 
     protected void bindSimulationPane(GraphPane graphPane)
     {
@@ -151,7 +194,7 @@ public class Node extends GraphItem
                         setCursor(Cursor.CLOSED_HAND);
 
                         //When a press event occurs, the location coordinates of the event are cached
-                        pos = new Point2D( event.getX() + getWidth() / 2,  event.getY() + getHeight() / 2);
+                        pos = new Point2D(event.getX() + getWidth() / 2, event.getY() + getHeight() / 2);
                         break;
                 }
         });
@@ -169,24 +212,6 @@ public class Node extends GraphItem
                 relocate(x, y);
             }
         });
-    }
-
-    public double getWidth()
-    {
-        return getBoundsInParent().getWidth();
-    }
-    public double getHeight()
-    {
-        return getBoundsInParent().getHeight();
-    }
-
-    public DoubleBinding widthBinding()
-    {
-        return CustomBindings.createDouble(this::getWidth, boundsInParentProperty());
-    }
-    public DoubleBinding heightBinding()
-    {
-        return CustomBindings.createDouble(this::getHeight, boundsInParentProperty());
     }
 
     private ContextMenu createContextMenu()

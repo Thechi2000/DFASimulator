@@ -4,6 +4,7 @@ import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.components.Edge;
 import ch.ludovic_mermod.dfasimulator.gui.components.GraphItem;
+import ch.ludovic_mermod.dfasimulator.gui.components.Node;
 import ch.ludovic_mermod.dfasimulator.gui.components.SelfEdge;
 import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
@@ -33,15 +34,17 @@ public class GraphPane extends Region
     public static final    String     FONT_SIZE       = "graph.font_size";
     protected static final String     JSON_SELF_EDGES = "self_edges";
     protected static final String     JSON_EDGES      = "edges";
+    public static final    String     JSON_NODES      = "nodes";
     private final          JSONObject object;
 
     private final ObservableSet<Edge>       edges;
     private final ObservableSet<SelfEdge>   selfEdges;
+    private final ObservableSet<Node>       nodes;
     private final ObjectProperty<GraphItem> focusedItem;
 
     private MainPane   mainPane;
-    private       Simulation simulation;
-    private       Tool       tool;
+    private Simulation simulation;
+    private Tool       tool;
 
     private Point2D     menuPosition;
     private ContextMenu menu;
@@ -53,12 +56,15 @@ public class GraphPane extends Region
     {
         edges = FXCollections.observableSet(new HashSet<>());
         selfEdges = FXCollections.observableSet(new HashSet<>());
+        nodes = FXCollections.observableSet(new HashSet<>());
+
         tool = Tool.EDIT;
         focusedItem = new SimpleObjectProperty<>();
 
         object = new JSONObject();
         object.add(JSON_EDGES, JSONArray.fromObservableSet(edges, Edge::getJSONObject));
         object.add(JSON_SELF_EDGES, JSONArray.fromObservableSet(selfEdges, SelfEdge::getJSONObject));
+        object.add(JSON_NODES, new JSONArray());
     }
 
     public void create(MainPane mainPane)
@@ -68,10 +74,11 @@ public class GraphPane extends Region
         menu = createContextMenu();
 
         mainPane.getFiniteAutomaton().states().addListener((ListChangeListener<? super State>) change -> {
-            if(change.wasAdded())
+            change.next();
+            if (change.wasAdded())
                 change.getAddedSubList().forEach(this::addState);
 
-            if(change.wasRemoved())
+            if (change.wasRemoved())
                 change.getRemoved().forEach(this::removeState);
         });
 
@@ -149,8 +156,10 @@ public class GraphPane extends Region
 
         SelfEdge selfEdge = new SelfEdge(state, this);
         selfEdges.add(selfEdge);
+        object.getAsJSONArray(JSON_NODES).add(state.getNode().getJSONObject());
         getChildren().add(selfEdge);
         getChildren().add(state.getNode());
+        nodes.add(state.getNode());
     }
     private void removeState(State state)
     {
@@ -162,7 +171,9 @@ public class GraphPane extends Region
         getChildren().removeAll(selfEdgesToRemove);
         selfEdgesToRemove.forEach(this.selfEdges::remove);
 
+        object.getAsJSONArray(JSON_NODES).remove(state.getNode().getJSONObject());
         getChildren().remove(state.getNode());
+        nodes.remove(state.getNode());
     }
 
     public JSONObject getJSONObject()
@@ -174,6 +185,24 @@ public class GraphPane extends Region
     {
         object.checkHasArray(JSON_EDGES);
         object.checkHasArray(JSON_SELF_EDGES);
+        object.checkHasArray(JSON_NODES);
+
+        for (JSONElement element : object.getAsJSONArray(JSON_NODES))
+        {
+            JSONObject obj;
+            if (!element.isJSONObject()) throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a node", element);
+            obj = element.getAsJSONObject();
+            obj.checkHasString(Node.JSON_STATE);
+
+            Node node = nodes.stream().filter(n -> n.getState().name().equals(obj.get(Node.JSON_STATE).getAsString())).findAny().orElse(null);
+            if (node == null)
+            {
+                Main.log(Level.WARNING, "Tried to parse unknown node at \"%s\"", obj.get(SelfEdge.JSON_STATE));
+                return;
+            }
+
+            node.loadFromJSONObject(obj);
+        }
 
         for (JSONElement element : object.getAsJSONArray(JSON_EDGES))
         {
@@ -196,14 +225,14 @@ public class GraphPane extends Region
         for (JSONElement element : object.getAsJSONArray(JSON_SELF_EDGES))
         {
             JSONObject obj;
-            if (!element.isJSONObject()) throw new IOManager.CorruptedFileException("Could not parse \"%s\" into an edge", element);
+            if (!element.isJSONObject()) throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a self edge", element);
             obj = element.getAsJSONObject();
             obj.checkHasString(SelfEdge.JSON_STATE);
 
             SelfEdge edge = selfEdges.stream().filter(e -> e.state().name().equals(obj.get(SelfEdge.JSON_STATE).getAsString())).findAny().orElse(null);
             if (edge == null)
             {
-                Main.log(Level.WARNING, "Tried to parse unknown edge at \"%s\"", obj.get(SelfEdge.JSON_STATE));
+                Main.log(Level.WARNING, "Tried to parse unknown self edge at \"%s\"", obj.get(SelfEdge.JSON_STATE));
                 return;
             }
 

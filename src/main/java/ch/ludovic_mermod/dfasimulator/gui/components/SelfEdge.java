@@ -55,8 +55,8 @@ public class SelfEdge extends GraphItem
         this.state = state;
         mutex = new Mutex();
 
-        center = new Point2DProperty(state.getNode().centerXProperty().get(), state.getNode().centerYProperty().get() - 75);
-        radius = new SimpleDoubleProperty(state.getNode().radiusProperty().get());
+        center = new Point2DProperty(this, "center", state.getNode().centerXProperty().get(), state.getNode().centerYProperty().get() - 75);
+        radius = new SimpleDoubleProperty(this, "radius", state.getNode().radiusProperty().get());
         radiusControlPoint = new Point2DProperty();
 
         // Create alphabet display

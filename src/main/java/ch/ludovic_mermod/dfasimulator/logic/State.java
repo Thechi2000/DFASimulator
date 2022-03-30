@@ -17,8 +17,6 @@ import java.util.Objects;
 public class State
 {
     protected static final String JSON_TRANSITION_MAP = "transition_map";
-    protected static final String JSON_X_COORD        = "x_coord";
-    protected static final String JSON_Y_COORD        = "y_coord";
     protected static final String JSON_IS_ACCEPTING   = "is_accepting";
     protected static final String JSON_NAME           = "name";
 
@@ -62,8 +60,6 @@ public class State
 
         jsonObject.addProperty(JSON_NAME, name);
         jsonObject.addProperty(JSON_IS_ACCEPTING, isAcceptingProperty);
-        jsonObject.addProperty(JSON_X_COORD, node.layoutXProperty());
-        jsonObject.addProperty(JSON_Y_COORD, node.layoutYProperty());
         jsonObject.add(JSON_TRANSITION_MAP, new JSONObject());
 
         finiteAutomaton.alphabet().forEach(transitionMapProperty::get);
@@ -89,14 +85,11 @@ public class State
     {
         jsonObject.checkHasString(JSON_NAME);
         jsonObject.checkHasBoolean(JSON_IS_ACCEPTING);
-        jsonObject.checkHasNumber(JSON_X_COORD);
-        jsonObject.checkHasNumber(JSON_Y_COORD);
         jsonObject.checkHasObject(JSON_TRANSITION_MAP);
 
         State state = new State(finiteAutomaton);
         state.name.set(jsonObject.get(JSON_NAME).getAsString());
         state.isAcceptingProperty.set(jsonObject.get(JSON_IS_ACCEPTING).getAsBoolean());
-        state.node.relocate(jsonObject.get(State.JSON_X_COORD).getAsDouble() + state.node.getLayoutBounds().getMinX(), jsonObject.get(JSON_Y_COORD).getAsDouble() + state.node.getLayoutBounds().getMinY());
         return state;
     }
 
