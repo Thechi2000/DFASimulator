@@ -8,6 +8,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
+/**
+ * Pane to change State's properties
+ */
 public class EditPane extends VBox
 {
     private final State    node;
@@ -49,10 +52,5 @@ public class EditPane extends VBox
             });
             getChildren().add(deleteButton);
         }
-    }
-
-    public void unbind()
-    {
-        node.isAcceptingProperty().unbindBidirectional(acceptingStateBox.selectedProperty());
     }
 }

@@ -154,12 +154,7 @@ public class MainPane extends BorderPane
 
     public void bindEditPane(State state)
     {
-        bindEditPane(new EditPane(finiteAutomaton, state));
-    }
-    private void bindEditPane(EditPane pane)
-    {
-        if (editPaneProperty.get() != null) editPaneProperty.get().unbind();
-        editPaneProperty.set(pane);
+        editPaneProperty.set(new EditPane(finiteAutomaton, state));
     }
 
     protected void removeEditPane()
