@@ -6,6 +6,9 @@ import javafx.scene.text.TextFlow;
 
 import java.util.ResourceBundle;
 
+/**
+ * Pane to log user destined information about application execution
+ */
 public class ConsolePane extends ScrollPane implements System.Logger
 {
     private TextFlow textFlow;
@@ -29,7 +32,7 @@ public class ConsolePane extends ScrollPane implements System.Logger
     @Override
     public void log(Level level, ResourceBundle bundle, String msg, Throwable thrown)
     {
-        //textFlow.getChildren().add(new Text(String.format("[%s] %s\n", level.name(), msg)));
+        textFlow.getChildren().add(new Text(String.format("[%s] %s\n", level.name(), msg)));
     }
 
     @Override

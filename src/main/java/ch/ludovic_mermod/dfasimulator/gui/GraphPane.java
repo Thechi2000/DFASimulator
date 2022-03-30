@@ -13,6 +13,7 @@ import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
@@ -24,6 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 
+/**
+ * Pane to display a FiniteAutomaton
+ */
 public class GraphPane extends Region
 {
     public static final    String     FONT_SIZE       = "graph.font_size";
@@ -35,17 +39,18 @@ public class GraphPane extends Region
     private final ObservableSet<SelfEdge>   selfEdges;
     private final ObjectProperty<GraphItem> focusedItem;
 
-    private final MainPane   mainPane;
+    private MainPane   mainPane;
     private       Simulation simulation;
     private       Tool       tool;
 
     private Point2D     menuPosition;
     private ContextMenu menu;
 
-
-    public GraphPane(MainPane mainPane)
+    /**
+     * Constructs an empty GraphPane
+     */
+    public GraphPane()
     {
-        this.mainPane = mainPane;
         edges = FXCollections.observableSet(new HashSet<>());
         selfEdges = FXCollections.observableSet(new HashSet<>());
         tool = Tool.EDIT;
@@ -58,8 +63,17 @@ public class GraphPane extends Region
 
     public void create(MainPane mainPane)
     {
+        this.mainPane = mainPane;
         simulation = mainPane.getSimulation();
         menu = createContextMenu();
+
+        mainPane.getFiniteAutomaton().states().addListener((ListChangeListener<? super State>) change -> {
+            if(change.wasAdded())
+                change.getAddedSubList().forEach(this::addState);
+
+            if(change.wasRemoved())
+                change.getRemoved().forEach(this::removeState);
+        });
 
         setOnMousePressed(event -> {
             for (var g : getChildren().stream().filter(n -> n instanceof GraphItem).map(n -> ((GraphItem) n)).toList())
@@ -117,7 +131,7 @@ public class GraphPane extends Region
         this.tool = tool;
     }
 
-    public void addState(State state)
+    private void addState(State state)
     {
         mainPane.getFiniteAutomaton().states()
                 .stream()
@@ -138,7 +152,7 @@ public class GraphPane extends Region
         getChildren().add(selfEdge);
         getChildren().add(state.getNode());
     }
-    public void removeState(State state)
+    private void removeState(State state)
     {
         var edgesToRemove = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).toList();
         getChildren().removeAll(edgesToRemove);
@@ -155,6 +169,7 @@ public class GraphPane extends Region
     {
         return object;
     }
+
     public void loadJSON(JSONObject object) throws IOManager.CorruptedFileException
     {
         object.checkHasArray(JSON_EDGES);

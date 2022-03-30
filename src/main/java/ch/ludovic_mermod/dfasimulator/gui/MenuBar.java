@@ -131,6 +131,10 @@ public class MenuBar extends javafx.scene.control.MenuBar
         if (path != null) mainPane.getIoManager().saveAs(path);
     }
 
+    /**
+     * Prompt the user to choose a file to save to
+     * @return the chosen file path
+     */
     public String chooseSaveFile()
     {
         fileChooser.setTitle(Strings.get("menu.file.save_as").get());

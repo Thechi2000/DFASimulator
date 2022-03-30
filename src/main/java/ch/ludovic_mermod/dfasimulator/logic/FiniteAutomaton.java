@@ -147,7 +147,6 @@ public class FiniteAutomaton
     public void addState(State state)
     {
         states.add(state);
-        mainPane.getGraphPane().addState(state);
     }
     /**
      * Add a State at the given position
@@ -173,7 +172,6 @@ public class FiniteAutomaton
                                 s.transitionMap().setValue(key, null);
                         }));
         states.remove(state);
-        mainPane.getGraphPane().removeState(state);
     }
 
     /**

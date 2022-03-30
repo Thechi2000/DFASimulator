@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Pane to test an automaton over large amounts of inputs
+ */
 public class TestPane extends VBox
 {
     public static final String    FAILURE_COLOR = "test_pane.failure_color";
@@ -165,7 +168,7 @@ public class TestPane extends VBox
         return sb.toString();
     }
 
-    enum Radix
+    private enum Radix
     {
         HEX,
         DEC,

@@ -17,6 +17,9 @@ import javafx.scene.text.Text;
 import java.util.Comparator;
 import java.util.Objects;
 
+/**
+ * Table to visualize and modify a FiniteAutomaton
+ */
 public class TablePane extends ScrollPane
 {
     private static final int ADDITIONAL_COLUMNS = 4;

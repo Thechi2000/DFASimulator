@@ -8,6 +8,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+/**
+ * Pane for controls to start/update simulations and display information about them
+ */
 public class SimulationPane extends VBox
 {
     private MainPane  mainPane;

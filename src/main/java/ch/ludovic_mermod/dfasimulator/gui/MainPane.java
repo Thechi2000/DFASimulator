@@ -38,7 +38,7 @@ public class MainPane extends BorderPane
         rightSplitPane = new SplitPane();
 
         finiteAutomaton = new FiniteAutomaton();
-        graphPane = new GraphPane(this);
+        graphPane = new GraphPane();
         ioManager = new IOManager(this);
         simulation = new Simulation(this);
     }
