@@ -83,7 +83,6 @@ public class Setting extends HBox
                 size.textProperty().addListener((o, ov, nv) -> {
                     if (nv.matches(Constants.DOUBLE_PATTERN.pattern()))
                         value.set(new Font(((Font) value.get()).getName(), Double.parseDouble(nv)));
-                    System.out.println("f");
                 });
                 size.setText(String.valueOf(Constants.getFontValue(id).getSize()));
 
