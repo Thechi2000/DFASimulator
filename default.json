@@ -1,1 +1,83 @@
-{"automaton": {"alphabet": ["0", "1"], "edges": [{"control_x": 286.6198734597819, "control_y": 364.55775262286716, "source": "even", "target": "odd"}, {"control_x": 277.3290054500993, "control_y": 67.28950426333851, "source": "odd", "target": "even"}], "initial": "even", "states": [{"is_accepting": false, "name": "odd", "transition_map": {"0": "odd", "1": "even"}}, {"is_accepting": true, "name": "even", "transition_map": {"0": "even", "1": "odd"}}]}, "graph": {"edges": [{"control_x": 286.6198734597819, "control_y": 364.55775262286716, "source": "even", "target": "odd"}, {"control_x": 277.3290054500993, "control_y": 67.28950426333851, "source": "odd", "target": "even"}], "nodes": [{"state": "odd", "x": 454.8679301016441, "y": 175.1698140259442}, {"state": "even", "x": 109.96226450946249, "y": 186.0377389453578}], "self_edges": [{"center_x": 460.7735905115953, "center_y": 114.79245048351828, "radius": 50.0, "state": "odd"}, {"center_x": 109.96226450946249, "center_y": 261.0377389453582, "radius": 50.0, "state": "even"}]}}
+{
+  "automaton": {
+    "alphabet": [
+      "0",
+      "1"
+    ],
+    "edges": [
+      {
+        "control_x": 284.4977539460509,
+        "control_y": 384.21185315983513,
+        "source": "even",
+        "target": "odd"
+      },
+      {
+        "control_x": 276.42173535364816,
+        "control_y": 68.10522973342592,
+        "source": "odd",
+        "target": "even"
+      }
+    ],
+    "initial": "even",
+    "states": [
+      {
+        "is_accepting": false,
+        "name": "odd",
+        "transition_map": {
+          "0": "odd",
+          "1": "even"
+        }
+      },
+      {
+        "is_accepting": true,
+        "name": "even",
+        "transition_map": {
+          "0": "even",
+          "1": "odd"
+        }
+      }
+    ]
+  },
+  "graph": {
+    "nodes": [
+      {
+        "state": "odd",
+        "x": 459.0,
+        "y": 204.0
+      },
+      {
+        "state": "even",
+        "x": 88.0,
+        "y": 222.0
+      }
+    ],
+    "edges": [
+      {
+        "control_x": 284.4977539460509,
+        "control_y": 384.21185315983513,
+        "source": "even",
+        "target": "odd"
+      },
+      {
+        "control_x": 276.42173535364816,
+        "control_y": 68.10522973342592,
+        "source": "odd",
+        "target": "even"
+      }
+    ],
+    "self_edges": [
+      {
+        "center_x": 473.0,
+        "center_y": 123.0,
+        "radius": 49.33073107047614,
+        "state": "odd"
+      },
+      {
+        "center_x": 93.0,
+        "center_y": 145.0,
+        "radius": 50.30607703016814,
+        "state": "even"
+      }
+    ]
+  }
+}
