@@ -1,5 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
+import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
@@ -64,8 +65,7 @@ public class MainPane extends BorderPane
         rightSplitPane.setOrientation(Orientation.VERTICAL);
         rightSplitPane.getItems().addAll(simulationPane);
 
-        //fillGraphPane();
-        ioManager.open("default.json");
+        ioManager.open(Resources.get("default.json"));
 
         setRight(rightSplitPane);
         setTop(menuBar);

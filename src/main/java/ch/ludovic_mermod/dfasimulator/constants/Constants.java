@@ -24,14 +24,14 @@ import static javafx.scene.paint.Color.BLACK;
  */
 public class Constants
 {
-    public static final Pattern DOUBLE_PATTERN = Pattern.compile("(\\d+\\.?\\d*|\\d*\\.\\d+)d?");
+    public static final  Pattern                       DOUBLE_PATTERN = Pattern.compile("(\\d+\\.?\\d*|\\d*\\.\\d+)d?");
     private static final PropertiesMap<String, Object> values;
-    private static JSONObject json;
+    private static       JSONObject                    json;
 
     static
     {
         values = new PropertiesMap<>();
-        loadFromFile("settings.json");
+        loadFromFile(Resources.get("settings.json"));
         //values.addListener((p, k, o, n) -> getSetting (k).);
     }
 

@@ -39,18 +39,6 @@
     ]
   },
   "graph": {
-    "nodes": [
-      {
-        "state": "odd",
-        "x": 459.0,
-        "y": 204.0
-      },
-      {
-        "state": "even",
-        "x": 88.0,
-        "y": 222.0
-      }
-    ],
     "edges": [
       {
         "control_x": 284.4977539460509,
@@ -63,6 +51,18 @@
         "control_y": 68.10522973342592,
         "source": "odd",
         "target": "even"
+      }
+    ],
+    "nodes": [
+      {
+        "state": "odd",
+        "x": 459.0,
+        "y": 204.0
+      },
+      {
+        "state": "even",
+        "x": 88.0,
+        "y": 222.0
       }
     ],
     "self_edges": [

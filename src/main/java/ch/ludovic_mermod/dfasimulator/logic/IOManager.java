@@ -52,6 +52,7 @@ public class IOManager
      */
     public void save()
     {
+        Strings.save();
         if (filepathProperty.isEmpty().get() || filepathProperty.get().isEmpty())
         {
             String str = mainPane.getGraphPane().getMainPane().getSimulatorMenuBar().chooseSaveFile();
