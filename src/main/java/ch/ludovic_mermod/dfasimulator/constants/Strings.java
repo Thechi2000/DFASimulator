@@ -6,10 +6,10 @@ import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.StringProperty;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -20,12 +20,17 @@ import java.util.regex.Pattern;
  */
 public class Strings
 {
-    protected static final Pattern DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
-    private static final PropertiesMap<String, String> map;
+    protected static final Pattern                       DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
+    private static final   PropertiesMap<String, String> map;
+    private static final   Properties                    properties;
+    private static         Locale                        currentLocale      = null;
 
     static
     {
         map = new PropertiesMap<>();
+        properties = new Properties();
+        map.addListener((p, k, o, n) -> properties.setProperty(k, n));
+        map.addListener((k, p) -> properties.remove(k));
         loadLocale(Locale.ENGLISH);
     }
 
@@ -127,11 +132,30 @@ public class Strings
         try
         {
             ResourceBundle bundle = ResourceBundle.getBundle("lang", locale);
-            bundle.keySet().forEach(k -> set(k, bundle.getString(k)));
+            bundle.keySet().forEach(k -> {
+                set(k, bundle.getString(k));
+                properties.put(k, bundle.getString(k));
+            });
+            currentLocale = locale;
         }
         catch (MissingResourceException e)
         {
             Main.logger.log(Level.SEVERE, "While loading lang bundle", e);
+        }
+    }
+
+    /**
+     * Save all Strings to the current locale file
+     */
+    public static void save()
+    {
+        try (FileWriter writer = new FileWriter(Resources.get("lang_" + currentLocale.toLanguageTag() + ".properties")))
+        {
+            properties.store(writer, LocalDateTime.now().toString());
+        }
+        catch (IOException e)
+        {
+            Main.logger.log(Level.SEVERE, "Could not save language properties", e);
         }
     }
 }
