@@ -29,7 +29,10 @@ public class Strings
     {
         map = new PropertiesMap<>();
         properties = new Properties();
-        map.addListener((p, k, o, n) -> properties.setProperty(k, n));
+        map.addListener((p, k, o, n) -> {
+            final String value = k.equals(n) ? "" : n;
+            properties.setProperty(k, value);
+        });
         map.addListener((k, p) -> properties.remove(k));
         loadLocale(Locale.ENGLISH);
     }
@@ -132,10 +135,7 @@ public class Strings
         try
         {
             ResourceBundle bundle = ResourceBundle.getBundle("lang", locale);
-            bundle.keySet().forEach(k -> {
-                set(k, bundle.getString(k));
-                properties.put(k, bundle.getString(k));
-            });
+            bundle.keySet().forEach(k -> set(k, bundle.getString(k)));
             currentLocale = locale;
         }
         catch (MissingResourceException e)
