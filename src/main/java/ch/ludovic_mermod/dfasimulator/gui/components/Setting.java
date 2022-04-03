@@ -8,8 +8,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -28,6 +28,7 @@ public class Setting extends HBox
 
     /**
      * Constructs a Setting component for the setting with the given id
+     *
      * @param id id of the setting to represent
      */
     public Setting(String id)
@@ -73,7 +74,8 @@ public class Setting extends HBox
             }
 
             case "font" -> {
-                ChoiceBox<String> fontName = new ChoiceBox<>(FXCollections.observableList(Font.getFontNames()));
+                ComboBox<String> fontName = new ComboBox<>(FXCollections.observableList(Font.getFontNames()));
+                fontName.setVisibleRowCount(10);
                 value.set(Constants.getFontValue(id));
                 fontName.valueProperty().addListener((o, ov, nv) -> value.set(new Font(nv, ((Font) value.get()).getSize())));
                 fontName.setValue(Constants.getFontValue(id).getName());

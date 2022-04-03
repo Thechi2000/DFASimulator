@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
@@ -42,18 +43,21 @@ public class SettingGroup extends VBox
             hBox.getChildren().add(text);
 
             ToggleButton toggleButton = new ToggleButton();
-            toggleButton.setSelected(true);
+            toggleButton.textProperty().bind(CustomBindings.ternary(toggleButton.selectedProperty(), "-", "+"));
             toggleButton.selectedProperty().addListener((o, ov, nv) -> {
                 if (nv && getChildren().size() == 1)
                     getChildren().add(childrenBox);
                 else if (!nv)
                     getChildren().remove(childrenBox);
             });
+            toggleButton.setSelected(false);
             hBox.getChildren().add(toggleButton);
             getChildren().add(hBox);
 
             childrenBox.setPadding(new Insets(0, 0, 0, 20));
         }
+        else
+            getChildren().addAll(childrenBox);
 
         childrenGroups = new TreeMap<>();
         childrenSettings = new TreeMap<>();
@@ -73,8 +77,6 @@ public class SettingGroup extends VBox
 
         childrenGroups.values().forEach(childrenBox.getChildren()::add);
         childrenSettings.values().forEach(childrenBox.getChildren()::add);
-
-        getChildren().addAll(childrenBox);
     }
 
     /**
