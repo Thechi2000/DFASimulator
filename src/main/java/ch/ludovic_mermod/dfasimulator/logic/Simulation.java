@@ -15,6 +15,7 @@ public class Simulation
     private final MainPane        mainPane;
 
     private final ObjectProperty<State> currentStateProperty;
+    private final ObjectProperty<State> lastStateProperty;
     private final StringProperty        remainingInputProperty;
     private final BooleanProperty       isSimulatingProperty;
 
@@ -31,6 +32,7 @@ public class Simulation
         this.mainPane = mainPane;
 
         currentStateProperty = new SimpleObjectProperty<>();
+        lastStateProperty = new SimpleObjectProperty<>();
         remainingInputProperty = new SimpleStringProperty();
         isSimulatingProperty = new SimpleBooleanProperty(false);
 
@@ -51,6 +53,10 @@ public class Simulation
     public ReadOnlyObjectProperty<State> currentStateProperty()
     {
         return currentStateProperty;
+    }
+    public ObjectProperty<State> lastStateProperty()
+    {
+        return lastStateProperty;
     }
     public ReadOnlyStringProperty remainingInputProperty()
     {
@@ -172,6 +178,7 @@ public class Simulation
 
         isSimulatingProperty.set(true);
         simulationEndedProperty.set(false);
+        lastStateProperty.set(null);
         currentStateProperty.set(finiteAutomaton.initialState());
         remainingInputProperty.set(input);
         initialInputProperty.set(input);
@@ -184,6 +191,7 @@ public class Simulation
     {
         if (remainingInputProperty.get().length() == 0)
         {
+            lastStateProperty.set(null);
             currentStateProperty.set(null);
             isSimulatingProperty.set(false);
             return;
@@ -193,6 +201,7 @@ public class Simulation
         char c = input.charAt(0);
         remainingInputProperty.set(input.substring(1));
 
+        lastStateProperty.set(currentStateProperty.get());
         currentStateProperty.set(currentStateProperty.get().transitionMap().getValue(c));
 
         if (remainingInputProperty.get().length() == 0)
