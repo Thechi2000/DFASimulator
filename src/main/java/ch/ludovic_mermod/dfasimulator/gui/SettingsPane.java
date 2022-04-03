@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.gui.components.SettingGroup;
 import javafx.geometry.Pos;
@@ -41,6 +42,6 @@ public class SettingsPane extends BorderPane
     private void saveChanges()
     {
         settingGroup.saveChanges();
-        Constants.saveToFile("settings.json");
+        Constants.saveToFile(Resources.get("settings.json"));
     }
 }
