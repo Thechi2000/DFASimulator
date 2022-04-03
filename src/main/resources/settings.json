@@ -21,7 +21,11 @@
       }
     },
     "edge": {
-      "color": {
+      "current_color": {
+        ".type": "color",
+        ".value": "0xff0000ff"
+      },
+      "default_color": {
         ".type": "color",
         ".value": "0x000000ff"
       },
