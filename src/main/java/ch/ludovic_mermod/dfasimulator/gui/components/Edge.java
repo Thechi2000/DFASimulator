@@ -4,6 +4,7 @@ import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
+import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.BezierQuadCurve;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
@@ -32,7 +33,8 @@ public class Edge extends GraphItem
     public static final String JSON_CONTROL_X = "control_x";
     public static final String JSON_CONTROL_Y = "control_y";
 
-    public static final String COLOR           = "graph.edge.color";
+    public static final String DEFAULT_COLOR   = "graph.edge.default_color";
+    public static final String CURRENT_COLOR   = "graph.edge.current_color";
     public static final String WIDTH           = "graph.edge.width";
     public static final String SIDELINE_LENGTH = "graph.edge.sideline_length";
 
@@ -57,8 +59,9 @@ public class Edge extends GraphItem
 
     /**
      * Constructs an Edge
-     * @param source the source node of the Edge
-     * @param target the target node of the Edge
+     *
+     * @param source    the source node of the Edge
+     * @param target    the target node of the Edge
      * @param graphPane the parent GraphPane
      */
     public Edge(State source, State target, GraphPane graphPane)
@@ -82,7 +85,8 @@ public class Edge extends GraphItem
         path = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
 
         arrow = new Arrow(path);
-        arrow.fillProperty().bind(Constants.getColor(COLOR));
+        Simulation simulation = graphPane.getMainPane().getSimulation();
+        arrow.fillProperty().bind(CustomBindings.ternary(simulation.isSimulatingProperty().and(simulation.lastStateProperty().isEqualTo(source).and(simulation.currentStateProperty().isEqualTo(target))), Constants.getColor(CURRENT_COLOR), Constants.getColor(DEFAULT_COLOR)));
         arrow.widthProperty().bind(Constants.getDouble(WIDTH));
         arrow.sidelineLengthProperty().bind(Constants.getDouble(SIDELINE_LENGTH));
         arrow.endXProperty().bind(curve.xProperty());
@@ -133,6 +137,7 @@ public class Edge extends GraphItem
 
     /**
      * Load control points from a JSONObject
+     *
      * @param object the values to load
      * @throws IOManager.CorruptedFileException when one or more values are missing in object
      */

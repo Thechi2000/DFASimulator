@@ -4,6 +4,7 @@ import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
+import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.utils.Maths;
@@ -85,12 +86,13 @@ public class SelfEdge extends GraphItem
 
         // Create arrow
         {
+            Simulation simulation = graphPane.getMainPane().getSimulation();
             arrow = new Arrow(new Path(startingPoint, arc));
             arrow.endXProperty().bind(arc.xProperty());
             arrow.endYProperty().bind(arc.yProperty());
             arrow.widthProperty().bind(Constants.getDouble(Edge.WIDTH));
             arrow.sidelineLengthProperty().bind(Constants.getDouble(Edge.SIDELINE_LENGTH));
-            arrow.fillProperty().bind(Constants.getColor(Edge.COLOR));
+            arrow.fillProperty().bind(CustomBindings.ternary(simulation.isSimulatingProperty().and(simulation.lastStateProperty().isEqualTo(state).and(simulation.currentStateProperty().isEqualTo(state))), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR)));
             arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
         }
 
