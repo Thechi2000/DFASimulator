@@ -19,7 +19,7 @@ public class Main extends Application
     public static final Logger logger = Logger.getLogger(Main.class.getPackageName());
     public static void log(Level level, String msg, Object... params)
     {
-        logger.log(level, msg, params);
+        logger.log(level, String.format(msg, params));
     }
 
 
