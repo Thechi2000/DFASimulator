@@ -54,8 +54,8 @@ public class Arrow extends Group
         path.strokeWidthProperty().bind(width);
 
         fill = new SimpleObjectProperty<>(Color.BLACK);
-        leftLine.fillProperty().bind(fill);
-        rightLine.fillProperty().bind(fill);
+        leftLine.strokeProperty().bind(fill);
+        rightLine.strokeProperty().bind(fill);
         path.strokeProperty().bind(fill);
 
         Observable[] observables = new Observable[]{endX, endY, directionX, directionY, sidelineLength};
