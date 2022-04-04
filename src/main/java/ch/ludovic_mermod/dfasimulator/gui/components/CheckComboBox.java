@@ -10,7 +10,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuButton;
 import javafx.util.StringConverter;
 
@@ -45,13 +46,16 @@ public class CheckComboBox<T> extends Group
         this.items.addListener((ListChangeListener<? super T>) change -> {
             change.next();
             change.getAddedSubList().forEach(t -> {
-                CheckMenuItem item = new CheckMenuItem();
-                item.setUserData(t);
-                item.textProperty().bind(CustomBindings.create(() -> converter.get().toString(t), converter));
-                item.selectedProperty().addListener((o, ov, nv) -> {
+                CheckBox checkBox = new CheckBox();
+                checkBox.textProperty().bind(CustomBindings.create(() -> converter.get().toString(t), converter));
+                checkBox.selectedProperty().addListener((o, ov, nv) -> {
                     if (nv) selectedItems.add(t);
                     else selectedItems.remove(t);
                 });
+
+                CustomMenuItem item = new CustomMenuItem(checkBox);
+                item.setUserData(t);
+                item.setHideOnClick(false);
                 menu.getItems().add(item);
             });
 
@@ -83,7 +87,7 @@ public class CheckComboBox<T> extends Group
 
     public void setSelectedItems(List<T> items)
     {
-        menu.getItems().stream().map(i -> (CheckMenuItem) i).filter(i -> items.contains(i.getUserData())).forEach(i -> i.setSelected(true));
+        menu.getItems().stream().map(i -> (CustomMenuItem) i).filter(i -> items.contains(i.getUserData())).forEach(i -> ((CheckBox) i.getContent()).setSelected(true));
     }
     public void setConverter(StringConverter<T> converter)
     {
