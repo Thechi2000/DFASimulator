@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.gui.components.CheckComboBox;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.Utils;
@@ -272,14 +273,44 @@ public class TablePane extends ScrollPane
                 return new SimpleObjectProperty<>(button);
             }
 
-            ChoiceBox<State> choiceBox = new ChoiceBox<>();
+            /*
+            MenuButton menu = new MenuButton();
+
+            finiteAutomaton.states().stream().map(s -> {
+                CheckMenuItem item = new CheckMenuItem();
+                item.textProperty().bind(s.nameProperty());
+                return item;
+            }).forEach(menu.getItems()::add);
+            finiteAutomaton.states().addListener((ListChangeListener<? super State>) change ->
+            {
+                change.next();
+                menu.getItems().clear();
+                finiteAutomaton.states().stream().map(s -> {
+                    CheckMenuItem item = new CheckMenuItem();
+                    item.textProperty().bind(s.nameProperty());
+                    return item;
+                }).forEach(menu.getItems()::add);
+            });
+
+            ComboBox<State> choiceBox = new ComboBox<>();
+            choiceBox.getSelectionModel();
             choiceBox.setItems(finiteAutomaton.states());
 
             choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""));
             finiteAutomaton.states().forEach(s -> s.nameProperty().addListener((o, ov, nv) -> choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""))));
 
             choiceBox.valueProperty().bindBidirectional(cellFeatures.getValue().transitionMap().get(character));
-            return new SimpleObjectProperty<>(choiceBox);
+            return new SimpleObjectProperty<>(menu);
+             */
+
+            CheckComboBox<State> checkComboBox = new CheckComboBox<>(finiteAutomaton.states());
+            checkComboBox.setSelectedItems(cellFeatures.getValue().transitionMap().get(character).get());
+            checkComboBox.setConverter(Utils.stringConverter(State::name, s -> {throw new UnsupportedOperationException();}, ""));
+            checkComboBox.getSelectedItems().addListener((ListChangeListener<? super State>) change -> {
+                change.next();
+                cellFeatures.getValue().transitionMap().setValue(character, checkComboBox.getSelectedItems());
+            });
+            return new SimpleObjectProperty<>(checkComboBox);
         });
 
         column.prefWidthProperty().bind(columnWidthBinding);
