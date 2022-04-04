@@ -11,6 +11,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,16 +24,18 @@ public class State
 
     private final JSONObject jsonObject;
 
-    private final StringProperty                  name;
-    private final BooleanBinding                  isInitialBinding;
-    private final BooleanProperty                 isAcceptingProperty;
-    private final PropertiesMap<Character, State> transitionMapProperty;
+    private final StringProperty  name;
+    private final BooleanBinding  isInitialBinding;
+    private final BooleanProperty isAcceptingProperty;
+
+    private final PropertiesMap<Character, List<State>> transitionMapProperty;
 
     private final Node            node;
     private final FiniteAutomaton finiteAutomaton;
 
     /**
      * Construct a State for a finite automaton
+     *
      * @param finiteAutomaton the parent automaton
      */
     public State(FiniteAutomaton finiteAutomaton)
@@ -66,8 +70,7 @@ public class State
 
         transitionMapProperty.addListener((p, k, o, n) ->
         {
-            if (n != null)
-                jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).addProperty(k.toString(), n.nameProperty());
+            if (n != null && n.size() != 0) jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).addProperty(k.toString(), n.get(0).nameProperty());
             else jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).add(k.toString(), JSONNull.INSTANCE);
         });
         transitionMapProperty.addListener((k, p) -> jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).remove(String.valueOf(k)));
@@ -76,7 +79,8 @@ public class State
     /**
      * Creates a State from a JSONObject
      * The transition map is not loaded, it must be with the loadTransitionMap method
-     * @param jsonObject the jsonObject containing the information for the state
+     *
+     * @param jsonObject      the jsonObject containing the information for the state
      * @param finiteAutomaton the parent automaton
      * @return the new State
      * @throws IOManager.CorruptedFileException when the jsonObject does not hold the correct values
@@ -95,6 +99,7 @@ public class State
 
     /**
      * Load a transition map from a jsonObject
+     *
      * @param jsonObject a jsonObject containing the transition map
      * @throws IOManager.CorruptedFileException when the jsonObject is invalid
      */
@@ -110,7 +115,7 @@ public class State
                 throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a transition map", jsonObject);
 
 
-            transitionMapProperty.setValue(key.charAt(0), e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString()));
+            transitionMapProperty.setValue(key.charAt(0), new ArrayList<>(List.of(e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString()))));
         }
     }
 
@@ -139,7 +144,7 @@ public class State
     {
         return isAcceptingProperty.get();
     }
-    public PropertiesMap<Character, State> transitionMap()
+    public PropertiesMap<Character, List<State>> transitionMap()
     {
         return transitionMapProperty;
     }

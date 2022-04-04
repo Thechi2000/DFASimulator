@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainPane extends BorderPane
@@ -133,14 +134,14 @@ public class MainPane extends BorderPane
         stateNode3.getNode().relocate(50, 300);
 
 
-        stateNode1.transitionMap().setValue('0', stateNode2);
-        stateNode1.transitionMap().setValue('1', stateNode2);
+        stateNode1.transitionMap().setValue('0', new ArrayList<>(List.of(stateNode2)));
+        stateNode1.transitionMap().setValue('1', new ArrayList<>(List.of(stateNode2)));
 
-        stateNode2.transitionMap().setValue('0', stateNode3);
-        stateNode2.transitionMap().setValue('1', stateNode3);
+        stateNode2.transitionMap().setValue('0', new ArrayList<>(List.of(stateNode3)));
+        stateNode2.transitionMap().setValue('1', new ArrayList<>(List.of(stateNode3)));
 
-        stateNode3.transitionMap().setValue('0', stateNode1);
-        stateNode3.transitionMap().setValue('1', stateNode1);
+        stateNode3.transitionMap().setValue('0', new ArrayList<>(List.of(stateNode1)));
+        stateNode3.transitionMap().setValue('1', new ArrayList<>(List.of(stateNode1)));
 
 
         finiteAutomaton.addState(stateNode1);

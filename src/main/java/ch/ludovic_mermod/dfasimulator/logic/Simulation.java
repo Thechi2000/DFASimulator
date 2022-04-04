@@ -202,7 +202,7 @@ public class Simulation
         remainingInputProperty.set(input.substring(1));
 
         lastStateProperty.set(currentStateProperty.get());
-        currentStateProperty.set(currentStateProperty.get().transitionMap().getValue(c));
+        currentStateProperty.set(currentStateProperty.get().transitionMap().getValue(c).get(0));
 
         if (remainingInputProperty.get().length() == 0)
             simulationEndedProperty.set(true);
@@ -237,7 +237,7 @@ public class Simulation
         if (!compileDFA()) return false;
 
         State currentState = finiteAutomaton.initialState();
-        for (char c : input.toCharArray()) currentState = currentState.transitionMap().getValue(c);
+        for (char c : input.toCharArray()) currentState = currentState.transitionMap().getValue(c).get(0);
 
         return currentState.isAccepting();
     }

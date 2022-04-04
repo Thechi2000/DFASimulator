@@ -222,7 +222,7 @@ public class Edge extends GraphItem
         alphabetDisplay.setText(source.transitionMap()
                 .entrySet()
                 .stream()
-                .filter(e -> target.equals(e.getValue().get()))
+                .filter(e ->e != null && e.getValue() != null && e.getValue().get() != null && e.getValue().get().contains(target))
                 .map(e -> e.getKey().toString())
                 .sorted()
                 .collect(Collectors.joining(", ")));

@@ -192,7 +192,7 @@ public class SelfEdge extends GraphItem
         alphabetDisplay.setText(state.transitionMap()
                 .entrySet()
                 .stream()
-                .filter(e -> state.equals(e.getValue().get()))
+                .filter(e -> e != null && e.getValue() != null && e.getValue().get() != null && e.getValue().get().contains(state))
                 .map(e -> e.getKey().toString())
                 .sorted()
                 .collect(Collectors.joining(", ")));
