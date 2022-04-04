@@ -273,36 +273,6 @@ public class TablePane extends ScrollPane
                 return new SimpleObjectProperty<>(button);
             }
 
-            /*
-            MenuButton menu = new MenuButton();
-
-            finiteAutomaton.states().stream().map(s -> {
-                CheckMenuItem item = new CheckMenuItem();
-                item.textProperty().bind(s.nameProperty());
-                return item;
-            }).forEach(menu.getItems()::add);
-            finiteAutomaton.states().addListener((ListChangeListener<? super State>) change ->
-            {
-                change.next();
-                menu.getItems().clear();
-                finiteAutomaton.states().stream().map(s -> {
-                    CheckMenuItem item = new CheckMenuItem();
-                    item.textProperty().bind(s.nameProperty());
-                    return item;
-                }).forEach(menu.getItems()::add);
-            });
-
-            ComboBox<State> choiceBox = new ComboBox<>();
-            choiceBox.getSelectionModel();
-            choiceBox.setItems(finiteAutomaton.states());
-
-            choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""));
-            finiteAutomaton.states().forEach(s -> s.nameProperty().addListener((o, ov, nv) -> choiceBox.setConverter(Utils.stringConverter(State::name, finiteAutomaton::getState, ""))));
-
-            choiceBox.valueProperty().bindBidirectional(cellFeatures.getValue().transitionMap().get(character));
-            return new SimpleObjectProperty<>(menu);
-             */
-
             CheckComboBox<State> checkComboBox = new CheckComboBox<>(finiteAutomaton.states());
             checkComboBox.setSelectedItems(cellFeatures.getValue().transitionMap().get(character).get());
             checkComboBox.setConverter(Utils.stringConverter(State::name, s -> {throw new UnsupportedOperationException();}, ""));
