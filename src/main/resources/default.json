@@ -24,16 +24,26 @@
         "is_accepting": false,
         "name": "odd",
         "transition_map": {
-          "0": "odd",
-          "1": "even"
+          "0": [
+            "odd",
+            "even"
+          ],
+          "1": [
+            "even"
+          ]
         }
       },
       {
         "is_accepting": true,
         "name": "even",
         "transition_map": {
-          "0": "even",
-          "1": "odd"
+          "0": [
+            "even",
+            "odd"
+          ],
+          "1": [
+            "odd"
+          ]
         }
       }
     ]

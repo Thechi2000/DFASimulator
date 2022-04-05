@@ -1,17 +1,15 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.components.Node;
-import ch.ludovic_mermod.dfasimulator.json.JSONElement;
-import ch.ludovic_mermod.dfasimulator.json.JSONNull;
-import ch.ludovic_mermod.dfasimulator.json.JSONObject;
+import ch.ludovic_mermod.dfasimulator.json.*;
 import ch.ludovic_mermod.dfasimulator.utils.PropertiesMap;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,7 +68,17 @@ public class State
 
         transitionMapProperty.addListener((p, k, o, n) ->
         {
-            if (n != null && n.size() != 0) jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).addProperty(k.toString(), n.get(0).nameProperty());
+            if (n != null && n.size() != 0)
+                jsonObject
+                        .getAsJSONObject(JSON_TRANSITION_MAP)
+                        .add(
+                                k.toString(),
+                                JSONArray.fromObservableValueList(
+                                        n.stream()
+                                                .map(s -> (ObservableValue<String>) s.name)
+                                                .toList(),
+                                        JSONPrimitive::new));
+
             else jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).add(k.toString(), JSONNull.INSTANCE);
         });
         transitionMapProperty.addListener((k, p) -> jsonObject.getAsJSONObject(JSON_TRANSITION_MAP).remove(String.valueOf(k)));
@@ -111,11 +119,10 @@ public class State
 
             if (key.length() != 1
                 || !jsonObject.has(key)
-                || !(jsonObject.get(key).isJSONNull() || jsonObject.hasString(key)))
+                || !(jsonObject.get(key).isJSONNull() || jsonObject.hasArray(key)))
                 throw new IOManager.CorruptedFileException("Could not parse \"%s\" into a transition map", jsonObject);
 
-
-            transitionMapProperty.setValue(key.charAt(0), new ArrayList<>(List.of(e.getValue().isJSONNull() ? null : finiteAutomaton.getState(e.getValue().getAsString()))));
+            transitionMapProperty.setValue(key.charAt(0), e.getValue().isJSONNull() ? List.of() : e.getValue().getAsJSONArray().stream().map(j -> finiteAutomaton.getState(j.getAsString())).toList());
         }
     }
 
