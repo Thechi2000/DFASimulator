@@ -10,6 +10,7 @@ import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -71,7 +72,7 @@ public class MainPane extends BorderPane
         setRight(rightSplitPane);
         setTop(menuBar);
         setBottom(consolePane);
-        setCenter(graphPane);
+        setCenter(new ScrollPane(graphPane));
 
         getScene().getWindow().setOnCloseRequest(request ->
         {
