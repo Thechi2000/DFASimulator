@@ -43,9 +43,6 @@ public class Simulation
         initialInputProperty = new SimpleStringProperty("");
         resultProperty = new SimpleBooleanProperty(false);
         simulationEndedProperty = new SimpleBooleanProperty(false);
-
-        simulationEndedProperty.addListener((o, ov, nv) -> updateResult());
-        currentStatesProperty.addListener((o, ov, nv) -> updateResult());
     }
 
     private void updateResult()
@@ -204,6 +201,7 @@ public class Simulation
     public void startSimulation(String input)
     {
         if (!compileNFA()) return;
+        resultProperty.set(false);
         currentLinksProperty.clear();
         currentStatesProperty.clear();
 
@@ -245,7 +243,10 @@ public class Simulation
         currentLinksProperty.set(newLinks);
 
         if (remainingInputProperty.get().length() == 0)
+        {
             simulationEndedProperty.set(true);
+            updateResult();
+        }
     }
 
     /**

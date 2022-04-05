@@ -76,8 +76,8 @@ public class SimulationPane extends VBox
         // Result
         {
             Text resultText = new Text();
-            mainPane.getGraphPane().resultProperty().addListener((o, ov, nv) -> updateResultText(resultText));
-            mainPane.getGraphPane().simulationEndedProperty().addListener((o, ov, nv) -> updateResultText(resultText));
+            mainPane.getSimulation().resultProperty().addListener((o, ov, nv) -> updateResultText(resultText));
+            mainPane.getSimulation().simulationEndedProperty().addListener((o, ov, nv) -> updateResultText(resultText));
             Strings.get("simulation_pane.result_false").addListener((o, ov, nv) -> updateResultText(resultText));
             Strings.get("simulation_pane.result_true").addListener((o, ov, nv) -> updateResultText(resultText));
             getChildren().add(resultText);
@@ -86,13 +86,13 @@ public class SimulationPane extends VBox
 
     private void updateResultText(Text resultText)
     {
-        if (mainPane.getGraphPane().initialInputProperty().get().equals("") || !mainPane.getGraphPane().simulationEndedProperty().get())
+        if (mainPane.getGraphPane().initialInputProperty().get().equals("") || !mainPane.getSimulation().simulationEndedProperty().get())
         {
             resultText.setVisible(false);
             return;
         }
 
         resultText.setVisible(true);
-        Strings.bindFormat("simulation_pane.result_" + mainPane.getGraphPane().resultProperty().get(), resultText.textProperty(), mainPane.getGraphPane().initialInputProperty().get());
+        Strings.bindFormat("simulation_pane.result_" + mainPane.getSimulation().resultProperty().get(), resultText.textProperty(), mainPane.getGraphPane().initialInputProperty().get());
     }
 }
