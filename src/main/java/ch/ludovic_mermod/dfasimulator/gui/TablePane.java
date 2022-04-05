@@ -14,8 +14,10 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -25,7 +27,7 @@ public class TablePane extends ScrollPane
 {
     private static final int ADDITIONAL_COLUMNS = 4;
 
-    private final TableView<State> tableView;
+    private final TableView<Pair<State, Boolean>> tableView;
 
     public TablePane()
     {
@@ -59,13 +61,13 @@ public class TablePane extends ScrollPane
 
         // Name column
         {
-            TableColumn<State, Group> nameColumn = new TableColumn<>();
+            TableColumn<Pair<State, Boolean>, Group> nameColumn = new TableColumn<>();
             Strings.bind("table_pane.label_column", nameColumn.textProperty());
             nameColumn.setCellValueFactory(cellFeatures ->
             {
                 SimpleObjectProperty<Group> cell = new SimpleObjectProperty<>(new Group());
 
-                if (cellFeatures.getValue() == null)
+                if (cellFeatures.getValue().getValue())
                 {
                     TextField addStateField = new TextField();
                     cell.get().getChildren().add(addStateField);
@@ -92,10 +94,15 @@ public class TablePane extends ScrollPane
                         addStateField.requestFocus();
                     });
                 }
+                else if (cellFeatures.getValue().getKey() == null)
+                {
+                    return new SimpleObjectProperty<>();
+                }
                 else
                 {
+                    State state = cellFeatures.getValue().getKey();
                     Text text = new Text();
-                    text.textProperty().bind(cellFeatures.getValue().nameProperty());
+                    text.textProperty().bind(state.nameProperty());
                     cell.get().getChildren().add(text);
                 }
 
@@ -107,7 +114,7 @@ public class TablePane extends ScrollPane
 
         // Alphabet columns
         {
-            TableColumn<State, Node> alphabetColumn = new TableColumn<>();
+            TableColumn<Pair<State, Boolean>, Node> alphabetColumn = new TableColumn<>();
             Strings.bind("table_pane.alphabet_column", alphabetColumn.textProperty());
 
             finiteAutomaton.alphabet().stream().sorted().forEach(character -> alphabetColumn.getColumns().add(createAlphabetColumn(character, finiteAutomaton, columnWidthBinding)));
@@ -126,14 +133,14 @@ public class TablePane extends ScrollPane
 
         // Accepting column
         {
-            TableColumn<State, CheckBox> acceptingColumn = new TableColumn<>();
+            TableColumn<Pair<State, Boolean>, CheckBox> acceptingColumn = new TableColumn<>();
             Strings.bind("table_pane.accepting_column", acceptingColumn.textProperty());
             acceptingColumn.setCellValueFactory(cellFeatures ->
             {
-                if (cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
+                if (cellFeatures.getValue().getValue() || cellFeatures.getValue().getKey() == null) return new SimpleObjectProperty<>();
 
                 CheckBox checkBox = new CheckBox();
-                checkBox.selectedProperty().bindBidirectional(cellFeatures.getValue().isAcceptingProperty());
+                checkBox.selectedProperty().bindBidirectional(cellFeatures.getValue().getKey().isAcceptingProperty());
                 return new SimpleObjectProperty<>(checkBox);
             });
             acceptingColumn.prefWidthProperty().bind(columnWidthBinding);
@@ -142,18 +149,18 @@ public class TablePane extends ScrollPane
 
         // Initial column
         {
-            TableColumn<State, Toggle> initialColumn = new TableColumn<>();
+            TableColumn<Pair<State, Boolean>, Toggle> initialColumn = new TableColumn<>();
             Strings.bind("table_pane.initial_column", initialColumn.textProperty());
             ToggleGroup toggleGroup = new ToggleGroup();
 
             initialColumn.setCellValueFactory(cellFeatures ->
             {
-                if (cellFeatures.getValue() == null) return new SimpleObjectProperty<>();
+                if (cellFeatures.getValue().getValue() || cellFeatures.getValue().getKey() == null) return new SimpleObjectProperty<>();
 
                 Toggle button = new RadioButton();
-                button.setUserData(cellFeatures.getValue());
+                button.setUserData(cellFeatures.getValue().getKey());
                 button.setToggleGroup(toggleGroup);
-                button.setSelected(cellFeatures.getValue().isInitialBinding().get());
+                button.setSelected(cellFeatures.getValue().getKey().isInitialBinding().get());
                 return new SimpleObjectProperty<>(button);
             });
             toggleGroup.selectedToggleProperty().addListener((o, ov, nv) ->
@@ -173,10 +180,10 @@ public class TablePane extends ScrollPane
 
         // Delete column
         {
-            TableColumn<State, Node> deleteColumn = new TableColumn<>();
+            TableColumn<Pair<State, Boolean>, Node> deleteColumn = new TableColumn<>();
             deleteColumn.setCellValueFactory(cellFeatures ->
             {
-                if (cellFeatures.getValue() == null)
+                if (cellFeatures.getValue().getValue())
                 {
                     Group cell = new Group();
 
@@ -210,11 +217,15 @@ public class TablePane extends ScrollPane
 
                     return new SimpleObjectProperty<>(cell);
                 }
+                else if (cellFeatures.getValue().getKey() == null)
+                {
+                    return new SimpleObjectProperty<>();
+                }
                 else
                 {
                     Button button = new Button();
                     Strings.bind("table_pane.delete_button", button.textProperty());
-                    button.setOnAction(event -> finiteAutomaton.removeState(cellFeatures.getValue()));
+                    button.setOnAction(event -> finiteAutomaton.removeState(cellFeatures.getValue().getKey()));
                     return new SimpleObjectProperty<>(button);
                 }
             });
@@ -224,14 +235,14 @@ public class TablePane extends ScrollPane
 
         // Add items
         {
-            tableView.getItems().addAll(finiteAutomaton.states());
-            tableView.getItems().add(null);
+            tableView.getItems().addAll(convert(finiteAutomaton.states()));
+            tableView.getItems().add(new Pair<>(null, true));
 
-            Comparator<State> stateComparator = (o1, o2) ->
-                    o1 == null && o2 == null ? 0 :
-                    o1 == null ? Integer.MAX_VALUE :
-                    o2 == null ? Integer.MIN_VALUE :
-                    o1.name().compareTo(o2.name());
+            Comparator<Pair<State, Boolean>> stateComparator = (o1, o2) ->
+                    o1.getKey() == null && o2.getKey() == null ? 0 :
+                    o1.getKey() == null ? Integer.MAX_VALUE :
+                    o2.getKey() == null ? Integer.MIN_VALUE :
+                    o1.getKey().name().compareTo(o2.getKey().name());
             final ChangeListener<String> nameListener = (o, ov, nv) -> tableView.getItems().sort(stateComparator);
             tableView.getItems().sort(stateComparator);
             finiteAutomaton.states().forEach(s -> s.nameProperty().addListener(nameListener));
@@ -240,50 +251,52 @@ public class TablePane extends ScrollPane
             {
                 change.next();
 
-                if (change.wasPermutated()) return;
-
                 if (change.wasAdded())
-                    change.getAddedSubList().forEach(s ->
-                    {
-                        tableView.getItems().add(s);
-                        s.nameProperty().addListener(nameListener);
-                    });
+                    tableView.getItems().addAll(convert(change.getAddedSubList()));
 
                 if (change.wasRemoved())
-                    change.getRemoved().forEach(s ->
-                    {
-                        tableView.getItems().remove(s);
-                        s.nameProperty().removeListener(nameListener);
-                    });
+                    tableView.getItems().removeAll(convert(change.getRemoved()));
+
+                tableView.getItems().sort(stateComparator);
             });
         }
     }
 
-    private TableColumn<State, Node> createAlphabetColumn(Character character, FiniteAutomaton finiteAutomaton, DoubleBinding columnWidthBinding)
+    private TableColumn<Pair<State, Boolean>, Node> createAlphabetColumn(Character character, FiniteAutomaton finiteAutomaton, DoubleBinding columnWidthBinding)
     {
-        TableColumn<State, Node> column = new TableColumn<>(character.toString());
+        TableColumn<Pair<State, Boolean>, Node> column = new TableColumn<>(character.toString());
 
         column.setCellValueFactory(cellFeatures ->
         {
-            if (cellFeatures.getValue() == null)
+            if (cellFeatures.getValue().getValue())
             {
                 Button button = new Button();
                 Strings.bind("table_pane.remove_alphabet", button.textProperty());
                 button.setOnAction(event -> finiteAutomaton.alphabet().remove(character));
                 return new SimpleObjectProperty<>(button);
             }
+            else if (cellFeatures.getValue().getKey() == null)
+            {
+                return new SimpleObjectProperty<>();
+            }
 
+            State state = cellFeatures.getValue().getKey();
             CheckComboBox<State> checkComboBox = new CheckComboBox<>(finiteAutomaton.states());
-            checkComboBox.setSelectedItems(cellFeatures.getValue().transitionMap().get(character).get());
+            checkComboBox.setSelectedItems(state.transitionMap().getValue(character));
             checkComboBox.setConverter(Utils.stringConverter(State::name, s -> {throw new UnsupportedOperationException();}, ""));
             checkComboBox.getSelectedItems().addListener((ListChangeListener<? super State>) change -> {
                 change.next();
-                cellFeatures.getValue().transitionMap().setValue(character, checkComboBox.getSelectedItems());
+                state.transitionMap().setValue(character, checkComboBox.getSelectedItems());
             });
             return new SimpleObjectProperty<>(checkComboBox);
         });
 
         column.prefWidthProperty().bind(columnWidthBinding);
         return column;
+    }
+
+    private List<Pair<State, Boolean>> convert(List<? extends State> states)
+    {
+        return states.stream().map(s -> new Pair<>((State) s, false)).toList();
     }
 }
