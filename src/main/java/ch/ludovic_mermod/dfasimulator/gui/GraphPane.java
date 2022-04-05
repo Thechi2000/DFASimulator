@@ -107,18 +107,9 @@ public class GraphPane extends Region
     {
         return simulation.isSimulatingProperty();
     }
-
     public ReadOnlyStringProperty initialInputProperty()
     {
         return simulation.initialInputProperty();
-    }
-    public ReadOnlyBooleanProperty resultProperty()
-    {
-        return simulation.resultProperty();
-    }
-    public ReadOnlyBooleanProperty simulationEndedProperty()
-    {
-        return simulation.simulationEndedProperty();
     }
     public ReadOnlyBooleanProperty getSimulationProperty()
     {
