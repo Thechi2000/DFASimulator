@@ -5,6 +5,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableNumberValue;
 import javafx.beans.value.ObservableStringValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.*;
 
 import java.math.BigDecimal;
@@ -44,6 +45,18 @@ public class JSONArray extends JSONElement implements ObservableList<JSONElement
                 change.getRemoved().stream()
                         .filter(Objects::nonNull)
                         .forEach(e -> array.remove(jsonGetter.apply(e)));
+        });
+        return array;
+    }
+    public static <T> JSONArray fromObservableValueList(List<ObservableValue<T>> list, Function<T, JSONElement> jsonGetter)
+    {
+        JSONArray array = new JSONArray();
+        list.forEach(e -> {
+            e.addListener((o, ov, nv) -> {
+                array.remove(jsonGetter.apply(ov));
+                array.add(jsonGetter.apply(nv));
+            });
+            array.add(jsonGetter.apply(e.getValue()));
         });
         return array;
     }
