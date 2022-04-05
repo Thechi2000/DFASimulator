@@ -222,8 +222,8 @@ public class Simulation
     {
         if (remainingInputProperty.get().length() == 0)
         {
-            currentLinksProperty.set(null);
-            currentStatesProperty.set(null);
+            currentLinksProperty.set(FXCollections.observableSet(new HashSet<>()));
+            currentStatesProperty.set(FXCollections.observableSet(new HashSet<>()));
             isSimulatingProperty.set(false);
             return;
         }
@@ -234,10 +234,13 @@ public class Simulation
 
         ObservableSet<State> newStates = FXCollections.observableSet(new HashSet<>());
         ObservableSet<Pair<State, State>> newLinks = FXCollections.observableSet(new HashSet<>());
-        currentStatesProperty.forEach(source -> source.transitionMap().get(c).get().forEach(target -> {
-            newStates.add(target);
-            newLinks.add(new Pair<>(source, target));
-        }));
+        currentStatesProperty.forEach(source -> {
+            if (source.transitionMap().getValue(c) != null)
+                source.transitionMap().getValue(c).forEach(target -> {
+                    newStates.add(target);
+                    newLinks.add(new Pair<>(source, target));
+                });
+        });
         currentStatesProperty.set(newStates);
         currentLinksProperty.set(newLinks);
 
