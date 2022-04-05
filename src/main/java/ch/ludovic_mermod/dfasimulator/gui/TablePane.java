@@ -25,8 +25,6 @@ import java.util.Objects;
  */
 public class TablePane extends ScrollPane
 {
-    private static final int ADDITIONAL_COLUMNS = 4;
-
     private final TableView<Pair<State, Boolean>> tableView;
 
     public TablePane()
