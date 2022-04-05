@@ -18,6 +18,11 @@ import javafx.util.StringConverter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * ComboBox like component allowing multiple item selection through combo boxes
+ *
+ * @param <T>
+ */
 public class CheckComboBox<T> extends Group
 {
     private final ObjectProperty<StringConverter<T>> converter;
@@ -27,11 +32,19 @@ public class CheckComboBox<T> extends Group
 
     private final MenuButton menu;
 
+    /**
+     * Construct an empty CheckComboBox
+     */
     public CheckComboBox()
     {
         this(FXCollections.observableArrayList());
     }
 
+    /**
+     * Construct a CheckComboBox
+     *
+     * @param items the items of the Box
+     */
     public CheckComboBox(ObservableList<T> items)
     {
         this.items = new SimpleListProperty<>();
