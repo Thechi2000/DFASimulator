@@ -2,6 +2,9 @@ package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.gui.MainPane;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+import javafx.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,10 +17,11 @@ public class Simulation
     private final FiniteAutomaton finiteAutomaton;
     private final MainPane        mainPane;
 
-    private final ObjectProperty<State> currentStateProperty;
-    private final ObjectProperty<State> lastStateProperty;
-    private final StringProperty        remainingInputProperty;
-    private final BooleanProperty       isSimulatingProperty;
+    private final SetProperty<Pair<State, State>> currentLinksProperty;
+    private final SetProperty<State>              currentStatesProperty;
+
+    private final StringProperty  remainingInputProperty;
+    private final BooleanProperty isSimulatingProperty;
 
     private final StringProperty  initialInputProperty;
     private final BooleanProperty resultProperty;
@@ -31,8 +35,8 @@ public class Simulation
         finiteAutomaton = mainPane.getFiniteAutomaton();
         this.mainPane = mainPane;
 
-        currentStateProperty = new SimpleObjectProperty<>();
-        lastStateProperty = new SimpleObjectProperty<>();
+        currentStatesProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
+        currentLinksProperty = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
         remainingInputProperty = new SimpleStringProperty();
         isSimulatingProperty = new SimpleBooleanProperty(false);
 
@@ -41,22 +45,22 @@ public class Simulation
         simulationEndedProperty = new SimpleBooleanProperty(false);
 
         simulationEndedProperty.addListener((o, ov, nv) -> updateResult());
-        currentStateProperty.addListener((o, ov, nv) -> updateResult());
+        currentStatesProperty.addListener((o, ov, nv) -> updateResult());
     }
 
     private void updateResult()
     {
-        if (currentStateProperty.get() != null)
-            resultProperty.set(currentStateProperty.get().isAcceptingProperty().get() && simulationEndedProperty.get());
+        if (currentStatesProperty.get() != null)
+            resultProperty.set(currentStatesProperty.get().stream().anyMatch(State::isAccepting) && simulationEndedProperty.get());
     }
 
-    public ReadOnlyObjectProperty<State> currentStateProperty()
+    public ReadOnlySetProperty<State> currentStateProperty()
     {
-        return currentStateProperty;
+        return currentStatesProperty;
     }
-    public ObjectProperty<State> lastStateProperty()
+    public ReadOnlySetProperty<Pair<State, State>> lastStateProperty()
     {
-        return lastStateProperty;
+        return currentLinksProperty;
     }
     public ReadOnlyStringProperty remainingInputProperty()
     {
@@ -89,7 +93,6 @@ public class Simulation
     {
         List<Error> errors = new ArrayList<>();
         Set<Character> alphabet = finiteAutomaton.alphabet();
-        List<State> states = finiteAutomaton.states();
 
         for (State state : finiteAutomaton.states())
         {
@@ -108,7 +111,23 @@ public class Simulation
             }
         }
 
+        errors.addAll(checkInitialState());
         return errors;
+    }
+
+    /**
+     * Check whether the automaton is a valid DFA
+     *
+     * @return a list containing all design errors (if empty, the DFA is valid)
+     */
+    public List<Error> checkNFA()
+    {
+        return checkInitialState();
+    }
+
+    public List<Error> checkInitialState()
+    {
+        return finiteAutomaton.initialStateProperty().get() == null ? List.of(new Error(ErrorCode.NO_INITIAL_STATE, null)) : List.of();
     }
 
     /**
@@ -122,7 +141,7 @@ public class Simulation
         Set<Character> alphabet = finiteAutomaton.alphabet();
         List<Error> errors = checkDFA();
 
-        if (alphabet.stream().anyMatch(c -> !alphabet.contains(c)))
+        if (input.chars().anyMatch(c -> !alphabet.contains((char) c)))
             errors.add(new Error(ErrorCode.STRING_DOES_NOT_MATCH_ALPHABET, new Object[]{alphabet.stream().filter(c -> !alphabet.contains(c)).collect(Collectors.toSet())}));
 
         return errors;
@@ -133,10 +152,22 @@ public class Simulation
      *
      * @return whether the DFA is valid
      */
-    @SuppressWarnings("unchecked")
     public boolean compileDFA()
     {
         var errors = checkDFA();
+        printErrors(errors);
+        return errors.isEmpty();
+    }
+
+    public boolean compileNFA()
+    {
+        var errors = checkNFA();
+        printErrors(errors);
+        return errors.isEmpty();
+    }
+
+    private void printErrors(Collection<Error> errors)
+    {
         mainPane.getConsolePane().clear();
         errors.forEach(e ->
         {
@@ -162,9 +193,7 @@ public class Simulation
         });
 
         if (errors.size() == 0)
-            mainPane.getConsolePane().log(System.Logger.Level.INFO, "DFA is valid");
-
-        return errors.size() == 0;
+            mainPane.getConsolePane().log(System.Logger.Level.INFO, "Automaton is valid");
     }
 
     /**
@@ -174,12 +203,14 @@ public class Simulation
      */
     public void startSimulation(String input)
     {
-        if (!compileDFA()) return;
+        if (!compileNFA()) return;
+        currentLinksProperty.clear();
+        currentStatesProperty.clear();
 
         isSimulatingProperty.set(true);
         simulationEndedProperty.set(false);
-        lastStateProperty.set(null);
-        currentStateProperty.set(finiteAutomaton.initialState());
+        currentLinksProperty.set(null);
+        currentStatesProperty.add(finiteAutomaton.initialState());
         remainingInputProperty.set(input);
         initialInputProperty.set(input);
     }
@@ -191,8 +222,8 @@ public class Simulation
     {
         if (remainingInputProperty.get().length() == 0)
         {
-            lastStateProperty.set(null);
-            currentStateProperty.set(null);
+            currentLinksProperty.set(null);
+            currentStatesProperty.set(null);
             isSimulatingProperty.set(false);
             return;
         }
@@ -201,8 +232,14 @@ public class Simulation
         char c = input.charAt(0);
         remainingInputProperty.set(input.substring(1));
 
-        lastStateProperty.set(currentStateProperty.get());
-        currentStateProperty.set(currentStateProperty.get().transitionMap().getValue(c).get(0));
+        ObservableSet<State> newStates = FXCollections.observableSet(new HashSet<>());
+        ObservableSet<Pair<State, State>> newLinks = FXCollections.observableSet(new HashSet<>());
+        currentStatesProperty.forEach(source -> source.transitionMap().get(c).get().forEach(target -> {
+            newStates.add(target);
+            newLinks.add(new Pair<>(source, target));
+        }));
+        currentStatesProperty.set(newStates);
+        currentLinksProperty.set(newLinks);
 
         if (remainingInputProperty.get().length() == 0)
             simulationEndedProperty.set(true);

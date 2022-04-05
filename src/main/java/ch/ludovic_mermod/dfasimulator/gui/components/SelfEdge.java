@@ -92,7 +92,7 @@ public class SelfEdge extends GraphItem
             arrow.endYProperty().bind(arc.yProperty());
             arrow.widthProperty().bind(Constants.getDouble(Edge.WIDTH));
             arrow.sidelineLengthProperty().bind(Constants.getDouble(Edge.SIDELINE_LENGTH));
-            arrow.fillProperty().bind(CustomBindings.ternary(simulation.isSimulatingProperty().and(simulation.lastStateProperty().isEqualTo(state).and(simulation.currentStateProperty().isEqualTo(state))), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR)));
+            arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(state, state)) ? Constants.getColorValue(Edge.CURRENT_COLOR) : Constants.getColorValue(Edge.DEFAULT_COLOR), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
             arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
         }
 

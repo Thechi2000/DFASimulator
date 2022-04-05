@@ -19,6 +19,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -86,7 +87,7 @@ public class Edge extends GraphItem
 
         arrow = new Arrow(path);
         Simulation simulation = graphPane.getMainPane().getSimulation();
-        arrow.fillProperty().bind(CustomBindings.ternary(simulation.isSimulatingProperty().and(simulation.lastStateProperty().isEqualTo(source).and(simulation.currentStateProperty().isEqualTo(target))), Constants.getColor(CURRENT_COLOR), Constants.getColor(DEFAULT_COLOR)));
+        arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(source, target)) ? Constants.getColorValue(CURRENT_COLOR) : Constants.getColorValue(DEFAULT_COLOR), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
         arrow.widthProperty().bind(Constants.getDouble(WIDTH));
         arrow.sidelineLengthProperty().bind(Constants.getDouble(SIDELINE_LENGTH));
         arrow.endXProperty().bind(curve.xProperty());
@@ -222,7 +223,7 @@ public class Edge extends GraphItem
         alphabetDisplay.setText(source.transitionMap()
                 .entrySet()
                 .stream()
-                .filter(e ->e != null && e.getValue() != null && e.getValue().get() != null && e.getValue().get().contains(target))
+                .filter(e -> e != null && e.getValue() != null && e.getValue().get() != null && e.getValue().get().contains(target))
                 .map(e -> e.getKey().toString())
                 .sorted()
                 .collect(Collectors.joining(", ")));

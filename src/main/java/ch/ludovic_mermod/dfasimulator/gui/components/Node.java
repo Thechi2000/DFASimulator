@@ -66,7 +66,7 @@ public class Node extends GraphItem
         Constants.getColor(DEFAULT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.getColor(INITIAL_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         Constants.getColor(CURRENT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        graphPane.currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        graphPane.getMainPane().getSimulation().currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         updateCircleColor(innerCircle);
 
         Circle outerCircle = new Circle();
@@ -161,7 +161,7 @@ public class Node extends GraphItem
 
     private void updateCircleColor(Circle c)
     {
-        c.setFill(graphPane.currentStateProperty().get() == state
+        c.setFill(graphPane.getMainPane().getSimulation().currentStateProperty().contains(state)
                   ? Constants.getColorValue(CURRENT_COLOR)
                   : state.isInitialBinding().get()
                     ? Constants.getColorValue(INITIAL_COLOR)

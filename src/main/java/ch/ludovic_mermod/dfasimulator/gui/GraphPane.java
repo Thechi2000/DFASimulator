@@ -32,9 +32,9 @@ import java.util.logging.Level;
 public class GraphPane extends Region
 {
     public static final    String     FONT_SIZE       = "graph.font_size";
+    public static final    String     JSON_NODES      = "nodes";
     protected static final String     JSON_SELF_EDGES = "self_edges";
     protected static final String     JSON_EDGES      = "edges";
-    public static final    String     JSON_NODES      = "nodes";
     private final          JSONObject object;
 
     private final ObservableSet<Edge>       edges;
@@ -99,10 +99,6 @@ public class GraphPane extends Region
         });
     }
 
-    public ReadOnlyObjectProperty<State> currentStateProperty()
-    {
-        return simulation.currentStateProperty();
-    }
     public ReadOnlyStringProperty remainingInputProperty()
     {
         return simulation.remainingInputProperty();
