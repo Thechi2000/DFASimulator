@@ -107,12 +107,12 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
             MenuItem transitionTableItem = new MenuItem();
             Strings.bind("menu.dfa.transition_table", transitionTableItem.textProperty());
-            transitionTableItem.setOnAction(event -> Utils.openNewStage(new TablePane(mainPane.getFiniteAutomaton())));
+            transitionTableItem.setOnAction(event -> Utils.openNewStage(new TablePane(mainPane.getFiniteAutomaton()), 800, 600));
             dfaMenu.getItems().add(transitionTableItem);
 
             MenuItem testItem = new MenuItem();
             Strings.bind("menu.dfa.test", testItem.textProperty());
-            testItem.setOnAction(event -> Utils.openNewStage(new TestPane(mainPane), 400, 600));
+            testItem.setOnAction(event -> Utils.openNewStage(new TestPane(mainPane), 800, 600));
             dfaMenu.getItems().add(testItem);
         }
     }
