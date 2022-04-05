@@ -21,6 +21,7 @@ public class GraphItem extends Group
     /**
      * Called when a MousePressedEvent is registered on the GraphPane
      * Must check if this item is concerned by the click and consume the event if it is
+     *
      * @param event the MouseEvent
      */
     public void onMousePressed(MouseEvent event)

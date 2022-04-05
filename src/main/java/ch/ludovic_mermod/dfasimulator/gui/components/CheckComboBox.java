@@ -68,33 +68,34 @@ public class CheckComboBox<T> extends Group
     {
         return selectedItems;
     }
+    public void setSelectedItems(List<T> items)
+    {
+        if (items != null) menu.getItems().stream().map(i -> (CustomMenuItem) i).filter(i -> items.contains(i.getUserData())).forEach(i -> ((CheckBox) i.getContent()).setSelected(true));
+    }
+
     public ObservableList<T> getItems()
     {
         return items.get();
+    }
+    public void setItems(ObservableList<T> items)
+    {
+        this.items.set(items);
     }
     public ListProperty<T> itemsProperty()
     {
         return items;
     }
+
     public StringConverter<T> getConverter()
     {
         return converter.get();
-    }
-    public ObjectProperty<StringConverter<T>> converterProperty()
-    {
-        return converter;
-    }
-
-    public void setSelectedItems(List<T> items)
-    {
-        menu.getItems().stream().map(i -> (CustomMenuItem) i).filter(i -> items.contains(i.getUserData())).forEach(i -> ((CheckBox) i.getContent()).setSelected(true));
     }
     public void setConverter(StringConverter<T> converter)
     {
         this.converter.set(converter);
     }
-    public void setItems(ObservableList<T> items)
+    public ObjectProperty<StringConverter<T>> converterProperty()
     {
-        this.items.set(items);
+        return converter;
     }
 }

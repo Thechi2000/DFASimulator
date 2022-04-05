@@ -89,6 +89,7 @@ public class FiniteAutomaton
 
     /**
      * Bind values to the MainPane
+     *
      * @param mainPane the MainPane to bind to
      */
     public void create(MainPane mainPane)
@@ -132,6 +133,7 @@ public class FiniteAutomaton
     /**
      * Adds a State with a given name (if it is valid)
      * The State position will be (0, 0)
+     *
      * @param name the name of the new State
      */
     public void addState(String name)
@@ -142,6 +144,7 @@ public class FiniteAutomaton
     }
     /**
      * Adds a State to the automaton
+     *
      * @param state the State to add
      */
     public void addState(State state)
@@ -159,6 +162,7 @@ public class FiniteAutomaton
     }
     /**
      * Remove a State from the automaton
+     *
      * @param state the state to remove
      */
     public void removeState(State state)
@@ -217,6 +221,7 @@ public class FiniteAutomaton
 
     /**
      * Load the automaton from a JSONObject
+     *
      * @param object the object to load
      * @throws IOManager.CorruptedFileException when the object is invalid
      */

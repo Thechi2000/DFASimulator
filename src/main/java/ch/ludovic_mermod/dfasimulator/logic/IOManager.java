@@ -67,6 +67,7 @@ public class IOManager
     }
     /**
      * Changes the current file and save the automaton to it
+     *
      * @param filename the path of the file
      */
     public void saveAs(String filename)
@@ -76,12 +77,13 @@ public class IOManager
     }
     /**
      * Open the given file
+     *
      * @param filename the file to oepn
      */
     public void open(String filename)
     {
         filepathProperty.set(filename);
-        if(!close()) return;
+        if (!close()) return;
 
         try
         {
@@ -133,6 +135,7 @@ public class IOManager
     /**
      * Close the current file
      * If the file is not saved, the user is prompted for saving the file
+     *
      * @return whether the closure was successful (i.e. whether the file is saved)
      */
     public boolean close()

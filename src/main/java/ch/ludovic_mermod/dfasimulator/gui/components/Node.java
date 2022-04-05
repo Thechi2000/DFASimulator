@@ -38,12 +38,10 @@ public class Node extends GraphItem
 
     private final State   state;
     private final Circle  innerCircle;
-    private       Point2D pos;
-
     private final ContextMenu menu;
-    private       MenuItem    deleteMenuItem;
-
     private final JSONObject object;
+    private       Point2D pos;
+    private       MenuItem    deleteMenuItem;
 
     /**
      * Constructs a Node
@@ -151,7 +149,7 @@ public class Node extends GraphItem
         object.checkHasNumber(JSON_X);
         object.checkHasNumber(JSON_Y);
 
-        relocate(object.get(JSON_X).getAsDouble() - getWidth() / 2, object.get(JSON_Y).getAsDouble()- getHeight() / 2);
+        relocate(object.get(JSON_X).getAsDouble() - getWidth() / 2, object.get(JSON_Y).getAsDouble() - getHeight() / 2);
     }
 
     protected void bindSimulationPane(GraphPane graphPane)

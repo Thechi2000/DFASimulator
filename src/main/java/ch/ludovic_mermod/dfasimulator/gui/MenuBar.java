@@ -133,6 +133,7 @@ public class MenuBar extends javafx.scene.control.MenuBar
 
     /**
      * Prompt the user to choose a file to save to
+     *
      * @return the chosen file path
      */
     public String chooseSaveFile()

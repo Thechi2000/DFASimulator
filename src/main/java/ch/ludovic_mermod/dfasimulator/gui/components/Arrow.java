@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.Shape;
 
 /**
  * Arrow shaped component
@@ -34,6 +33,7 @@ public class Arrow extends Group
 
     /**
      * Constructs an arrow
+     *
      * @param path the path of the body of the arrow
      */
     public Arrow(Path path)
