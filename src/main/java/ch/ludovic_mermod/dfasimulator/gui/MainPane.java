@@ -2,6 +2,11 @@ package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Element;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Item;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Leaf;
+import ch.ludovic_mermod.dfasimulator.json.JSONElement;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
@@ -21,6 +26,8 @@ import java.util.List;
 
 public class MainPane extends BorderPane
 {
+    public static final String JSON_LAYOUT = "layout";
+
     private final FiniteAutomaton finiteAutomaton;
     private final IOManager       ioManager;
     private final GraphPane       graphPane;
@@ -31,6 +38,10 @@ public class MainPane extends BorderPane
     private final SimulationPane           simulationPane;
     private final SplitPane                rightSplitPane;
     private final Simulation               simulation;
+
+    private final JSONObject sessionObject;
+
+    private Element layout;
 
     public MainPane()
     {
@@ -44,6 +55,8 @@ public class MainPane extends BorderPane
         graphPane = new GraphPane();
         ioManager = new IOManager(this);
         simulation = new Simulation(this);
+
+        sessionObject = new JSONObject();
     }
 
     public void create(Stage primaryStage)
@@ -69,10 +82,11 @@ public class MainPane extends BorderPane
 
         ioManager.open(Resources.get("default.json"));
 
-        setRight(rightSplitPane);
+        Item.register(new Item(consolePane, "Console", "console"));
+        Item.register(new Item(new ScrollPane(graphPane), "Graph", "graph"));
+        Item.register(new Item(simulationPane, "Simulation", "simulation"));
+
         setTop(menuBar);
-        setBottom(consolePane);
-        setCenter(new ScrollPane(graphPane));
 
         getScene().getWindow().setOnCloseRequest(request ->
         {
@@ -80,6 +94,33 @@ public class MainPane extends BorderPane
                 request.consume();
         });
         Strings.bindFormat("window.title", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
+
+        loadSession();
+
+        sessionObject.addListener((JSONElement.ChildUpdateListener) child -> sessionObject.saveToFile(Resources.get("session.json")));
+    }
+
+    public Element getLayout()
+    {
+        return layout;
+    }
+
+    public void loadSession()
+    {
+        try
+        {
+            final JSONElement element = JSONElement.readFromFile(Resources.get("session.json"));
+            layout = element.isJSONObject() && element.getAsJSONObject().hasObject(JSON_LAYOUT) ? Element.load(element.getAsJSONObject().getAsJSONObject(JSON_LAYOUT)) : null;
+
+            if (layout == null) layout = new Leaf(new Item[0]);
+
+            setCenter(layout.getContent());
+            sessionObject.add(JSON_LAYOUT, layout.getJSONObject());
+        }
+        catch (IOManager.CorruptedFileException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public FiniteAutomaton getFiniteAutomaton()
