@@ -1,0 +1,28 @@
+{
+  "layout": {
+    "divider": 0.7631578947368421,
+    "first": {
+      "divider": 0.787085514834206,
+      "first": {
+        "items": ["graph"],
+        "type": "leaf"
+      },
+      "orientation": "VERTICAL",
+      "second": {
+        "items": [
+          "console"
+        ],
+        "type": "leaf"
+      },
+      "type": "fork"
+    },
+    "orientation": "HORIZONTAL",
+    "second": {
+      "items": [
+        "simulation"
+      ],
+      "type": "leaf"
+    },
+    "type": "fork"
+  }
+}
