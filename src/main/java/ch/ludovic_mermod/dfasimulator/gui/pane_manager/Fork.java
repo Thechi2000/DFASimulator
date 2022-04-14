@@ -2,7 +2,6 @@ package ch.ludovic_mermod.dfasimulator.gui.pane_manager;
 
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 
@@ -45,17 +44,26 @@ public class Fork extends Element
     }
 
     @Override
-    public Element add(Item i, double x, double y)
+    public void add(Item i, double x, double y)
     {
-        if (first.getContent().contains(x, y))
+        /*if (first.getContent().contains(x, y))
             first = first.add(i, x, y);
         else if (second.getContent().contains(x, y))
             second = second.add(i, x, y);
 
         updateContent();
-        return this;
+        return this;*/
+        throw new UnsupportedOperationException();
     }
 
+    @Override
+    protected void update(Element oldValue, Element newValue)
+    {
+        if(oldValue == first) first = newValue;
+        else if (oldValue == second) second = newValue;
+        else throw new IllegalArgumentException();
+        updateContent();
+    }
     @Override
     public Element remove(Item i)
     {

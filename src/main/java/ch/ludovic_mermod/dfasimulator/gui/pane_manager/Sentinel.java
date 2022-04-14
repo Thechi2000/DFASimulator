@@ -1,6 +1,5 @@
 package ch.ludovic_mermod.dfasimulator.gui.pane_manager;
 
-import ch.ludovic_mermod.dfasimulator.json.JSONNull;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.property.ObjectProperty;
@@ -20,17 +19,25 @@ public class Sentinel extends Element
     }
 
     @Override
-    public Element add(Item i, double x, double y)
+    protected void update(Element oldValue, Element newValue)
     {
-        element.set(element.get().add(i, x, y));
-        return this;
+        if (element.get() == oldValue) element.set(newValue);
+        else throw new IllegalArgumentException();
     }
+
+    @Override
+    public void add(Item i, double x, double y)
+    {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Element remove(Item i)
     {
         element.set(element.get().remove(i));
         return this;
     }
+
     @Override
     public Parent getContent()
     {

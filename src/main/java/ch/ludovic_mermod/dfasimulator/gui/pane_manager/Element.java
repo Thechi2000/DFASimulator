@@ -1,11 +1,9 @@
 package ch.ludovic_mermod.dfasimulator.gui.pane_manager;
 
-import ch.ludovic_mermod.dfasimulator.json.JSONArray;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.json.JSONable;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.TransferMode;
 
@@ -54,23 +52,18 @@ public abstract class Element implements JSONable
         });
 
         getContent().setOnDragDropped(e -> {
-            System.out.println("Drag dropped " + e.getDragboard().getString());
             Item i = Item.get(e.getDragboard().getString());
 
             PaneManager.INSTANCE.remove(i);
-            ascendingAdd(i, e.getX(), e.getY());
+            add(i, e.getX(), e.getY());
 
             e.consume();
         });
     }
 
-    private void ascendingAdd(Item i, double x, double y)
-    {
-        if (parent == null) add(i, x, y);
-        else parent.ascendingAdd(i, x, y);
-    }
 
-    public abstract Element add(Item i, double x, double y);
+    protected abstract void update(Element oldValue, Element newValue);
+    public abstract void add(Item i, double x, double y);
     public abstract Element remove(Item i);
     public abstract Parent getContent();
 }

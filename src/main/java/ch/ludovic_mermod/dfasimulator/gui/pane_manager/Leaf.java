@@ -5,31 +5,40 @@ import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.json.JSONPrimitive;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
+import javafx.geometry.Point2D;
 import javafx.scene.Parent;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+
+import static ch.ludovic_mermod.dfasimulator.gui.pane_manager.Direction.*;
 
 import java.util.Arrays;
 
-public class Leaf extends    Element
+public class Leaf extends Element
 {
     public static final String JSON_ITEMS = "items";
 
+    private static final double DRAG_HITBOX_FACTOR = 0.2;
+
+    private final StackPane  stackPane;
+    private final Pane       overlayPane;
     private final TabPane    tabPane;
     private final JSONObject object;
 
     private Leaf()
     {
+        overlayPane = new Pane();
         tabPane = new TabPane();
+        stackPane = new StackPane(tabPane, overlayPane);
+        overlayPane.setMouseTransparent(true);
 
         object = new JSONObject();
         object.addProperty("type", "leaf");
@@ -44,6 +53,22 @@ public class Leaf extends    Element
         });
 
         addHandlers();
+        stackPane.setOnDragOver(e -> {
+            if (e.getDragboard().hasString())
+            {
+                e.acceptTransferModes(TransferMode.ANY);
+                overlayPane.getChildren().clear();
+                for (var o : Direction.values())
+                {
+                    var p = getDragHitbox(o);
+                    p.setFill(Paint.valueOf("FF000488"));
+                    if (p.contains(e.getX(), e.getY()))
+                        overlayPane.getChildren().add(p);
+                }
+            }
+            e.consume();
+        });
+        stackPane.setOnDragExited(e -> overlayPane.getChildren().clear());
     }
     public Leaf(Item... item)
     {
@@ -77,6 +102,39 @@ public class Leaf extends    Element
         tabPane.getTabs().add(tab);
     }
 
+    private MoveTo mt(Point2D to) {return new MoveTo(to.getX(), to.getY());}
+    private Polygon polygon(Point2D... points)
+    {
+        Polygon polygon = new Polygon();
+        Arrays.stream(points).forEach(p -> polygon.getPoints().addAll(p.getX(), p.getY()));
+        return polygon;
+    }
+
+    private Polygon getDragHitbox(Direction direction)
+    {
+        double x = 0, y = 30,
+                w = getContent().getLayoutBounds().getWidth(), h = getContent().getLayoutBounds().getHeight(),
+                f = DRAG_HITBOX_FACTOR, of = 1 - f;
+
+        Point2D tl = new Point2D(x, y),
+                tr = new Point2D(x + w, y),
+                bl = new Point2D(x, h),
+                br = new Point2D(w, h),
+
+                itl = new Point2D(x + f * w, y + f * h),
+                itr = new Point2D(x + of * w, y + f * h),
+                ibl = new Point2D(f * w, of * h),
+                ibr = new Point2D(of * w, of * h);
+
+        return switch (direction)
+                {
+                    case UP -> polygon(tl, tr, itr, itl);
+                    case RIGHT -> polygon(tr, br, ibr, itr);
+                    case DOWN -> polygon(bl, br, ibr, ibl);
+                    case LEFT -> polygon(tl, bl, ibl, itl);
+                };
+    }
+
     @Override
     public JSONObject getJSONObject()
     {
@@ -84,24 +142,27 @@ public class Leaf extends    Element
     }
 
     @Override
-    public Element add(Item i, double x, double y)
+    protected void update(Element oldValue, Element newValue)
     {
-        if (!getContent().contains(x, y)) return this;
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void add(Item i, double x, double y)
+    {
+        if (!getContent().contains(x, y)) return;
 
-        double relX = (x - tabPane.getLayoutX()) / tabPane.getWidth(),
-                relY = (y - tabPane.getLayoutY()) / tabPane.getHeight();
+        System.out.printf("%s, %s\n", x, y);
 
-        if (relX <= 0.2)
-            return new Fork(new Leaf(i), this, Orientation.HORIZONTAL);
-        else if (relX >= 0.8)
-            return new Fork(this, new Leaf(i), Orientation.HORIZONTAL);
-        else if (relY <= 0.2)
-            return new Fork(new Leaf(i), this, Orientation.VERTICAL);
-        else if (relY >= 0.8)
-            return new Fork(this, new Leaf(i), Orientation.VERTICAL);
-
-        addTab(i);
-        return this;
+        if (getDragHitbox(LEFT).contains(x, y))
+            parent.update(this, new Fork(new Leaf(i), this, Orientation.HORIZONTAL));
+        else if (getDragHitbox(RIGHT).contains(x, y))
+            parent.update(this, new Fork(this, new Leaf(i), Orientation.HORIZONTAL));
+        else if (getDragHitbox(UP).contains(x, y))
+            parent.update(this, new Fork(new Leaf(i), this, Orientation.VERTICAL));
+        else if (getDragHitbox(DOWN).contains(x, y))
+            parent.update(this, new Fork(this, new Leaf(i), Orientation.VERTICAL));
+        else
+            addTab(i);
     }
     @Override
     public Element remove(Item i)
@@ -113,6 +174,6 @@ public class Leaf extends    Element
     @Override
     public Parent getContent()
     {
-        return tabPane;
+        return stackPane;
     }
 }
