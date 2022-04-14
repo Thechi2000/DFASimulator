@@ -23,11 +23,11 @@ public record Item(Node node, String name, String id)
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        return Objects.equals(name, ((Item) o).name);
+        return Objects.equals(id, ((Item) o).id);
     }
     @Override
     public int hashCode()
     {
-        return Objects.hash(name);
+        return Objects.hash(id);
     }
 }

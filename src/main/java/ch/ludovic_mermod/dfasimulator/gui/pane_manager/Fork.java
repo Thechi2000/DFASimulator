@@ -3,9 +3,10 @@ package ch.ludovic_mermod.dfasimulator.gui.pane_manager;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 
-public class Fork implements Element
+public class Fork extends Element
 {
     public static final String     JSON_FIRST       = "first";
     public static final String     JSON_SECOND      = "second";
@@ -20,15 +21,18 @@ public class Fork implements Element
 
     public Fork(Element first, Element second, Orientation orientation)
     {
-        this(first, second, orientation, 0);
+        this(first, second, orientation, 0.5);
     }
     public Fork(Element first, Element second, Orientation orientation, double divider)
     {
         this.first = first;
         this.second = second;
-        splitPane = new SplitPane(first.getContent(), second.getContent());
+
+        splitPane = new SplitPane();
+        updateContent();
+
         splitPane.setOrientation(orientation);
-        if(divider != 0) splitPane.getDividers().get(0).setPosition(divider);
+        if (divider != 0) splitPane.getDividers().get(0).setPosition(divider);
 
         jsonObject = new JSONObject();
         jsonObject.add(JSON_FIRST, first.getJSONObject());
@@ -36,6 +40,8 @@ public class Fork implements Element
         jsonObject.addProperty(JSON_TYPE, "fork");
         jsonObject.addProperty(JSON_DIVIDER, splitPane.getDividers().get(0).positionProperty());
         jsonObject.addProperty(JSON_ORIENTATION, String.valueOf(orientation));
+
+        addHandlers();
     }
 
     @Override
@@ -67,7 +73,7 @@ public class Fork implements Element
         return this;
     }
     @Override
-    public Node getContent()
+    public Parent getContent()
     {
         return splitPane;
     }
@@ -79,5 +85,7 @@ public class Fork implements Element
     private void updateContent()
     {
         splitPane.getItems().setAll(first.getContent(), second.getContent());
+        first.parent = this;
+        second.parent = this;
     }
 }
