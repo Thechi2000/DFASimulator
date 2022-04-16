@@ -142,6 +142,12 @@ public class Leaf extends Element
     }
 
     @Override
+    protected void removeChild(Element child)
+    {
+        tabPane.getTabs().removeIf(t -> t.getContent() == child.getContent());
+    }
+
+    @Override
     protected void update(Element oldValue, Element newValue)
     {
         throw new UnsupportedOperationException();

@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+import java.util.Iterator;
 import java.util.logging.Level;
 
 public class PaneManager
@@ -107,10 +108,32 @@ public class PaneManager
         return mainLayout;
     }
 
+    public void moveToWindow(Item i)
+    {
+        remove(i);
+
+        Stage stage = new Stage();
+        Sentinel sentinel = new Sentinel(new Leaf(i));
+
+        stage.setScene(new Scene(sentinel.getContent()));
+        stage.getScene().rootProperty().bind(sentinel.getContentBinding());
+        stage.show();
+
+        stages.add(new Pair<>(sentinel, stage));
+    }
+
     protected void remove(Item i)
     {
-        stages.forEach(p -> p.getKey().remove(i));
-        stages.stream().filter(p -> p.getKey() == null).forEach(p -> p.getValue().close());
-        stages.removeIf(p -> p.getValue() == null);
+        // Must use indexed looping, or a ConcurrentModificationException will be thrown
+        for (int j = 0; j < stages.size(); j++)
+        {
+            Pair<Sentinel, Stage> p = stages.get(j);
+            p.getKey().remove(i);
+
+            if (p.getKey().isEmpty())
+                p.getValue().close();
+        }
+
+        stages.removeIf(p -> p.getKey().isEmpty());
     }
 }

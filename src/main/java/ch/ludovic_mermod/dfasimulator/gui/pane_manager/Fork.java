@@ -57,6 +57,12 @@ public class Fork extends Element
     }
 
     @Override
+    protected void removeChild(Element child)
+    {
+        splitPane.getItems().remove(child.getContent());
+    }
+
+    @Override
     protected void update(Element oldValue, Element newValue)
     {
         if(oldValue == first) first = newValue;

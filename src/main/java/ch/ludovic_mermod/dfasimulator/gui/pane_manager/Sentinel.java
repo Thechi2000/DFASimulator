@@ -16,13 +16,24 @@ public class Sentinel extends Element
     {
         element = new SimpleObjectProperty<>(e);
         element.get().parent = this;
+
+        element.addListener((o, ov, nv) -> {
+            if (nv != null) nv.removeFromParent();
+        });
     }
+
+    public boolean isEmpty() {return element.get() == null;}
 
     @Override
     protected void update(Element oldValue, Element newValue)
     {
         if (element.get() == oldValue) element.set(newValue);
         else throw new IllegalArgumentException();
+    }
+
+    @Override
+    protected void removeChild(Element child)
+    {
     }
 
     @Override
@@ -41,11 +52,11 @@ public class Sentinel extends Element
     @Override
     public Parent getContent()
     {
-        return element.get() == null ? new Pane() : element.get().getContent();
+        return element.get() != null ? element.get().getContent() : new Pane();
     }
     public ObservableValue<Parent> getContentBinding()
     {
-        return CustomBindings.create(() -> element.get() == null ? new Pane() : element.get().getContent(), element);
+        return CustomBindings.create(this::getContent, element);
     }
 
     @Override
