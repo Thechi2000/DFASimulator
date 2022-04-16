@@ -50,6 +50,12 @@ public class MainPane extends BorderPane
         graphPane = new GraphPane();
         ioManager = new IOManager(this);
         simulation = new Simulation(this);
+
+        Item.register(new Item(consolePane, "Console", "console"));
+        Item.register(new Item(new ScrollPane(graphPane), "Graph", "graph"));
+        Item.register(new Item(simulationPane, "Simulation", "simulation"));
+        Item.register(new Item(new TestPane(this), "Test", "test"));
+        Item.register(new Item(new TablePane(finiteAutomaton), "Table", "table"));
     }
 
     public void create(Stage primaryStage)
@@ -74,10 +80,6 @@ public class MainPane extends BorderPane
         rightSplitPane.getItems().addAll(simulationPane);
 
         ioManager.open(Resources.get("default.json"));
-
-        Item.register(new Item(consolePane, "Console", "console"));
-        Item.register(new Item(new ScrollPane(graphPane), "Graph", "graph"));
-        Item.register(new Item(simulationPane, "Simulation", "simulation"));
 
         setTop(menuBar);
         Strings.bindFormat("window.title", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
