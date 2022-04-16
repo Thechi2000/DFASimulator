@@ -15,7 +15,7 @@ public abstract class Element implements JSONable
 {
     protected Element parent;
 
-    private static Element p_load(JSONObject object) throws IOManager.CorruptedFileException
+    private static Element recursiveLoad(JSONObject object) throws IOManager.CorruptedFileException
     {
         object.checkHasString("type");
         switch (object.get("type").getAsString())
@@ -27,8 +27,8 @@ public abstract class Element implements JSONable
                 object.checkHasString(Fork.JSON_ORIENTATION);
                 object.checkHasNumber(Fork.JSON_DIVIDER);
 
-                return new Fork(Objects.requireNonNull(p_load(object.getAsJSONObject(Fork.JSON_FIRST))),
-                        Objects.requireNonNull(p_load(object.getAsJSONObject(Fork.JSON_SECOND))),
+                return new Fork(Objects.requireNonNull(recursiveLoad(object.getAsJSONObject(Fork.JSON_FIRST))),
+                        Objects.requireNonNull(recursiveLoad(object.getAsJSONObject(Fork.JSON_SECOND))),
                         Orientation.valueOf(object.get(Fork.JSON_ORIENTATION).getAsString()),
                         object.get(Fork.JSON_DIVIDER).getAsNumber().doubleValue());
             }
@@ -43,7 +43,8 @@ public abstract class Element implements JSONable
     }
     public static Sentinel load(JSONObject object) throws IOManager.CorruptedFileException
     {
-        return new Sentinel(p_load(object));
+        object.checkHasBoolean(PaneManager.JSON_IS_MAIN);
+        return new Sentinel(recursiveLoad(object), object.get(PaneManager.JSON_IS_MAIN).getAsBoolean());
     }
 
     protected void addHandlers()

@@ -12,9 +12,16 @@ public class Sentinel extends Element
 {
     private final ObjectProperty<Element> element;
 
+    private final boolean isMain;
+
     public Sentinel(Element e)
     {
+        this(e, false);
+    }
+    public Sentinel(Element e, boolean isMain)
+    {
         element = new SimpleObjectProperty<>(e);
+        this.isMain = isMain;
         element.get().parent = this;
 
         element.addListener((o, ov, nv) -> {
@@ -23,6 +30,10 @@ public class Sentinel extends Element
     }
 
     public boolean isEmpty() {return element.get() == null;}
+    public boolean isMain()
+    {
+        return isMain;
+    }
 
     @Override
     protected void update(Element oldValue, Element newValue)
@@ -62,6 +73,8 @@ public class Sentinel extends Element
     @Override
     public JSONObject getJSONObject()
     {
-        return element == null ? new JSONObject() : element.get().getJSONObject();
+        var obj = element.get() == null ? new JSONObject() : element.get().getJSONObject();
+        if (element != null) obj.addProperty(PaneManager.JSON_IS_MAIN, isMain);
+        return obj;
     }
 }

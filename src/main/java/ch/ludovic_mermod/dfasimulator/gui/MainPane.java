@@ -13,6 +13,7 @@ import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
@@ -90,8 +91,14 @@ public class MainPane extends BorderPane
         primaryStage.setOnCloseRequest(request ->
         {
             PaneManager.INSTANCE.save();
+
             if (!ioManager.close())
+            {
                 request.consume();
+                return;
+            }
+
+            Platform.exit();
         });
     }
 
