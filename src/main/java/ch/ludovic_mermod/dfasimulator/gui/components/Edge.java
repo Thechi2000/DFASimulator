@@ -14,7 +14,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
@@ -85,14 +84,14 @@ public class Edge extends GraphItem
 
         path = new Path(moveTo = new MoveTo(), curve = new QuadCurveTo());
 
-        arrow = new Arrow(path);
         Simulation simulation = graphPane.getMainPane().getSimulation();
+        arrow = new Arrow(path);
+        arrow.setMouseTransparent(true);
         arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(source, target)) ? Constants.getColorValue(CURRENT_COLOR) : Constants.getColorValue(DEFAULT_COLOR), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
         arrow.widthProperty().bind(Constants.getDouble(WIDTH));
         arrow.sidelineLengthProperty().bind(Constants.getDouble(SIDELINE_LENGTH));
         arrow.endXProperty().bind(curve.xProperty());
         arrow.endYProperty().bind(curve.yProperty());
-        arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
 
         bezier = new BezierQuadCurve(
                 moveTo.xProperty(),
@@ -104,6 +103,7 @@ public class Edge extends GraphItem
 
         bindPositions();
 
+        visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
         getChildren().addAll(arrow, alphabetDisplay);
         addControlComponents();
 
@@ -156,14 +156,6 @@ public class Edge extends GraphItem
                "source=" + source.name() +
                ", target=" + target.name() +
                '}';
-    }
-
-    @Override
-    public void onMousePressed(MouseEvent event)
-    {
-        final Point2D mousePosition = new Point2D(event.getX(), event.getY());
-        if (bezier.distance(bezier.findClosest(mousePosition), mousePosition) < 10 || new Point2D(curve.getControlX(), curve.getControlY()).distance(mousePosition) < Constants.getDoubleValue(ControlPoint.RADIUS))
-            super.onMousePressed(event);
     }
 
     private void setControlPoint(double x, double y)
@@ -281,4 +273,19 @@ public class Edge extends GraphItem
     }
 
     private record Points(Point2D start, Point2D end, Point2D center, Point2D leftLineStart, Point2D rightLineStart) {}
+
+    @Override
+    public boolean contains(Point2D point2D)
+    {
+        double closest = bezier.distance(bezier.findClosest(point2D), point2D);
+        double v = arrow.widthProperty().get() / 2;
+        Double doubleValue = Constants.getDoubleValue(ControlPoint.RADIUS);
+        double distance = new Point2D(curve.getControlX(), curve.getControlY()).distance(point2D);
+        return isVisible() && (closest <= v || distance < doubleValue);
+    }
+    @Override
+    public boolean contains(double v, double v1)
+    {
+        return contains(new Point2D(v, v1));
+    }
 }

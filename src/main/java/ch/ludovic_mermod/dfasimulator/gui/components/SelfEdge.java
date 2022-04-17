@@ -88,12 +88,12 @@ public class SelfEdge extends GraphItem
         {
             Simulation simulation = graphPane.getMainPane().getSimulation();
             arrow = new Arrow(new Path(startingPoint, arc));
+            arrow.setMouseTransparent(true);
             arrow.endXProperty().bind(arc.xProperty());
             arrow.endYProperty().bind(arc.yProperty());
             arrow.widthProperty().bind(Constants.getDouble(Edge.WIDTH));
             arrow.sidelineLengthProperty().bind(Constants.getDouble(Edge.SIDELINE_LENGTH));
             arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(state, state)) ? Constants.getColorValue(Edge.CURRENT_COLOR) : Constants.getColorValue(Edge.DEFAULT_COLOR), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
-            arrow.visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
         }
 
         // Add endpoints bindings
@@ -143,6 +143,7 @@ public class SelfEdge extends GraphItem
             });
         }
 
+        visibleProperty().bind(alphabetDisplay.textProperty().isEqualTo("").not());
         recomputeControl();
         getChildren().addAll(arrow, alphabetDisplay);
         addControlComponents();
@@ -234,5 +235,25 @@ public class SelfEdge extends GraphItem
     public State state()
     {
         return state;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SelfEdge{" +
+               "state=" + state +
+               '}';
+    }
+
+    @Override
+    public boolean contains(Point2D point2D)
+    {
+        double distance = point2D.distance(center.get());
+        return isVisible() && (radius.get() - arrow.widthProperty().get() / 2 <= distance && distance <= radius.get() + arrow.widthProperty().get() / 2);
+    }
+    @Override
+    public boolean contains(double v, double v1)
+    {
+        return contains(new Point2D(v, v1));
     }
 }

@@ -57,14 +57,14 @@ public class PaneManager
                     obj.checkHasBoolean(JSON_IS_MAIN);
                     boolean isMain = obj.get(JSON_IS_MAIN).getAsBoolean();
 
-                    Sentinel e = Element.load(obj);
-                    if (isMain) mainLayout = e;
+                    Sentinel sentinel = Element.load(obj);
+                    if (isMain) mainLayout = sentinel;
 
                     Stage stage = isMain ? primaryStage : new Stage();
-                    stage.setScene(new Scene(isMain ? mainPane : e.getContent(), 800, 600));
+                    stage.setScene(new Scene(isMain ? mainPane : sentinel.getContent(), 800, 600));
                     stage.show();
 
-                    stages.add(new Pair<>(e, stage));
+                    stages.add(new Pair<>(sentinel, stage));
                 }
         }
         catch (IOManager.CorruptedFileException e)
@@ -99,6 +99,7 @@ public class PaneManager
         Sentinel sentinel = new Sentinel(new Leaf(i));
 
         stage.setScene(new Scene(sentinel.getContent()));
+        stage.getScene().rootProperty().bind(sentinel.getContentBinding());
         stage.show();
 
         stages.add(new Pair<>(sentinel, stage));
