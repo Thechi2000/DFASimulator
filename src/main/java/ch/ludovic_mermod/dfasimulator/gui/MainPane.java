@@ -86,7 +86,7 @@ public class MainPane extends BorderPane
         Strings.bindFormat("window.title", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
 
         PaneManager.INSTANCE.load(primaryStage, this);
-        centerProperty().bind(PaneManager.INSTANCE.getMainLayout().getContentBinding());
+        setCenter(PaneManager.INSTANCE.getMainLayout().getContent());
 
         primaryStage.setOnCloseRequest(request ->
         {

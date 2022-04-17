@@ -5,14 +5,17 @@ import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 public class Sentinel extends Element
 {
     private final ObjectProperty<Element> element;
 
-    private final boolean isMain;
+    private final AnchorPane anchorPane;
+    private final boolean    isMain;
 
     public Sentinel(Element e)
     {
@@ -20,13 +23,28 @@ public class Sentinel extends Element
     }
     public Sentinel(Element e, boolean isMain)
     {
-        element = new SimpleObjectProperty<>(e);
+        element = new SimpleObjectProperty<>();
         this.isMain = isMain;
-        element.get().parent = this;
+        anchorPane = new AnchorPane();
 
         element.addListener((o, ov, nv) -> {
-            if (nv != null) nv.removeFromParent();
+            anchorPane.getChildren().clear();
+
+            if (nv != null)
+            {
+                nv.removeFromParent();
+
+                Node content = nv.getContent();
+                anchorPane.getChildren().add(content);
+
+                AnchorPane.setBottomAnchor(content, 0.0);
+                AnchorPane.setLeftAnchor(content, 0.0);
+                AnchorPane.setTopAnchor(content, 0.0);
+                AnchorPane.setRightAnchor(content, 0.0);
+            }
         });
+        element.set(e);
+        element.get().parent = this;
     }
 
     public boolean isEmpty() {return element.get() == null;}
@@ -63,12 +81,12 @@ public class Sentinel extends Element
     @Override
     public Parent getContent()
     {
-        return element.get() != null ? element.get().getContent() : new Pane();
+        return anchorPane;
     }
-    public ObservableValue<Parent> getContentBinding()
+    /*public ObservableValue<Parent> getContentBinding()
     {
         return CustomBindings.create(this::getContent, element);
-    }
+    }*/
 
     @Override
     public JSONObject getJSONObject()

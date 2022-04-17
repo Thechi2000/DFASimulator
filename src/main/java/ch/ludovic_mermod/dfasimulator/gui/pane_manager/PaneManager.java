@@ -62,7 +62,6 @@ public class PaneManager
 
                     Stage stage = isMain ? primaryStage : new Stage();
                     stage.setScene(new Scene(isMain ? mainPane : e.getContent(), 800, 600));
-                    if (!isMain) stage.getScene().rootProperty().bind(e.getContentBinding());
                     stage.show();
 
                     stages.add(new Pair<>(e, stage));
@@ -100,7 +99,6 @@ public class PaneManager
         Sentinel sentinel = new Sentinel(new Leaf(i));
 
         stage.setScene(new Scene(sentinel.getContent()));
-        stage.getScene().rootProperty().bind(sentinel.getContentBinding());
         stage.show();
 
         stages.add(new Pair<>(sentinel, stage));
