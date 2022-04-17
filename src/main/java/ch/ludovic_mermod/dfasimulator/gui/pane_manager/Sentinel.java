@@ -12,6 +12,7 @@ public class Sentinel extends Element
 {
     private final ObjectProperty<Element> element;
 
+    private final Pane    pane;
     private final boolean isMain;
 
     public Sentinel(Element e)
@@ -20,13 +21,21 @@ public class Sentinel extends Element
     }
     public Sentinel(Element e, boolean isMain)
     {
-        element = new SimpleObjectProperty<>(e);
+        element = new SimpleObjectProperty<>();
         this.isMain = isMain;
-        element.get().parent = this;
+        pane = new Pane();
 
         element.addListener((o, ov, nv) -> {
-            if (nv != null) nv.removeFromParent();
+            pane.getChildren().clear();
+
+            if (nv != null)
+            {
+                nv.removeFromParent();
+                pane.getChildren().add(nv.getContent());
+            }
         });
+        element.set(e);
+        element.get().parent = this;
     }
 
     public boolean isEmpty() {return element.get() == null;}
@@ -63,18 +72,19 @@ public class Sentinel extends Element
     @Override
     public Parent getContent()
     {
-        return element.get() != null ? element.get().getContent() : new Pane();
+        return pane;
+        //return element.get() != null ? element.get().getContent() : new Pane();
     }
     public ObservableValue<Parent> getContentBinding()
     {
-        return CustomBindings.create(this::getContent, element);
+        return CustomBindings.create(() -> pane);
     }
 
     @Override
     public JSONObject getJSONObject()
     {
         var obj = element.get() == null ? new JSONObject() : element.get().getJSONObject();
-        if (element != null) obj.addProperty(PaneManager.JSON_IS_MAIN, isMain);
+        if (element.get() != null) obj.addProperty(PaneManager.JSON_IS_MAIN, isMain);
         return obj;
     }
 }
