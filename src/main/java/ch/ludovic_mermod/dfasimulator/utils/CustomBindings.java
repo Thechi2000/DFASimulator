@@ -29,7 +29,7 @@ public class CustomBindings
      * @param <T>     type of the values
      * @return a ternary operator like binding
      */
-    public static <T> Binding<T> ternary(ObservableBooleanValue bool, ObservableValue<T> ifTrue, ObservableValue<T> ifFalse)
+    public static <T> Binding<T> ternary(ObservableValue<Boolean> bool, ObservableValue<T> ifTrue, ObservableValue<T> ifFalse)
     {
         return new ObjectBinding<T>()
         {
@@ -40,7 +40,7 @@ public class CustomBindings
             @Override
             protected T computeValue()
             {
-                return bool.get() ? ifTrue.getValue() : ifFalse.getValue();
+                return bool.getValue() ? ifTrue.getValue() : ifFalse.getValue();
             }
         };
     }
@@ -53,7 +53,7 @@ public class CustomBindings
      * @param <T>     type of the values
      * @return a ternary operator like binding
      */
-    public static <T> Binding<T> ternary(ObservableBooleanValue bool, T ifTrue, ObservableValue<T> ifFalse)
+    public static <T> Binding<T> ternary(ObservableValue<Boolean> bool, T ifTrue, ObservableValue<T> ifFalse)
     {
         return new ObjectBinding<T>()
         {
@@ -64,7 +64,7 @@ public class CustomBindings
             @Override
             protected T computeValue()
             {
-                return bool.get() ? ifTrue : ifFalse.getValue();
+                return bool.getValue() ? ifTrue : ifFalse.getValue();
             }
         };
     }
@@ -77,7 +77,7 @@ public class CustomBindings
      * @param <T>     type of the values
      * @return a ternary operator like binding
      */
-    public static <T> Binding<T> ternary(ObservableBooleanValue bool, ObservableValue<T> ifTrue, T ifFalse)
+    public static <T> Binding<T> ternary(ObservableValue<Boolean> bool, ObservableValue<T> ifTrue, T ifFalse)
     {
         return new ObjectBinding<T>()
         {
@@ -88,7 +88,7 @@ public class CustomBindings
             @Override
             protected T computeValue()
             {
-                return bool.get() ? ifTrue.getValue() : ifFalse;
+                return bool.getValue() ? ifTrue.getValue() : ifFalse;
             }
         };
     }
@@ -101,7 +101,7 @@ public class CustomBindings
      * @param <T>     type of the values
      * @return a ternary operator like binding
      */
-    public static <T> Binding<T> ternary(ObservableBooleanValue bool, T ifTrue, T ifFalse)
+    public static <T> Binding<T> ternary(ObservableValue<Boolean> bool, T ifTrue, T ifFalse)
     {
         return new ObjectBinding<T>()
         {
@@ -112,7 +112,7 @@ public class CustomBindings
             @Override
             protected T computeValue()
             {
-                return bool.get() ? ifTrue : ifFalse;
+                return bool.getValue() ? ifTrue : ifFalse;
             }
         };
     }
