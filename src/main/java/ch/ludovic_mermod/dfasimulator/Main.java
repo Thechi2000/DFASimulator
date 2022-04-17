@@ -55,8 +55,8 @@ public class Main extends Application
     {
         MainPane mainPane = new MainPane();
 
-        primaryStage.setScene(new Scene(mainPane, 800, 600));
-        primaryStage.show();
+       /* primaryStage.setScene(new Scene(mainPane, 800, 600));
+        primaryStage.show();*/
 
         mainPane.create(primaryStage);
     }

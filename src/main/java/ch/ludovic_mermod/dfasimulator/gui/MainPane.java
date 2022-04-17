@@ -2,11 +2,18 @@ package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Element;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Item;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Leaf;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.PaneManager;
+import ch.ludovic_mermod.dfasimulator.json.JSONElement;
+import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
 import ch.ludovic_mermod.dfasimulator.logic.State;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
@@ -44,6 +51,12 @@ public class MainPane extends BorderPane
         graphPane = new GraphPane();
         ioManager = new IOManager(this);
         simulation = new Simulation(this);
+
+        Item.register(new Item(consolePane, "Console", "console"));
+        Item.register(new Item(new ScrollPane(graphPane), "Graph", "graph"));
+        Item.register(new Item(simulationPane, "Simulation", "simulation"));
+        Item.register(new Item(new TestPane(this), "Test", "test"));
+        Item.register(new Item(new TablePane(finiteAutomaton), "Table", "table"));
     }
 
     public void create(Stage primaryStage)
@@ -69,17 +82,29 @@ public class MainPane extends BorderPane
 
         ioManager.open(Resources.get("default.json"));
 
-        setRight(rightSplitPane);
         setTop(menuBar);
-        setBottom(consolePane);
-        setCenter(new ScrollPane(graphPane));
-
-        getScene().getWindow().setOnCloseRequest(request ->
-        {
-            if (!ioManager.close())
-                request.consume();
-        });
         Strings.bindFormat("window.title", primaryStage.titleProperty(), ioManager.filenameProperty(), CustomBindings.ternary(ioManager.isSavedProperty(), "", "*"));
+
+        PaneManager.INSTANCE.load(primaryStage, this);
+        centerProperty().bind(PaneManager.INSTANCE.getMainLayout().getContentBinding());
+
+        primaryStage.setOnCloseRequest(request ->
+        {
+            PaneManager.INSTANCE.save();
+
+            if (!ioManager.close())
+            {
+                request.consume();
+                return;
+            }
+
+            Platform.exit();
+        });
+    }
+
+    public Element getLayout()
+    {
+        return PaneManager.INSTANCE.getMainLayout();
     }
 
     public FiniteAutomaton getFiniteAutomaton()

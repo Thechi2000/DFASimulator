@@ -2,6 +2,8 @@ package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Controls;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Item;
+import ch.ludovic_mermod.dfasimulator.gui.pane_manager.PaneManager;
 import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -66,6 +68,15 @@ public class MenuBar extends javafx.scene.control.MenuBar
             Menu windowMenu = new Menu();
             Strings.bind("menu.window", windowMenu.textProperty());
             getMenus().add(windowMenu);
+
+            Item.getItems().forEach(i -> {
+                MenuItem item = new MenuItem();
+                Strings.bind("menu.window." + i.id(), item.textProperty());
+                item.setOnAction(e -> PaneManager.INSTANCE.moveToWindow(i));
+                windowMenu.getItems().add(item);
+            });
+
+            windowMenu.getItems().add(separator);
 
             MenuItem settings = new MenuItem();
             Strings.bind("menu.window.settings", settings.textProperty());
