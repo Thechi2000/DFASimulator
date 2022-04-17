@@ -15,18 +15,20 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.*;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 
-import static ch.ludovic_mermod.dfasimulator.gui.pane_manager.Direction.*;
-
 import java.util.Arrays;
+
+import static ch.ludovic_mermod.dfasimulator.gui.pane_manager.Direction.*;
 
 public class Leaf extends Element
 {
     public static final String JSON_ITEMS = "items";
 
     private static final double DRAG_HITBOX_FACTOR = 0.2;
+    public static final  int    TAB_HEIGHT         = 30;
 
     private final StackPane  stackPane;
     private final Pane       overlayPane;
@@ -60,7 +62,7 @@ public class Leaf extends Element
                 overlayPane.getChildren().clear();
                 for (var o : Direction.values())
                 {
-                    var p = getDragHitbox(o);
+                    var p = getSideHitbox(o);
                     p.setFill(Paint.valueOf("FF000488"));
                     if (p.contains(e.getX(), e.getY()))
                         overlayPane.getChildren().add(p);
@@ -110,9 +112,9 @@ public class Leaf extends Element
         return polygon;
     }
 
-    private Polygon getDragHitbox(Direction direction)
+    private Polygon getSideHitbox(Direction direction)
     {
-        double x = 0, y = 30,
+        double x = 0, y = TAB_HEIGHT,
                 w = getContent().getLayoutBounds().getWidth(), h = getContent().getLayoutBounds().getHeight(),
                 f = DRAG_HITBOX_FACTOR, of = 1 - f;
 
@@ -133,6 +135,11 @@ public class Leaf extends Element
                     case DOWN -> polygon(bl, br, ibr, ibl);
                     case LEFT -> polygon(tl, bl, ibl, itl);
                 };
+    }
+    private Polygon getTabsHitbox()
+    {
+        double x = 0, y = 0, w = getContent().getLayoutBounds().getWidth(), h = TAB_HEIGHT;
+        return polygon(new Point2D(x, y), new Point2D(x + w, y), new Point2D(x + w, y + h), new Point2D(x, y + h));
     }
 
     @Override
@@ -159,16 +166,18 @@ public class Leaf extends Element
 
         System.out.printf("%s, %s\n", x, y);
 
-        if (getDragHitbox(LEFT).contains(x, y))
+        if (getTabsHitbox().contains(x, y))
+            addTab(i);
+        else if (getSideHitbox(LEFT).contains(x, y))
             parent.update(this, new Fork(new Leaf(i), this, Orientation.HORIZONTAL));
-        else if (getDragHitbox(RIGHT).contains(x, y))
+        else if (getSideHitbox(RIGHT).contains(x, y))
             parent.update(this, new Fork(this, new Leaf(i), Orientation.HORIZONTAL));
-        else if (getDragHitbox(UP).contains(x, y))
+        else if (getSideHitbox(UP).contains(x, y))
             parent.update(this, new Fork(new Leaf(i), this, Orientation.VERTICAL));
-        else if (getDragHitbox(DOWN).contains(x, y))
+        else if (getSideHitbox(DOWN).contains(x, y))
             parent.update(this, new Fork(this, new Leaf(i), Orientation.VERTICAL));
         else
-            addTab(i);
+            PaneManager.INSTANCE.moveToWindow(i);
     }
     @Override
     public Element remove(Item i)
