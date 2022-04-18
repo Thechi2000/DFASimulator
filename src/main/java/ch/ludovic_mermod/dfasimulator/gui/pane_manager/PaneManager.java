@@ -99,7 +99,6 @@ public class PaneManager
         Sentinel sentinel = new Sentinel(new Leaf(i));
 
         stage.setScene(new Scene(sentinel.getContent()));
-        stage.getScene().rootProperty().bind(sentinel.getContentBinding());
         stage.show();
 
         stages.add(new Pair<>(sentinel, stage));

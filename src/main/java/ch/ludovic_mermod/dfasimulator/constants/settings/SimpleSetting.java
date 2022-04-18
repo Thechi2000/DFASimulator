@@ -44,6 +44,6 @@ public class SimpleSetting extends Setting
     {
         JSONObject object = super.getJSONObject();
         object.addProperty(JSON_VALUE, converter.toString(valueProperty.get()));
-        return null;
+        return object;
     }
 }

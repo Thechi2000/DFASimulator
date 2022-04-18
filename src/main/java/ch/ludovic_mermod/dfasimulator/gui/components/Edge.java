@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
@@ -77,7 +77,7 @@ public class Edge extends GraphItem
         updatingTargetFromControl = new AtomicBoolean(false);
 
         alphabetDisplay = new Text();
-        alphabetDisplay.fontProperty().bind(Constants.getFont("graph.font"));
+        alphabetDisplay.fontProperty().bind(Settings.getFont("graph.font"));
         updateAlphabetDisplay();
         source.transitionMap().addListener((p, k, o, n) -> updateAlphabetDisplay());
         source.transitionMap().addListener((k, p) -> updateAlphabetDisplay());
@@ -87,9 +87,9 @@ public class Edge extends GraphItem
         Simulation simulation = graphPane.getMainPane().getSimulation();
         arrow = new Arrow(path);
         arrow.setMouseTransparent(true);
-        arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(source, target)) ? Constants.getColorValue(CURRENT_COLOR) : Constants.getColorValue(DEFAULT_COLOR), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
-        arrow.widthProperty().bind(Constants.getDouble(WIDTH));
-        arrow.sidelineLengthProperty().bind(Constants.getDouble(SIDELINE_LENGTH));
+        arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(source, target)) ? Settings.getColorValue(CURRENT_COLOR) : Settings.getColorValue(DEFAULT_COLOR), Settings.getColor(Edge.CURRENT_COLOR), Settings.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
+        arrow.widthProperty().bind(Settings.getDouble(WIDTH));
+        arrow.sidelineLengthProperty().bind(Settings.getDouble(SIDELINE_LENGTH));
         arrow.endXProperty().bind(curve.xProperty());
         arrow.endYProperty().bind(curve.yProperty());
 
@@ -173,8 +173,8 @@ public class Edge extends GraphItem
                 sn.layoutXProperty(), sn.layoutYProperty(), sn.widthBinding(), sn.heightBinding(),
                 tn.layoutXProperty(), tn.layoutYProperty(), tn.widthBinding(), tn.heightBinding(),
                 curve.controlXProperty(), curve.controlYProperty(),
-                Constants.getDouble(Node.INNER_CIRCLE_RADIUS),
-                Constants.getDouble(SIDELINE_LENGTH)
+                Settings.getDouble(Node.INNER_CIRCLE_RADIUS),
+                Settings.getDouble(SIDELINE_LENGTH)
         };
 
         CustomBindings.bindDouble(moveTo.xProperty(), () -> computePoints().start.getX(), observables);
@@ -232,10 +232,10 @@ public class Edge extends GraphItem
                 directorStart = controlPoint.subtract(startCenter).normalize(),
                 directorEnd = endCenter.subtract(controlPoint).normalize(),
                 normalEnd = new Point2D(directorEnd.getY(), -directorEnd.getX()),
-                start = startCenter.add(directorStart.multiply(Constants.getDoubleValue(Node.INNER_CIRCLE_RADIUS))),
-                end = endCenter.subtract(directorEnd.multiply(Constants.getDoubleValue(Node.INNER_CIRCLE_RADIUS))),
-                projectionPoint = end.subtract(directorEnd.multiply(Constants.getDoubleValue(SIDELINE_LENGTH))),
-                projectionDistance = normalEnd.multiply(Constants.getDoubleValue(SIDELINE_LENGTH));
+                start = startCenter.add(directorStart.multiply(Settings.getDoubleValue(Node.INNER_CIRCLE_RADIUS))),
+                end = endCenter.subtract(directorEnd.multiply(Settings.getDoubleValue(Node.INNER_CIRCLE_RADIUS))),
+                projectionPoint = end.subtract(directorEnd.multiply(Settings.getDoubleValue(SIDELINE_LENGTH))),
+                projectionDistance = normalEnd.multiply(Settings.getDoubleValue(SIDELINE_LENGTH));
 
         return new Points(
                 start,
@@ -279,7 +279,7 @@ public class Edge extends GraphItem
     {
         double closest = bezier.distance(bezier.findClosest(point2D), point2D);
         double v = arrow.widthProperty().get() / 2;
-        Double doubleValue = Constants.getDoubleValue(ControlPoint.RADIUS);
+        Double doubleValue = Settings.getDoubleValue(ControlPoint.RADIUS);
         double distance = new Point2D(curve.getControlX(), curve.getControlY()).distance(point2D);
         return isVisible() && (closest <= v || distance < doubleValue);
     }

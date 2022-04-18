@@ -44,4 +44,13 @@ public class FontSetting extends Setting
     {
         return CustomBindings.create(fontProperty::get, fontProperty);
     }
+
+    @Override
+    public JSONObject getJSONObject()
+    {
+        var object = super.getJSONObject();
+        object.addProperty(JSON_NAME, fontProperty.get().getName());
+        object.addProperty(JSON_SIZE, fontProperty.get().getSize());
+        return object;
+    }
 }

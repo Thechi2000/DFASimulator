@@ -38,7 +38,7 @@ public abstract class Setting implements JSONable
 
     enum Type
     {
-        DOUBLE(() -> new SimpleSetting(Type.valueOf("DOUBLE"), Utils.stringConverter(Object::toString, Double::parseDouble), 0)),
+        DOUBLE(() -> new SimpleSetting(Type.valueOf("DOUBLE"), Utils.stringConverter(Object::toString, Double::parseDouble), 0d)),
         BOOLEAN(() -> new SimpleSetting(Type.valueOf("BOOLEAN"), Utils.stringConverter(Object::toString, Boolean::parseBoolean), false)),
         FONT(() -> new FontSetting()),
         COLOR(() -> new ColorSetting());

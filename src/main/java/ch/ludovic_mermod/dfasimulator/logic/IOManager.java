@@ -1,7 +1,9 @@
 package ch.ludovic_mermod.dfasimulator.logic;
 
 import ch.ludovic_mermod.dfasimulator.Main;
+import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.MainPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
@@ -52,6 +54,8 @@ public class IOManager
      */
     public void save()
     {
+        Settings.save(Resources.get("settings.properties"));
+
         Strings.save();
         if (filepathProperty.isEmpty().get() || filepathProperty.get().isEmpty())
         {

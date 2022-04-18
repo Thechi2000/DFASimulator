@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
@@ -63,7 +63,7 @@ public class SelfEdge extends GraphItem
         // Create alphabet display
         {
             alphabetDisplay = new Text();
-            alphabetDisplay.fontProperty().bind(Constants.getFont("graph.font"));
+            alphabetDisplay.fontProperty().bind(Settings.getFont("graph.font"));
             alphabetDisplay.xProperty().bind(center.xProperty());
             alphabetDisplay.yProperty().bind(center.yProperty().subtract(radius).subtract(20));
             updateAlphabetDisplay();
@@ -91,9 +91,9 @@ public class SelfEdge extends GraphItem
             arrow.setMouseTransparent(true);
             arrow.endXProperty().bind(arc.xProperty());
             arrow.endYProperty().bind(arc.yProperty());
-            arrow.widthProperty().bind(Constants.getDouble(Edge.WIDTH));
-            arrow.sidelineLengthProperty().bind(Constants.getDouble(Edge.SIDELINE_LENGTH));
-            arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(state, state)) ? Constants.getColorValue(Edge.CURRENT_COLOR) : Constants.getColorValue(Edge.DEFAULT_COLOR), Constants.getColor(Edge.CURRENT_COLOR), Constants.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
+            arrow.widthProperty().bind(Settings.getDouble(Edge.WIDTH));
+            arrow.sidelineLengthProperty().bind(Settings.getDouble(Edge.SIDELINE_LENGTH));
+            arrow.fillProperty().bind(CustomBindings.create(() -> simulation.lastStateProperty().contains(new Pair<>(state, state)) ? Settings.getColorValue(Edge.CURRENT_COLOR) : Settings.getColorValue(Edge.DEFAULT_COLOR), Settings.getColor(Edge.CURRENT_COLOR), Settings.getColor(Edge.DEFAULT_COLOR), simulation.lastStateProperty()));
         }
 
         // Add endpoints bindings

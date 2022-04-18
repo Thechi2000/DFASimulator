@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.utils.Point2DProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ObservableBooleanValue;
@@ -20,8 +20,8 @@ public class ControlLine extends Group
     public ControlLine()
     {
         line = new Line();
-        line.strokeWidthProperty().bind(Constants.getDouble(WIDTH));
-        line.strokeProperty().bind(Constants.getColor(COLOR));
+        line.strokeWidthProperty().bind(Settings.getDouble(WIDTH));
+        line.strokeProperty().bind(Settings.getColor(COLOR));
         line.getStrokeDashArray().addAll(5d, 5d);
 
         getChildren().add(line);

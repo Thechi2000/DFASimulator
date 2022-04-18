@@ -59,7 +59,9 @@ public class Settings
     public static void save(String filename)
     {
         Properties properties = new Properties();
-        settingsMap.forEach((k, v) -> properties.put(k, v.getJSONObject().toString()));
+        settingsMap.forEach((k, v) -> {
+            if (v != null) properties.put(k, v.getJSONObject().toString());
+        });
 
         try (Writer writer = new FileWriter(filename))
         {

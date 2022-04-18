@@ -1,7 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import ch.ludovic_mermod.dfasimulator.utils.Utils;
 import javafx.collections.FXCollections;
@@ -50,11 +50,11 @@ public class TestPane extends VBox
 
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
-        gridPane.gridLinesVisibleProperty().bind(Constants.getBoolean("test_pane.grid_lines"));
+        gridPane.gridLinesVisibleProperty().bind(Settings.getBoolean("test_pane.grid_lines"));
 
         HBox inputBox = new HBox(maxValueField, mainPane.getFiniteAutomaton().hasBinaryAlphabet().getValue() ? radixChoiceBox : discardedCharacterField, runButton);
         inputBox.setAlignment(Pos.CENTER);
-        inputBox.spacingProperty().bind(Constants.getDouble("test_pane.input_spacing"));
+        inputBox.spacingProperty().bind(Settings.getDouble("test_pane.input_spacing"));
         getChildren().add(inputBox);
         getChildren().add(gridPane);
 
@@ -84,8 +84,8 @@ public class TestPane extends VBox
                 for (int i = 0; i < maxValue; ++i)
                 {
                     Text text = new Text();
-                    text.fontProperty().bind(Constants.getFont("graph.font"));
-                    text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Constants.getColor(SUCCESS_COLOR) : Constants.getColor(FAILURE_COLOR));
+                    text.fontProperty().bind(Settings.getFont("graph.font"));
+                    text.fillProperty().bind(mainPane.getSimulation().test(Integer.toBinaryString(i)) ? Settings.getColor(SUCCESS_COLOR) : Settings.getColor(FAILURE_COLOR));
 
                     int finalI = i;
                     text.textProperty().bind(CustomBindings.create(() ->
@@ -106,8 +106,8 @@ public class TestPane extends VBox
                 for (int i = 0; i < entries.size(); ++i)
                 {
                     Text text = new Text(String.format(" %" + (int) Math.ceil(Math.log(maxValue) / Math.log(alphabet.size())) + "s ", entries.get(i)));
-                    text.fontProperty().bind(Constants.getFont("font"));
-                    text.fillProperty().bind(mainPane.getSimulation().test(entries.get(i)) ? Constants.getColor(SUCCESS_COLOR) : Constants.getColor(FAILURE_COLOR));
+                    text.fontProperty().bind(Settings.getFont("font"));
+                    text.fillProperty().bind(mainPane.getSimulation().test(entries.get(i)) ? Settings.getColor(SUCCESS_COLOR) : Settings.getColor(FAILURE_COLOR));
                     gridPane.add(text, i / 16, i % 16);
                 }
             }

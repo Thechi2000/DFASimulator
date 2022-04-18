@@ -1,7 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.GraphPane;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
@@ -59,23 +59,23 @@ public class Node extends GraphItem
         pos = new Point2D(0, 0);
 
         innerCircle = new Circle();
-        innerCircle.radiusProperty().bind(Constants.getDouble(INNER_CIRCLE_RADIUS));
+        innerCircle.radiusProperty().bind(Settings.getDouble(INNER_CIRCLE_RADIUS));
         initialBinding().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.getColor(DEFAULT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.getColor(INITIAL_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
-        Constants.getColor(CURRENT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Settings.getColor(DEFAULT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Settings.getColor(INITIAL_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
+        Settings.getColor(CURRENT_COLOR).addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         graphPane.getMainPane().getSimulation().currentStateProperty().addListener((o, ov, nv) -> updateCircleColor(innerCircle));
         updateCircleColor(innerCircle);
 
         Circle outerCircle = new Circle();
-        outerCircle.radiusProperty().bind(Constants.getDouble(OUTER_CIRCLE_RADIUS));
+        outerCircle.radiusProperty().bind(Settings.getDouble(OUTER_CIRCLE_RADIUS));
         outerCircle.setStrokeWidth(5);
         outerCircle.setStroke(Color.BLACK);
         outerCircle.setFill(Color.TRANSPARENT);
         outerCircle.visibleProperty().bind(state.isAcceptingProperty());
 
         Text text = new Text();
-        text.fontProperty().bind(Constants.getFont("graph.font"));
+        text.fontProperty().bind(Settings.getFont("graph.font"));
         text.textProperty().bind(state.nameProperty());
         text.setTextAlignment(TextAlignment.CENTER);
 
@@ -160,10 +160,10 @@ public class Node extends GraphItem
     private void updateCircleColor(Circle c)
     {
         c.setFill(graphPane.getMainPane().getSimulation().currentStateProperty().contains(state)
-                  ? Constants.getColorValue(CURRENT_COLOR)
+                  ? Settings.getColorValue(CURRENT_COLOR)
                   : state.isInitialBinding().get()
-                    ? Constants.getColorValue(INITIAL_COLOR)
-                    : Constants.getColorValue(DEFAULT_COLOR));
+                    ? Settings.getColorValue(INITIAL_COLOR)
+                    : Settings.getColorValue(DEFAULT_COLOR));
     }
 
     private void addEventHandlers()

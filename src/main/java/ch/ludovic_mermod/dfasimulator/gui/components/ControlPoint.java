@@ -1,6 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Point2D;
@@ -26,8 +26,8 @@ public class ControlPoint extends Group
     public ControlPoint()
     {
         Circle circle = new Circle();
-        circle.radiusProperty().bind(Constants.getDouble(RADIUS));
-        circle.fillProperty().bind(Constants.getColor(FILL));
+        circle.radiusProperty().bind(Settings.getDouble(RADIUS));
+        circle.fillProperty().bind(Settings.getColor(FILL));
         getChildren().add(circle);
 
         addHandlers();
