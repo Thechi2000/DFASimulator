@@ -136,6 +136,31 @@ public class Utils
     }
 
     /**
+     * Creates a StringConverter
+     *
+     * @param toString   function to convert T to String
+     * @param fromString function to convert String to T
+     * @param <T>        type of the converted
+     * @return a StringConverter
+     */
+    public static <T> StringConverter<T> stringConverter(Function<T, String> toString, Function<String, T> fromString)
+    {
+        return new StringConverter<T>()
+        {
+            @Override
+            public String toString(T t)
+            {
+                return toString.apply(t);
+            }
+            @Override
+            public T fromString(String s)
+            {
+                return fromString.apply(s);
+            }
+        };
+    }
+
+    /**
      * Create, open and return a new Stage
      *
      * @param content content of the Stage
