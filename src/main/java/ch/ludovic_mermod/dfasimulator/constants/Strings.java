@@ -20,20 +20,24 @@ import java.util.regex.Pattern;
  */
 public class Strings
 {
-    protected static final Pattern                       DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
-    private static final   PropertiesMap<String, String> map;
-    private static final   Properties                    properties;
-    private static         Locale                        currentLocale      = null;
+    protected static final Pattern DEPENDENCY_PATTERN = Pattern.compile("\\$\\(([a-z_.]+)\\)");
+
+    private static final PropertiesMap<String, String> map;
+    private static final Properties                    properties;
+    private static       Locale                        currentLocale;
 
     static
     {
+        currentLocale = null;
         map = new PropertiesMap<>();
         properties = new Properties();
+
         map.addListener((p, k, o, n) -> {
             final String value = k.equals(n) ? "" : n;
             properties.setProperty(k, value);
         });
         map.addListener((k, p) -> properties.remove(k));
+
         loadLocale(Locale.ENGLISH);
     }
 
@@ -122,7 +126,7 @@ public class Strings
      */
     public static void set(String id, String value)
     {
-        map.setValue(id, value);
+        map.setValue(id, value.isEmpty() ? id : value);
     }
 
     /**
