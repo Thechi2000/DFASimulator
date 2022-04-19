@@ -6,15 +6,16 @@ module ch.ludovic_mermod.dfasimulator {
     exports ch.ludovic_mermod.dfasimulator;
     exports ch.ludovic_mermod.dfasimulator.json;
     exports ch.ludovic_mermod.dfasimulator.logic;
+    exports ch.ludovic_mermod.dfasimulator.utils;
     exports ch.ludovic_mermod.dfasimulator.gui;
+    exports ch.ludovic_mermod.dfasimulator.gui.components;
+    exports ch.ludovic_mermod.dfasimulator.gui.pane_manager;
+    exports ch.ludovic_mermod.dfasimulator.constants;
+    exports ch.ludovic_mermod.dfasimulator.constants.settings;
 
     opens ch.ludovic_mermod.dfasimulator.gui to javafx.fxml;
     opens ch.ludovic_mermod.dfasimulator.gui.components to javafx.fxml;
     opens ch.ludovic_mermod.dfasimulator.utils to javafx.fxml;
     opens ch.ludovic_mermod.dfasimulator.constants to javafx.fxml;
-
-    exports ch.ludovic_mermod.dfasimulator.utils;
-    exports ch.ludovic_mermod.dfasimulator.gui.components;
-    exports ch.ludovic_mermod.dfasimulator.constants;
-    exports ch.ludovic_mermod.dfasimulator.gui.pane_manager;
+    opens ch.ludovic_mermod.dfasimulator.constants.settings to javafx.fxml;
 }
