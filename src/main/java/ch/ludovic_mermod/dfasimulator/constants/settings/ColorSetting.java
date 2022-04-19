@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.paint.Color;
 
-public class ColorSetting extends Setting
+public class ColorSetting extends Setting<Color>
 {
     public static final String JSON_LIGHT = "light";
     public static final String JSON_DARK  = "dark";
@@ -24,15 +24,12 @@ public class ColorSetting extends Setting
     }
 
     @Override
-    public void setValue(Object newValue)
+    public void setValue(Color newValue)
     {
-        if (!(newValue instanceof Color))
-            throw new IllegalArgumentException(String.format("Invalid value set in ColorSetting %s", newValue.getClass().getName()));
-
-        (Settings.getBooleanValue("dark_mode") ? darkProperty : lightProperty).set((Color) newValue);
+        (Settings.getBooleanValue("dark_mode") ? darkProperty : lightProperty).set(newValue);
     }
     @Override
-    public ObservableValue<Object> getValueBinding()
+    public ObservableValue<Color> computeBinding()
     {
         ObservableValue<Boolean> darkMode = Settings.getBoolean("dark_mode");
         return CustomBindings.create(() -> darkMode.getValue() ? darkProperty.get() : lightProperty.get(), darkMode, darkProperty, lightProperty);
@@ -62,6 +59,6 @@ public class ColorSetting extends Setting
         darkProperty.set(dark);
         lightProperty.set(light);
     }
-    public Color getDark(){return darkProperty.get();}
-    public Color getLight(){return lightProperty.get();}
+    public Color getDark() {return darkProperty.get();}
+    public Color getLight() {return lightProperty.get();}
 }

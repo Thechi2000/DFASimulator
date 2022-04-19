@@ -18,7 +18,7 @@ import java.util.logging.Level;
 
 public class Settings
 {
-    private static final Map<String, Setting> settingsMap = new TreeMap<>();
+    private static final Map<String, Setting<?>> settingsMap = new TreeMap<>();
 
     public static Set<String> keySet() {return settingsMap.keySet();}
 
@@ -77,11 +77,11 @@ public class Settings
         }
     }
 
-    public static Setting getSetting(String id)
+    public static Setting<?> getSetting(String id)
     {
         return settingsMap.getOrDefault(id, null);
     }
-    public static Setting getSetting(String id, Setting.Type type)
+    public static Setting<?> getSetting(String id, Setting.Type type)
     {
         var setting = settingsMap.computeIfAbsent(id, k -> {
             Main.log(Level.WARNING, "Could not find property \"%s\" of type %s", id, type);
@@ -98,9 +98,9 @@ public class Settings
      * @param id (String) id of the setting
      * @return the ObservableValue for the setting
      */
-    public static ObservableValue<Object> get(String id, Setting.Type type)
+    public static <T> ObservableValue<T> get(String id, Setting.Type type)
     {
-        return getSetting(id, type).getValueBinding();
+        return (ObservableValue<T>) getSetting(id, type).getValueBinding();
     }
 
     /**
@@ -111,7 +111,7 @@ public class Settings
      */
     public static ObservableValue<Boolean> getBoolean(String id)
     {
-        return getAs(id, Setting.Type.BOOLEAN);
+        return get(id, Setting.Type.BOOLEAN);
     }
     /**
      * Get a setting as a Double setting
@@ -121,7 +121,7 @@ public class Settings
      */
     public static ObservableValue<Double> getDouble(String id)
     {
-        return getAs(id, Setting.Type.DOUBLE);
+        return get(id, Setting.Type.DOUBLE);
     }
     /**
      * Get a setting as a Color setting
@@ -131,7 +131,7 @@ public class Settings
      */
     public static ObservableValue<Color> getColor(String id)
     {
-        return getAs(id, Setting.Type.COLOR);
+        return get(id, Setting.Type.COLOR);
     }
     /**
      * Get a setting as a Font setting
@@ -141,21 +141,7 @@ public class Settings
      */
     public static ObservableValue<Font> getFont(String id)
     {
-        return getAs(id, Setting.Type.FONT);
-    }
-
-    /**
-     * Get the ObservableValue bound to a setting
-     *
-     * @param <T>  class of the value
-     * @param id   id of the setting
-     * @param type type of value
-     * @return the ObservableValue bound to the setting
-     */
-    public static <T> ObservableValue<T> getAs(String id, Setting.Type type)
-    {
-        var set = getSetting(id, type);
-        return CustomBindings.create(() -> ((T) set.getValueBinding().getValue()), set.getValueBinding());
+        return get(id, Setting.Type.FONT);
     }
 
     /**
@@ -208,6 +194,6 @@ public class Settings
      */
     public static <T> T getValue(String id, Setting.Type type)
     {
-        return (T) getAs(id, type).getValue();
+        return (T) get(id, type).getValue();
     }
 }

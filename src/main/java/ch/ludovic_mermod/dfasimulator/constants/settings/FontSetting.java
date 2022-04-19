@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.text.Font;
 
-public class FontSetting extends Setting
+public class FontSetting extends Setting<Font>
 {
     public static final String JSON_NAME = "name";
     public static final String JSON_SIZE = "size";
@@ -31,7 +31,7 @@ public class FontSetting extends Setting
     }
 
     @Override
-    public void setValue(Object newValue)
+    public void setValue(Font newValue)
     {
         if (!(newValue instanceof Font))
             throw new IllegalArgumentException(String.format("Invalid value set in FontSetting %s", newValue.getClass().getName()));
@@ -40,7 +40,7 @@ public class FontSetting extends Setting
     }
 
     @Override
-    public ObservableValue<Object> getValueBinding()
+    public ObservableValue<Font> computeBinding()
     {
         return CustomBindings.create(fontProperty::get, fontProperty);
     }

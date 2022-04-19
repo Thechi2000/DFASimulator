@@ -7,14 +7,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.util.StringConverter;
 
-public class SimpleSetting extends Setting
+public class SimpleSetting<T> extends Setting<T>
 {
     public static final String JSON_VALUE = "value";
 
-    private final ObjectProperty<Object>  valueProperty;
-    private final StringConverter<Object> converter;
+    private final ObjectProperty<T>  valueProperty;
+    private final StringConverter<T> converter;
 
-    protected SimpleSetting(Type type, StringConverter<Object> converter, Object initialValue)
+    protected SimpleSetting(Type type, StringConverter<T> converter, T initialValue)
     {
         super(type);
         this.converter = converter;
@@ -22,12 +22,12 @@ public class SimpleSetting extends Setting
     }
 
     @Override
-    public void setValue(Object newValue)
+    public void setValue(T newValue)
     {
         valueProperty.set(newValue);
     }
     @Override
-    public ObservableValue<Object> getValueBinding()
+    public ObservableValue<T> computeBinding()
     {
         return valueProperty;
     }

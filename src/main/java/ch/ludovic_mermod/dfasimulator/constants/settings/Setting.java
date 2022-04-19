@@ -8,17 +8,22 @@ import javafx.beans.value.ObservableValue;
 
 import java.util.function.Supplier;
 
-public abstract class Setting implements JSONable
+public abstract class Setting<T> implements JSONable
 {
     public static final String JSON_TYPE = ".type";
 
-    protected final Type type;
-    protected Setting(Type type) {this.type = type;}
+    private         ObservableValue<T> valueBinding;
+    protected final Type               type;
 
-    public static Setting loadFromJSON(JSONObject object) throws IOManager.CorruptedFileException
+    protected Setting(Type type)
+    {
+        this.type = type;
+    }
+
+    public static Setting<?> loadFromJSON(JSONObject object) throws IOManager.CorruptedFileException
     {
         object.checkHasString(JSON_TYPE);
-        Setting setting = Type.valueOf(object.get(JSON_TYPE).getAsString()).factory.get();
+        Setting<?> setting = Type.valueOf(object.get(JSON_TYPE).getAsString()).factory.get();
         setting.load(object);
         return setting;
     }
@@ -32,8 +37,14 @@ public abstract class Setting implements JSONable
         return object;
     }
 
-    public abstract void setValue(Object newValue);
-     public abstract ObservableValue<Object> getValueBinding();
+    public abstract void setValue(T newValue);
+    protected abstract ObservableValue<T> computeBinding();
+
+    public ObservableValue<T> getValueBinding()
+    {
+        if (valueBinding == null) valueBinding = computeBinding();
+        return valueBinding;
+    }
 
     public Type getType()
     {
@@ -42,13 +53,13 @@ public abstract class Setting implements JSONable
 
     public enum Type
     {
-        DOUBLE(() -> new SimpleSetting(Type.valueOf("DOUBLE"), Utils.stringConverter(Object::toString, Double::parseDouble), 0d)),
-        BOOLEAN(() -> new SimpleSetting(Type.valueOf("BOOLEAN"), Utils.stringConverter(Object::toString, Boolean::parseBoolean), false)),
+        DOUBLE(() -> new SimpleSetting<>(Type.valueOf("DOUBLE"), Utils.stringConverter(Object::toString, Double::parseDouble), 0d)),
+        BOOLEAN(() -> new SimpleSetting<>(Type.valueOf("BOOLEAN"), Utils.stringConverter(Object::toString, Boolean::parseBoolean), false)),
         FONT(() -> new FontSetting()),
         COLOR(() -> new ColorSetting());
 
-        public final Supplier<Setting> factory;
+        public final Supplier<Setting<?>> factory;
 
-        Type(Supplier<Setting> factory) {this.factory = factory;}
+        Type(Supplier<Setting<?>> factory) {this.factory = factory;}
     }
 }
