@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui.components;
 
 import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.ToggleButton;
@@ -29,7 +30,7 @@ public class SettingGroup extends VBox
      */
     public SettingGroup(String id)
     {
-        var childrenKeys = Constants.keySet().stream().filter(k -> k.startsWith(id)).toList();
+        var childrenKeys = Settings.keySet().stream().filter(k -> k.startsWith(id)).toList();
         var path = id.equals("") ? List.of() : Arrays.asList(id.split("\\."));
 
         VBox childrenBox = new VBox();
