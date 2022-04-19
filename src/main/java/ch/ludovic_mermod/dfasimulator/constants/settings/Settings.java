@@ -1,11 +1,10 @@
 package ch.ludovic_mermod.dfasimulator.constants.settings;
 
 import ch.ludovic_mermod.dfasimulator.Main;
+import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.json.JSONElement;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -17,11 +16,16 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import static javafx.scene.paint.Color.BLACK;
-
 public class Settings
 {
     private static final Map<String, Setting> settingsMap = new TreeMap<>();
+
+    public static Set<String> keySet() {return settingsMap.keySet();}
+
+    static
+    {
+        load(Resources.get("settings.properties"));
+    }
 
     public static void load(String filename)
     {
@@ -73,6 +77,10 @@ public class Settings
         }
     }
 
+    public static Setting getSetting(String id)
+    {
+        return settingsMap.getOrDefault(id, null);
+    }
     public static Setting getSetting(String id, Setting.Type type)
     {
         var setting = settingsMap.computeIfAbsent(id, k -> {
