@@ -31,7 +31,7 @@ public class FontSetting extends Setting
     }
 
     @Override
-    void setValue(Object newValue)
+    public void setValue(Object newValue)
     {
         if (!(newValue instanceof Font))
             throw new IllegalArgumentException(String.format("Invalid value set in FontSetting %s", newValue.getClass().getName()));
@@ -40,7 +40,7 @@ public class FontSetting extends Setting
     }
 
     @Override
-    ObservableValue<Object> getValueBinding()
+    public ObservableValue<Object> getValueBinding()
     {
         return CustomBindings.create(fontProperty::get, fontProperty);
     }

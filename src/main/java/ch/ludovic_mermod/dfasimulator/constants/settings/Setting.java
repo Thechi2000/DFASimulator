@@ -1,6 +1,5 @@
 package ch.ludovic_mermod.dfasimulator.constants.settings;
 
-import ch.ludovic_mermod.dfasimulator.gui.components.Node;
 import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.json.JSONable;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
@@ -33,10 +32,15 @@ public abstract class Setting implements JSONable
         return object;
     }
 
-    abstract void setValue(Object newValue);
-    abstract ObservableValue<Object> getValueBinding();
+    public abstract void setValue(Object newValue);
+     public abstract ObservableValue<Object> getValueBinding();
 
-    enum Type
+    public Type getType()
+    {
+        return type;
+    }
+
+    public enum Type
     {
         DOUBLE(() -> new SimpleSetting(Type.valueOf("DOUBLE"), Utils.stringConverter(Object::toString, Double::parseDouble), 0d)),
         BOOLEAN(() -> new SimpleSetting(Type.valueOf("BOOLEAN"), Utils.stringConverter(Object::toString, Boolean::parseBoolean), false)),

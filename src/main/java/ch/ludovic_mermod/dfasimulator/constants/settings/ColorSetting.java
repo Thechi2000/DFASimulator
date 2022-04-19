@@ -24,7 +24,7 @@ public class ColorSetting extends Setting
     }
 
     @Override
-    void setValue(Object newValue)
+    public void setValue(Object newValue)
     {
         if (!(newValue instanceof Color))
             throw new IllegalArgumentException(String.format("Invalid value set in ColorSetting %s", newValue.getClass().getName()));
@@ -32,7 +32,7 @@ public class ColorSetting extends Setting
         (Settings.getBooleanValue("dark_mode") ? darkProperty : lightProperty).set((Color) newValue);
     }
     @Override
-    ObservableValue<Object> getValueBinding()
+    public ObservableValue<Object> getValueBinding()
     {
         ObservableValue<Boolean> darkMode = Settings.getBoolean("dark_mode");
         return CustomBindings.create(() -> darkMode.getValue() ? darkProperty.get() : lightProperty.get(), darkMode, darkProperty, lightProperty);
@@ -56,4 +56,12 @@ public class ColorSetting extends Setting
         lightProperty.set(Color.valueOf(object.get(JSON_LIGHT).getAsString()));
         darkProperty.set(Color.valueOf(object.get(JSON_DARK).getAsString()));
     }
+
+    public void setValues(Color dark, Color light)
+    {
+        darkProperty.set(dark);
+        lightProperty.set(light);
+    }
+    public Color getDark(){return darkProperty.get();}
+    public Color getLight(){return lightProperty.get();}
 }
