@@ -1,6 +1,5 @@
 package ch.ludovic_mermod.dfasimulator.gui.components;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.utils.CustomBindings;
@@ -81,7 +80,7 @@ public class SettingGroup extends VBox
     }
 
     /**
-     * Save recursively the current values of all child Setting to Constants
+     * Save recursively the current values of all child Setting to Settings
      */
     public void saveChanges()
     {

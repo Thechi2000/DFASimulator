@@ -8,7 +8,7 @@ import javafx.scene.input.KeyCombination;
 
 /**
  * Static grouping of all shortcuts of the application
- * May be moved in Constants in a later version
+ * May be moved in Settings in a later version
  */
 public class Controls
 {

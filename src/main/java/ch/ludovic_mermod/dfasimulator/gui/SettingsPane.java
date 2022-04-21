@@ -1,6 +1,5 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
-import ch.ludovic_mermod.dfasimulator.constants.Constants;
 import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
 import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
