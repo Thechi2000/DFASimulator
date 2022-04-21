@@ -10,4 +10,8 @@ public class Resources
     {
         return "resources/" + name;
     }
+    public static String getStyle(String name)
+    {
+        return Resources.class.getResource("/style/" + name + ".css").toExternalForm();
+    }
 }
