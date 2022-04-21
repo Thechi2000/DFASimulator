@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
@@ -82,6 +83,8 @@ public class SimulationPane extends VBox
             Strings.get("simulation_pane.result_true").addListener((o, ov, nv) -> updateResultText(resultText));
             getChildren().add(resultText);
         }
+
+        getStyleClass().add("background");
     }
 
     private void updateResultText(Text resultText)

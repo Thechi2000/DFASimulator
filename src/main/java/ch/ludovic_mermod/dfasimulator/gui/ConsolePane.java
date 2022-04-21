@@ -1,5 +1,6 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -16,6 +17,10 @@ public class ConsolePane extends ScrollPane implements System.Logger
     public void create(MainPane mainPane)
     {
         setContent(textFlow = new TextFlow());
+
+        textFlow.minWidthProperty().bind(widthProperty());
+        textFlow.minHeightProperty().bind(heightProperty());
+        textFlow.getStyleClass().add("background");
     }
 
     @Override

@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui.pane_manager;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.constants.Resources;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.MainPane;
 import ch.ludovic_mermod.dfasimulator.json.*;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
@@ -45,6 +46,17 @@ public class PaneManager
     public void load(Stage primaryStage, MainPane mainPane)
     {
         stages.clear();
+        Settings.getBoolean("dark_mode").addListener((o, ov, nv) -> stages.forEach(p -> {
+            p.getKey().getContent().getStylesheets().clear();
+            p.getKey().getContent().getStylesheets().add(Resources.getStyle(nv ? "dark" : "light"));
+        }));
+        stages.addListener((ListChangeListener<? super Pair<Sentinel, Stage>>) change ->{
+            change.next();
+            change.getAddedSubList().forEach(p ->{
+                p.getKey().getContent().getStylesheets().clear();
+                p.getKey().getContent().getStylesheets().addAll(Resources.getStyle(Settings.getBooleanValue("dark_mode") ? "dark" : "light"), Resources.getStyle("style"));
+            });
+        });
 
         try
         {

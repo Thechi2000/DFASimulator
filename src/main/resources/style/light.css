@@ -1,0 +1,7 @@
+.background {
+    -fx-background-color: #FFFFFF;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: red;
+}

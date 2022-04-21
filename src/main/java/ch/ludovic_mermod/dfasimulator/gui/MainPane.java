@@ -2,12 +2,10 @@ package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Resources;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Element;
 import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Item;
-import ch.ludovic_mermod.dfasimulator.gui.pane_manager.Leaf;
 import ch.ludovic_mermod.dfasimulator.gui.pane_manager.PaneManager;
-import ch.ludovic_mermod.dfasimulator.json.JSONElement;
-import ch.ludovic_mermod.dfasimulator.json.JSONObject;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import ch.ludovic_mermod.dfasimulator.logic.Simulation;
@@ -17,12 +15,12 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +51,7 @@ public class MainPane extends BorderPane
         simulation = new Simulation(this);
 
         Item.register(new Item(consolePane, "Console", "console"));
-        Item.register(new Item(new ScrollPane(graphPane), "Graph", "graph"));
+        Item.register(new Item(graphPane, "Graph", "graph"));
         Item.register(new Item(simulationPane, "Simulation", "simulation"));
         Item.register(new Item(new TestPane(this), "Test", "test"));
         Item.register(new Item(new TablePane(finiteAutomaton), "Table", "table"));

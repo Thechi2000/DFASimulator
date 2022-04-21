@@ -1,6 +1,7 @@
 package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.components.CheckComboBox;
 import ch.ludovic_mermod.dfasimulator.logic.FiniteAutomaton;
 import ch.ludovic_mermod.dfasimulator.logic.State;
@@ -31,6 +32,8 @@ public class TablePane extends ScrollPane
     {
         tableView = new TableView<>();
         setContent(tableView);
+
+        getStyleClass().add("background");
     }
 
     public TablePane(FiniteAutomaton finiteAutomaton)

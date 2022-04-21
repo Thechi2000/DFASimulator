@@ -2,6 +2,7 @@ package ch.ludovic_mermod.dfasimulator.gui;
 
 import ch.ludovic_mermod.dfasimulator.Main;
 import ch.ludovic_mermod.dfasimulator.constants.Strings;
+import ch.ludovic_mermod.dfasimulator.constants.settings.Settings;
 import ch.ludovic_mermod.dfasimulator.gui.components.Edge;
 import ch.ludovic_mermod.dfasimulator.gui.components.GraphItem;
 import ch.ludovic_mermod.dfasimulator.gui.components.Node;
@@ -20,6 +21,8 @@ import javafx.collections.ObservableSet;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 import java.util.HashSet;
@@ -29,7 +32,7 @@ import java.util.logging.Level;
 /**
  * Pane to display a FiniteAutomaton
  */
-public class GraphPane extends Region
+public class GraphPane extends ScrollPane
 {
     public static final    String     FONT_SIZE       = "graph.font_size";
     public static final    String     JSON_NODES      = "nodes";
@@ -49,6 +52,8 @@ public class GraphPane extends Region
     private Point2D     menuPosition;
     private ContextMenu menu;
 
+    private final Pane pane;
+
     /**
      * Constructs an empty GraphPane
      */
@@ -57,6 +62,7 @@ public class GraphPane extends Region
         edges = FXCollections.observableSet(new HashSet<>());
         selfEdges = FXCollections.observableSet(new HashSet<>());
         nodes = FXCollections.observableSet(new HashSet<>());
+        pane = new Pane();
 
         tool = Tool.EDIT;
         focusedItem = new SimpleObjectProperty<>();
@@ -65,6 +71,12 @@ public class GraphPane extends Region
         object.add(JSON_EDGES, JSONArray.fromObservableSet(edges, Edge::getJSONObject));
         object.add(JSON_SELF_EDGES, JSONArray.fromObservableSet(selfEdges, SelfEdge::getJSONObject));
         object.add(JSON_NODES, new JSONArray());
+
+        setContent(pane);
+
+        pane.minWidthProperty().bind(widthProperty());
+        pane.minHeightProperty().bind(heightProperty());
+        pane.getStyleClass().add("background");
     }
 
     public void create(MainPane mainPane)
@@ -82,8 +94,8 @@ public class GraphPane extends Region
                 change.getRemoved().forEach(this::removeState);
         });
 
-        setOnMousePressed(event -> {
-            for (var g : getChildren().stream().filter(n -> n instanceof GraphItem).map(n -> ((GraphItem) n)).toList())
+        pane.setOnMousePressed(event -> {
+            for (var g : pane.getChildren().stream().filter(n -> n instanceof GraphItem).map(n -> ((GraphItem) n)).toList())
             {
                 g.onMousePressed(event);
                 if (event.isConsumed()) return;
@@ -92,10 +104,10 @@ public class GraphPane extends Region
             menu.hide();
             focusedItem.set(null);
         });
-        setOnContextMenuRequested(event ->
+        pane.setOnContextMenuRequested(event ->
         {
             menuPosition = new Point2D(event.getX(), event.getY());
-            menu.show(this, event.getScreenX(), event.getScreenY());
+            menu.show(pane, event.getScreenX(), event.getScreenY());
         });
     }
 
@@ -134,32 +146,32 @@ public class GraphPane extends Region
                 {
                     final Edge e1 = new Edge(state, s, this);
                     edges.add(e1);
-                    getChildren().add(e1);
+                    pane.getChildren().add(e1);
 
                     final Edge e2 = new Edge(s, state, this);
                     edges.add(e2);
-                    getChildren().add(e2);
+                    pane.getChildren().add(e2);
                 });
 
         SelfEdge selfEdge = new SelfEdge(state, this);
         selfEdges.add(selfEdge);
         object.getAsJSONArray(JSON_NODES).add(state.getNode().getJSONObject());
-        getChildren().add(selfEdge);
-        getChildren().add(state.getNode());
+        pane.getChildren().add(selfEdge);
+        pane.getChildren().add(state.getNode());
         nodes.add(state.getNode());
     }
     private void removeState(State state)
     {
-        var edgesToRemove = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && getChildren().remove(e)).toList();
-        getChildren().removeAll(edgesToRemove);
+        var edgesToRemove = edges.stream().filter(e -> state.equals(e.source()) || state.equals(e.target()) && pane.getChildren().remove(e)).toList();
+        pane.getChildren().removeAll(edgesToRemove);
         edgesToRemove.forEach(edges::remove);
 
         final List<SelfEdge> selfEdgesToRemove = this.selfEdges.stream().filter(s -> s.state().equals(state)).toList();
-        getChildren().removeAll(selfEdgesToRemove);
+        pane.getChildren().removeAll(selfEdgesToRemove);
         selfEdgesToRemove.forEach(this.selfEdges::remove);
 
         object.getAsJSONArray(JSON_NODES).remove(state.getNode().getJSONObject());
-        getChildren().remove(state.getNode());
+        pane.getChildren().remove(state.getNode());
         nodes.remove(state.getNode());
     }
 
@@ -251,7 +263,7 @@ public class GraphPane extends Region
     }
     public ObservableList<javafx.scene.Node> children()
     {
-        return getChildren();
+        return pane.getChildren();
     }
     public ObservableSet<Edge> edges()
     {

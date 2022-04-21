@@ -112,6 +112,8 @@ public class TestPane extends VBox
                 }
             }
         });
+
+        getStyleClass().add("background");
     }
 
     private List<String> generateEntries(int count)
