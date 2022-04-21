@@ -7,13 +7,12 @@ import javafx.scene.control.SplitPane;
 
 public class Fork extends Element
 {
-    public static final String     JSON_FIRST       = "first";
-    public static final String     JSON_SECOND      = "second";
-    public static final String     JSON_TYPE        = "type";
-    public static final String     JSON_DIVIDER     = "divider";
-    public static final String     JSON_ORIENTATION = "orientation";
-    private final       SplitPane  splitPane;
-    private final       JSONObject jsonObject;
+    public static final String    JSON_FIRST       = "first";
+    public static final String    JSON_SECOND      = "second";
+    public static final String    JSON_TYPE        = "type";
+    public static final String    JSON_DIVIDER     = "divider";
+    public static final String    JSON_ORIENTATION = "orientation";
+    private final       SplitPane splitPane;
 
     private Element first;
     private Element second;
@@ -32,13 +31,6 @@ public class Fork extends Element
 
         splitPane.setOrientation(orientation);
         if (divider != 0) splitPane.getDividers().get(0).setPosition(divider);
-
-        jsonObject = new JSONObject();
-        jsonObject.add(JSON_FIRST, first.getJSONObject());
-        jsonObject.add(JSON_SECOND, second.getJSONObject());
-        jsonObject.addProperty(JSON_TYPE, "fork");
-        jsonObject.addProperty(JSON_DIVIDER, splitPane.getDividers().get(0).positionProperty());
-        jsonObject.addProperty(JSON_ORIENTATION, String.valueOf(orientation));
 
         addHandlers();
     }
@@ -65,7 +57,7 @@ public class Fork extends Element
     @Override
     protected void update(Element oldValue, Element newValue)
     {
-        if(oldValue == first) first = newValue;
+        if (oldValue == first) first = newValue;
         else if (oldValue == second) second = newValue;
         else throw new IllegalArgumentException();
         updateContent();
@@ -94,6 +86,12 @@ public class Fork extends Element
     @Override
     public JSONObject getJSONObject()
     {
+        var jsonObject = new JSONObject();
+        jsonObject.add(JSON_FIRST, first.getJSONObject());
+        jsonObject.add(JSON_SECOND, second.getJSONObject());
+        jsonObject.addProperty(JSON_TYPE, "fork");
+        jsonObject.addProperty(JSON_DIVIDER, splitPane.getDividers().get(0).positionProperty());
+        jsonObject.addProperty(JSON_ORIENTATION, String.valueOf(splitPane.getOrientation()));
         return jsonObject;
     }
     private void updateContent()

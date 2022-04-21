@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
@@ -30,10 +31,9 @@ public class Leaf extends Element
     private static final double DRAG_HITBOX_FACTOR = 0.2;
     public static final  int    TAB_HEIGHT         = 30;
 
-    private final StackPane  stackPane;
-    private final Pane       overlayPane;
-    private final TabPane    tabPane;
-    private final JSONObject object;
+    private final StackPane stackPane;
+    private final Pane      overlayPane;
+    private final TabPane   tabPane;
 
     private Leaf()
     {
@@ -42,21 +42,15 @@ public class Leaf extends Element
         stackPane = new StackPane(tabPane, overlayPane);
         overlayPane.setMouseTransparent(true);
 
-        object = new JSONObject();
-        object.addProperty("type", "leaf");
-        object.add(JSON_ITEMS, new JSONArray());
         tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> {
             change.next();
-            object.getAsJSONArray(JSON_ITEMS).clear();
-            object.getAsJSONArray(JSON_ITEMS).addAll(change.getList().stream().map(t -> new JSONPrimitive(((Item) t.getUserData()).id())).toList());
-
             if (change.wasRemoved())
                 change.getRemoved().forEach(t -> PaneManager.INSTANCE.remove(((Item) t.getUserData())));
         });
 
         addHandlers();
         stackPane.setOnDragOver(e -> {
-            if (e.getDragboard().hasString())
+            if (e.getDragboard().hasString() && tabPane.getTabs().stream().map(t -> ((Item) t.getUserData())).noneMatch(i -> i.id().equals(e.getDragboard().getString())))
             {
                 e.acceptTransferModes(TransferMode.ANY);
                 overlayPane.getChildren().clear();
@@ -145,6 +139,13 @@ public class Leaf extends Element
     @Override
     public JSONObject getJSONObject()
     {
+        var object = new JSONObject();
+        object.addProperty("type", "leaf");
+
+        JSONArray array = new JSONArray();
+        object.add(JSON_ITEMS, array);
+
+        tabPane.getTabs().forEach(t -> array.add(((Item) t.getUserData()).id()));
         return object;
     }
 

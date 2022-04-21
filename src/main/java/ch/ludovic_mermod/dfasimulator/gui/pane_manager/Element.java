@@ -6,6 +6,7 @@ import ch.ludovic_mermod.dfasimulator.json.JSONable;
 import ch.ludovic_mermod.dfasimulator.logic.IOManager;
 import javafx.geometry.Orientation;
 import javafx.scene.Parent;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 
 import java.util.Objects;
@@ -49,11 +50,6 @@ public abstract class Element implements JSONable
 
     protected void addHandlers()
     {
-        getContent().setOnDragOver(e -> {
-            if (e.getDragboard().hasString())
-                e.acceptTransferModes(TransferMode.ANY);
-        });
-
         getContent().setOnDragDropped(e -> {
             try
             {
